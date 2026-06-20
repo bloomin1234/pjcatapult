@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仕入集計 — SMART STOCK [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style -->
+  <style>
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+
+    .list-container {
+        height: calc(100vh - 300px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    /* SS primary カラー（ネイビー系）を CSS 変数で代替 */
+    .bg-primary-200 { background-color: #C3D2E2; }
+    .bg-primary-300 { background-color: #95AEC9; }
+    .bg-primary-600 { background-color: #1A3A63; }
+    .bg-primary-100 { background-color: #E9EEF5; }
+    .hover\:bg-primary-500:hover { background-color: #2B5A96; }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- block content -->
+  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col">
+    <!-- menu section -->
+    <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
+        <div class="grid grid-cols-12 gap-1 h-[130px]">
+
+            <div class="grid grid-rows-2 gap-1">
+                <a href="#" role="button">
+                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i>戻る</div>
+                </a>
+            </div>
+
+            <div class="col-span-2 grid grid-cols-3 grid-rows-3 gap-1">
+                <div class="col-span-3 rounded text-center flex items-center justify-center">
+                    <span class="text-lg font-bold">仕入集計</span>
+                </div>
+                <div class="col-span-3 row-start-2 rounded border">
+                    <div class="grid grid-cols-4 h-full">
+                        <input id="current_year_id" class="col-span-3 text-center bg-white text-center rounded-l">
+                        <div class="bg-primary-200 flex items-center justify-center rounded-r font-bold">年</div>
+                    </div>
+                </div>
+                <div class="col-span-3 row-start-3">
+                    <div class="grid grid-cols-2 gap-1 h-full">
+                        <a id="previous_day" class="bg-primary-600 text-white hover:bg-primary-500 font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="-1"><i class="fa-solid fa-angle-left mr-2"></i>前年</a>
+                        <a id="next_day" class="bg-primary-600 text-white hover:bg-primary-500 font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="1">翌年<i class="fa-solid fa-angle-right ml-2"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-start-4 grid grid-rows-3">
+                <a role="button" class="row-start-2 row-span-2 bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center transition-all"
+                    onclick="yearList(current_year_id.value)">
+                    <div class="rounded h-full flex items-center justify-center text-center">抽出</div>
+                </a>
+            </div>
+
+            <div class="col-start-5 col-span-2 grid grid-rows-3">
+                <div class="row-start-2 row-span-2 grid grid-rows-2">
+                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-primary-200">
+                        <div class="col-span-2 font-bold">集計単位</div>
+                        <div class="font-bold">区分</div>
+                    </div>
+                    <div class="grid grid-cols-3 items-center text-center border-l border-r border-b rounded-b bg-white">
+                        <div id="aggregation_unit_id" class="col-span-2">-</div>
+                        <div id="classification_id" class="">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-start-12 grid grid grid-rows-3">
+                <a role="button" id="btn_print_pdf" target="_blank" class="row-start-2 row-span-2 disabled bg-gray-300 text-gray-500 rounded h-full flex items-center justify-center transition-all">
+                    <div class="rounded h-full flex items-center justify-center">印刷</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- content section -->
+    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] rounded-md h-full drop-shadow flex-1 h-full overflow-hidden">
+        <div class="grid grid-cols-7 h-full gap-2">
+            <div class="col-span-1 flex flex-col h-full">
+                <!-- table header -->
+                <div class="grid grid-rows-3 gap-1">
+                    <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">年月仕入集計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-primary-200">
+                        <div class="border-r text-sm flex items-center justify-center">年</div>
+                        <div class="border-r text-sm flex items-center justify-center">月</div>
+                        <div class="col-span-3 text-sm flex items-center justify-center">合計税抜</div>
+                    </div>
+                </div>
+                <!-- table body -->
+                <div class="list-container">
+                    <div id="summary_list_data" class="grid grid-cols-5 bg-white text-md">
+                        <!-- javascript -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-1 flex flex-col h-full">
+                <!-- table header -->
+                <div class="grid grid-rows-3 gap-1">
+                    <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">月日仕入合計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-primary-200">
+                        <div class="border-r text-sm flex items-center justify-center">月</div>
+                        <div class="border-r text-sm flex items-center justify-center">日</div>
+                        <div class="border-r text-sm flex items-center justify-center">曜</div>
+                        <div class="col-span-3 text-sm flex items-center justify-center">合計税抜</div>
+                    </div>
+                </div>
+                <!-- table body -->
+                <div class="list-container">
+                    <div id="daily_summary_id" class="grid grid-cols-6 text-md">
+                        <!-- javascript -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-1 flex flex-col h-full">
+                <!-- table header -->
+                <div class="grid grid-rows-3 gap-1">
+                    <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">年月取引先別仕入集計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-primary-200">
+                        <div class="border-r text-sm flex items-center justify-center">取引先名</div>
+                        <div class="border-r text-sm flex items-center justify-center">合計税抜</div>
+                    </div>
+                </div>
+                <!-- table body -->
+                <div class="list-container">
+                    <div id="summary_list_id" class="grid grid-cols-2 text-md">
+                        <!-- javascript -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-4 flex flex-col h-full">
+                <!-- table header -->
+                <div class="grid grid-rows-3 gap-1">
+                    <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">取引先別仕入台帳</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-primary-200">
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
+                        <div class="col-span-2 border-r text-sm flex items-center justify-center">納品日</div>
+                        <div class="col-span-2 border-r text-sm flex items-center justify-center">発送元</div>
+                        <div class="col-span-3 border-r text-sm flex items-center justify-center">商品名</div>
+                        <div class="col-span-2 border-r text-sm flex items-center justify-center">形状大きさ等</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>容量</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>単位</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>数量</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">単価</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">消費<br>税率</div>
+                        <div class="col-span-1 border-r text-sm flex items-center justify-center">消費<br>税額</div>
+                        <div class="col-span-2 text-sm flex items-center justify-center">税込<br>金額</div>
+                    </div>
+                </div>
+                <!-- table body -->
+                <div class="list-container">
+                    <div id="sales_ledger_id" class="grid grid-cols-18 bg-white text-md">
+                        <!-- javascript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+
+  <!-- block script -->
+  <script>
+    $(document).ready(function(){
+        yearList();
+    });
+  </script>
+  <script>
+    //code about calendar year
+    var today = new Date();
+    var setToYear = document.getElementById('current_year_id');
+    var year = today.getFullYear();
+    var month = today.getMonth() + 1;
+    var date = today.getDate();
+    var currentTime;
+    currentTime = year + '-' + month + '-' + date;
+    setToYear.value = year;
+
+    $('#previous_day, #next_day').click(function(e) {
+        e.preventDefault();
+        setDate($(this).data('diff'));
+    })
+
+    function setDate(diff) {
+        let newDate = new Date(currentTime);
+        let newYear = newDate.setFullYear(newDate.getFullYear() + diff);
+        let yearValue = newDate.getFullYear();
+        let monthValue = newDate.getMonth() + 1;
+        let dayValue = newDate.getDate();
+        currentTime = yearValue + '-' + monthValue + '-' + dayValue;
+        setToYear.value = yearValue;
+    }
+
+    $("#current_year_id").change(function() {
+        let setDateSelect = document.getElementById('current_year_id');
+        let selectDate = new Date(setDateSelect.value);
+        let selectYear = selectDate.getFullYear();
+        let selectMonth = selectDate.getMonth() + 1;
+        let selectDay = selectDate.getDate();
+        currentTime = selectYear + '-' + selectMonth + '-' + selectDay;
+        setToYear.value = selectYear;
+    })
+  </script>
+
+  <script>
+    var divYear = '';
+    var customerId = '';
+    var month = '';
+    var aggregationUnit = document.getElementById('aggregation_unit_id');
+    var aggregationClassification = document.getElementById('classification_id');
+
+    function yearList(){
+        summaryByMonth('', '')
+        summaryByAmount('', '')
+        let setValueYear = setToYear.value;
+        // MOCKUP: AJAX disabled — use sample data
+        console.log('yearly-sales-summary (SS): mock data');
+        let summaryList = document.getElementById('summary_list_data');
+        summaryList.innerHTML = '';
+        let sampleData = [
+            {year:2026, shipping_date__month:1, total_amount:850000},
+            {year:2026, shipping_date__month:2, total_amount:720000},
+            {year:2026, shipping_date__month:3, total_amount:1100000},
+        ];
+        sampleData.forEach(function(item){
+            let divTotal = document.createElement('div');
+            divTotal.classList.add('div-color', 'col-span-5', 'grid', 'grid-cols-5', 'bg-white');
+            divYear = document.createElement('div');
+            divYear.classList.add('border-b', 'border-r', 'cursor-pointer', 'text-center', 'flex', 'items-center', 'justify-center');
+            divYear.innerHTML = item.year;
+            let divMonth = document.createElement('div');
+            divMonth.classList.add('border-b', 'border-r', 'cursor-pointer', 'text-center', 'flex', 'items-center', 'justify-center');
+            divMonth.innerHTML = item.shipping_date__month;
+            let divSummary = document.createElement('div');
+            divSummary.classList.add('col-span-3', 'border-b', 'border-r', 'cursor-pointer', 'text-right', 'pr-2', 'flex', 'items-center', 'justify-end');
+            divSummary.innerHTML = item.total_amount.toLocaleString('en-US');
+            divTotal.append(divYear, divMonth, divSummary);
+            summaryList.append(divTotal);
+        });
+        aggregationUnit.innerHTML = '-';
+        aggregationClassification.innerHTML = '-';
+    }
+
+    function summaryByMonth(yearNumber, shipMonth){
+        month = shipMonth;
+        // MOCKUP: AJAX disabled
+        if(shipMonth == null){
+            aggregationUnit.innerHTML = yearNumber + ' 年 ';
+        }else{
+            aggregationUnit.innerHTML = yearNumber + ' 年 ' + shipMonth + ' 月 ';
+        }
+        setTagColor();
+    }
+
+    function summaryByAmount(yearNumber, monthNumber){
+        month = monthNumber;
+        // MOCKUP: AJAX disabled
+        setTagColorPrice();
+    }
+
+    function dailySalesSummary(totalAmount, year, month, date){
+        let dailyAggregationUnit = document.getElementById('aggregation_unit_id');
+        dailyAggregationUnit.innerHTML = month + ' 月 ' + date + ' 日';
+        setTagColorByMonth();
+    }
+
+    function summaryEndDestination(numberAggregation, year, month, clientId, shippingDate){
+        customerId = clientId;
+        setTagColorDetail();
+        setTagColorByTotalPrice();
+    }
+  </script>
+
+  <script>
+    function setTagColor(){
+        $('#summary_list_data').on('click','.div-color',function () {
+            $(this).parent().find('.div-color').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+    }
+
+    function setTagColorPrice(){
+        $('#summary_list_data').on('dblclick','.div-color',function () {
+            $(this).parent().find('.div-color').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+    }
+
+    function printByClient(customer){
+        customerId = customer;
+        $('#summary_list_id').on('click','.set-tag-print',function () {
+            $(this).parent().find('.set-tag-print').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+        flag1 = true;
+        checkFlagStatus();
+    }
+
+    function setTagColorByTotalPrice(){
+        $('#summary_list_id').on('click','.set-color-by-total',function () {
+            $(this).parent().find('.set-color-by-total').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+        flag1 = true;
+        checkFlagStatus();
+    }
+
+    function setTagColorByMonth(){
+        $('#daily_summary_id').on('click','.set-color',function () {
+            $(this).parent().find('.set-color').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+    }
+
+    function setTagColorDetail(){
+        $('#summary_list_id').on('click','.set-tag-color',function () {
+            $(this).parent().find('.set-tag-color').removeClass('bg-primary-100');
+            $(this).addClass('bg-primary-100');
+        });
+    }
+  </script>
+
+  <script>
+    var flag1 = false;
+    function enableButton() {
+        let confirmButton1 = document.getElementById('btn_print_pdf');
+        confirmButton1.classList.remove('disabled');
+        confirmButton1.classList.remove('bg-gray-300', 'text-gray-500');
+        confirmButton1.classList.add('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        confirmButton1.setAttribute('onclick', 'btnPrintPDF()');
+    }
+
+    function disableButton() {
+        let disableBtn = document.getElementById('btn_print_pdf');
+        disableBtn.classList.add('disabled');
+        disableBtn.classList.add('bg-gray-300', 'text-gray-500');
+        disableBtn.classList.remove('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        disableBtn.removeAttribute('onclick', '');
+        disableBtn.removeAttribute('href', '');
+    }
+
+    function checkFlagStatus() {
+        if (flag1 === true){
+            enableButton();
+        };
+    };
+  </script>
+
+  <script>
+    function btnPrintPDF(){
+        let btnPrint = document.getElementById('btn_print_pdf');
+        btnPrint.setAttribute('href', '/pdf_salse/' + parseInt(divYear.innerHTML) + '/' + month + '/' + customerId);
+    }
+  </script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>
