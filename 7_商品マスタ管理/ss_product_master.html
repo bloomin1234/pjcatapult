@@ -28,6 +28,11 @@
     .vis-btn.on  { border-color:#1A3A63; background:#ECF0F5; color:#1A3A63; }
     .vis-btn.off { border-color:#C7C7C0; background:#EDEDE7; color:#82857E; }
     .mockup-badge { position:fixed; top:8px; right:8px; background:#1A3A63; color:white; font-size:10px; padding:2px 8px; border-radius:2px; z-index:9999; font-weight:bold; letter-spacing:.05em; }
+
+    /* ===== ZChain Rebrand — SS 商品マスタ スコープスタイル ===== */
+    .ss-zc-page-hd { padding-bottom:12px; margin-bottom:4px; border-bottom:1px solid #E6E6E6; }
+    .ss-zc-sys-label { font-size:11px; font-weight:700; letter-spacing:.1em; color:#1A3A63; text-transform:uppercase; display:block; margin-bottom:4px; }
+    .ss-zc-page-title { font-size:20px; font-weight:900; letter-spacing:.02em; color:#0A0A0A; margin:0; }
   </style>
 </head>
 <body>
@@ -44,7 +49,7 @@
 
     <!-- header section -->
     <div class="px-4 pt-3 pb-1 flex-shrink-0">
-      <a href="#" role="button" class="inline-flex items-center gap-1.5 text-sm text-[#1A3A63] border border-[#1A3A63] rounded px-3 py-1 hover:bg-[#ECF0F5] transition">
+      <a href="#" role="button" class="inline-flex items-center gap-1.5 text-sm text-[#1A3A63] border border-[#1A3A63] rounded-[2px] px-3 py-1 hover:bg-[#E9EEF5] transition">
         <i class="fa-solid fa-caret-left text-xs"></i>戻る
       </a>
     </div>
@@ -55,11 +60,11 @@
         <div class="bg-white flex flex-col overflow-hidden rounded drop-shadow-sm p-4 min-h-0 col-start-3 col-span-8">
 
           <!-- Page header -->
-          <div class="px-1 pb-3 flex-shrink-0">
-            <div style="font-size:11px;font-weight:500;letter-spacing:.08em;color:#1A3A63;margin-bottom:2px;">仕入 · SMART STOCK</div>
+          <div class="px-1 pb-3 flex-shrink-0 ss-zc-page-hd">
+            <span class="ss-zc-sys-label">仕入 · SMART STOCK</span>
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-carrot text-[#1A3A63] text-lg"></i>
-              <h1 style="font-size:18px;font-weight:500;margin:0;">商品管理</h1>
+              <h1 class="ss-zc-page-title">商品管理</h1>
             </div>
           </div>
 
@@ -80,16 +85,16 @@
               <div class="bg-white flex justify-between py-2 flex-shrink-0">
                 <div class="flex gap-2">
                   <button type="button" onclick="addMaterialModal()"
-                      class="flex items-center gap-1.5 bg-[#1A3A63] hover:bg-[#122b4e] text-white font-medium py-1.5 px-3 rounded text-sm transition">
+                      class="flex items-center gap-1.5 bg-[#1A3A63] hover:bg-[#0E2746] text-white font-bold py-1.5 px-3 rounded-[2px] text-sm transition">
                     <i class="fa-solid fa-plus text-xs"></i>新規登録
                   </button>
                   <button type="button" onclick="alert('静的モックアップ — CSV機能は無効です')"
-                      class="flex items-center gap-1.5 bg-white hover:bg-[#ECF0F5] text-[#1A3A63] font-medium py-1.5 px-3 border border-[#1A3A63] rounded text-sm transition">
+                      class="flex items-center gap-1.5 bg-white hover:bg-[#E9EEF5] text-[#1A3A63] font-semibold py-1.5 px-3 border border-[#1A3A63] rounded-[2px] text-sm transition">
                     <i class="fa-solid fa-download text-xs"></i>CSVダウンロード
                   </button>
                   <input type="file" id="csv_upload_input" accept=".csv" class="hidden">
                   <button type="button" onclick="alert('静的モックアップ — CSV機能は無効です')"
-                      class="flex items-center gap-1.5 bg-white hover:bg-[#ECF0F5] text-[#1A3A63] font-medium py-1.5 px-3 border border-[#1A3A63] rounded text-sm transition">
+                      class="flex items-center gap-1.5 bg-white hover:bg-[#E9EEF5] text-[#1A3A63] font-semibold py-1.5 px-3 border border-[#1A3A63] rounded-[2px] text-sm transition">
                     <i class="fa-solid fa-upload text-xs"></i>CSVアップロード
                   </button>
                 </div>
@@ -145,16 +150,16 @@
                 <div class="flex items-center justify-between py-2 border-b flex-shrink-0">
                   <div class="flex items-center gap-2">
                     <input id="new_manufacturer_input" type="text" class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#1A3A63] w-64" placeholder="新しいメーカー名を入力">
-                    <button type="button" onclick="addManufacturerMock()" class="text-white bg-[#1A3A63] hover:bg-[#122b4e] rounded px-4 py-1 text-sm font-bold transition whitespace-nowrap">追加</button>
+                    <button type="button" onclick="addManufacturerMock()" class="text-white bg-[#1A3A63] hover:bg-[#0E2746] rounded-[2px] px-4 py-1 text-sm font-bold transition whitespace-nowrap">追加</button>
                   </div>
                   <div class="flex items-center gap-2">
                     <button type="button" onclick="alert('静的モックアップ — CSV機能は無効です')"
-                        class="flex items-center gap-1.5 bg-white hover:bg-[#ECF0F5] text-[#1A3A63] font-medium py-1.5 px-3 border border-[#1A3A63] rounded text-sm transition">
+                        class="flex items-center gap-1.5 bg-white hover:bg-[#E9EEF5] text-[#1A3A63] font-semibold py-1.5 px-3 border border-[#1A3A63] rounded-[2px] text-sm transition">
                       <i class="fa-solid fa-download text-xs"></i>CSVダウンロード
                     </button>
                     <input type="file" id="mfg_csv_upload_input" accept=".csv" class="hidden">
                     <button type="button" onclick="alert('静的モックアップ — CSV機能は無効です')"
-                        class="flex items-center gap-1.5 bg-white hover:bg-[#ECF0F5] text-[#1A3A63] font-medium py-1.5 px-3 border border-[#1A3A63] rounded text-sm transition">
+                        class="flex items-center gap-1.5 bg-white hover:bg-[#E9EEF5] text-[#1A3A63] font-semibold py-1.5 px-3 border border-[#1A3A63] rounded-[2px] text-sm transition">
                       <i class="fa-solid fa-upload text-xs"></i>CSVアップロード
                     </button>
                   </div>
@@ -235,7 +240,7 @@
             </div>
             <!-- Modal Footer -->
             <div class="grid grid-cols-6 px-14 py-5">
-              <button type="button" onclick="addMaterialMock()" class="col-start-5 col-span-2 w-full rounded-md shadow-sm py-2 bg-[#1A3A63] hover:bg-[#2a4d7a] font-bold text-base text-white transition">
+              <button type="button" onclick="addMaterialMock()" class="col-start-5 col-span-2 w-full rounded-[2px] shadow-sm py-2 bg-[#1A3A63] hover:bg-[#0E2746] font-bold text-base text-white transition">
                 追加
               </button>
             </div>
