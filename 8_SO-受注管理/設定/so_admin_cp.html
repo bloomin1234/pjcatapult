@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設定（管理CP） — SMART ORDER [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style の内容 -->
+  <style>
+    .japansalad-background {
+        background-image: url('#');
+        background-position: left top;
+        background-repeat: no-repeat;
+        background-size: cover;
+        transition: background-image 1s;
+    }
+    @media screen and (max-width: 1000px) {
+        .japansalad-background {
+            background-image: url('#');
+            transition: background-image 1s;
+        }
+    }
+
+    input:checked ~ .dot {
+    transform: translateX(100%);
+    background-color: #48bb78;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+         margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- block content の内容 -->
+<div class="grid w-[1042px] mx-auto mt-10 p-5 border rounded-md shadow-lg bg-slate-50" x-data="{'successfullyModal': false, 'confirmDeleteDateModal': false, 'blockModal': false, 'successBusinessInfoModal': false, 'headerSettingsModal': false}">
+    <div class="mb-5">
+        <a href="#" role="button">
+            <span class="text-sm text-gray-700 my-2 font-bold bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-200 disabled:bg-gray-200 rounded-md px-3 py-2 text-center transition"><i class="fas fa-home mr-2"></i>メインメニュー</span>
+        </a>
+    </div>
+    <div class="grid gap-y-5">
+        <!-- 販売実績台帳 (Order_Ledger) CSV Export last 30 days Section -->
+        <div class="grid grid-cols-6 gap-y-2 rounded border p-4 bg-slate-100 hidden">
+            <span class="col-span-3 text-gray-700 text-2xl font-bold">
+                <i class="fa-solid fa-file-export fa-xs mr-3"></i>30日間前 CSV ダウンロード
+            </span>
+            <span class="text-gray-700 text-sm text-right mt-2">
+                販売実績台帳 :
+            </span>
+        </div>
+
+        <!-- Database Migration Section -->
+        <div class="grid grid-cols-6 gap-y-2 rounded border p-4 bg-slate-100 hidden">
+            <span class="col-span-6 text-gray-700 text-2xl font-bold">
+                <i class="fa-solid fa-database fa-xs mr-3"></i>データ管理
+            </span>
+            <div class="col-start-4 col-span-3 grid grid-cols-4">
+                <span id="file-name" class="col-span-1 text-right my-auto text-xs font-bold text-slate-700">データの削除</span>
+                <div class="col-span-2 text-left ml-1">
+                    <select class="bg-white-50 border border-gray-300 text-gray-900 text-sm rounded focus:border-gray-400 focus:ring-0 w-full" id="table_name">
+                        <option  value="" selected disabled hidden>Select </option>
+                        <option value="client_ledger">1. 取引先台帳</option>
+                        <option value="form_ledger">2. 注文形態</option>
+                        <option value="package_ledger">3. 外装形態</option>
+                        <option value="material_ledger">4. 原体台帳</option>
+                        <option value="client_destination_ledger">5. 取引先持込先台帳</option>
+                        <option value="client_material_unit_price_ledger">6. 取引先材料別単価台帳</option>
+                        <option value="order_ledger">7. 販売実績台帳</option>
+                        <option value="calendar">8. 暦</option>
+                        <option value="staff_ledger">9. 従業員台帳</option>
+                        <option value="ticket_sales_ledger">10. 伝票_売上入金台帳</option>
+                        <option value="client_s_material_ledger">11. 取引先S材料台帳</option>
+                        <option value="client_quotation_ledger">12. 取引先見積台帳</option>
+                        <option value="work_ledger">13. 作業台帳</option>
+                        <option value="direction_ledger">14. 方向台帳</option>
+                    </select>
+                </div>
+                <div class="col-span-1 grid grid-cols-3">
+                    <div class="col-span-1 text-center mt-2">
+                        <span id="circle_delete_id" class="text-slate-700 hidden"><i class="fas fa-circle-notch fa-lg fa-spin"></i></span>
+                        <span id="success_delete_id" class="text-green-500 hidden"><i class="fa-solid fa-check fa-lg"></i></span>
+                    </div>
+                    <div class="col-span-2 text-center">
+                        <button id="confirm_button_delete" type="button" class="text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-200 disabled:bg-gray-200 rounded-md text-sm px-5 py-2 text-center transition" disabled @click="confirmDeleteDateModal = true">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- - !!!! ------START------ !!!!! -->
+            <div class="col-span-6 grid">
+                <span class="text-base text-gray-700 font-bold">データの読み込み</span>
+                <form class="col-span-6" method="post" action="" enctype="multipart/form-data" id="myform">
+                    <button id="show_modal" type="button" class="hidden" @click="blockModal = true"></button>
+                    <button id="close_modal" type="button" class="hidden" @click="blockModal = false"></button>
+                    <div class="flex flex-col">
+                        <div class="sm:-mx-3 lg:-mx-6">
+                            <div class="py-2 inline-block min-w-full sm:px-3 lg:px-6">
+                                <table class="border rounded">
+                                    <thead class="bg-slate-200">
+                                        <tr class="text-sm text-gray-800">
+                                            <th scope="col" class="py-2" width="15%">テーブル名</th>
+                                            <th scope="col" class="py-2" width="8%">更新日</th>
+                                            <th scope="col" class="py-2" width="42%">選択ファイル名</th>
+                                            <th scope="col" class="py-2" width="35%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        <!-- Start client_ledger -->
+                                        <tr class="bg-white">
+                                            <!-- Table name -->
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_01" name="table_id" class="hidden" value="client_ledger">1. 取引先台帳
+                                                <input class="hidden" type="file" name="file" id="file_01" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_01')">
+                                            </td>
+                                            <!-- Update date -->
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap">
+                                                <span id="update_date_id_01"></span>
+                                            </td>
+                                            <!-- File Name -->
+                                            <td class="text-sm text-gray-700 my-auto overflow-hidden">
+                                                <span class="text-xs break-all" id="sel_file_01"></span>
+                                            </td>
+                                            <!-- File Operation -->
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <!-- File Select Btn -->
+                                                    <button type="button" id="choose_file_01" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_01');">
+                                                        <i class="fas fa-folder-open fa-1x mx-auto my-auto"></i>
+                                                    </button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <!-- Upload Btn -->
+                                                    <button type="button" id="btn_upload_01" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('01');" disabled>
+                                                        <i class="fas fa-upload fa-1x mx-auto my-auto"></i>
+                                                    </button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <!-- Import Btn -->
+                                                    <button id="btn_import_01" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled>
+                                                        <i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- 以下、02〜14 のテーブル行（02: 注文形態, 03: 外装形態, 04: 原体台帳, 05: 取引先持込先台帳, 06: 取引先材料別単価台帳, 07: 販売実績台帳, 08: 暦, 09: 従業員台帳, 10: 伝票_売上入金台帳, 11: 取引先S材料台帳, 12: 取引先見積台帳, 13: 作業台帳, 14: 方向台帳 は同様のパターンで続く） -->
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_02" name="table_id" class="hidden" value="form_ledger">2. 注文形態
+                                                <input class="hidden" type="file" name="file" id="file_02" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_02')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_02"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_02"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_02" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_02');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_02" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('02');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_02" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_03" name="table_id" class="hidden" value="package_ledger">3. 外装形態
+                                                <input class="hidden" type="file" name="file" id="file_03" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_03')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_03"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_03"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_03" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_03');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_03" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('03');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_03" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_04" name="table_id" class="hidden" value="material_ledger">4. 原体台帳
+                                                <input class="hidden" type="file" name="file" id="file_04" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_04')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_04"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_04"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_04" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_04');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_04" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('04');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_04" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_05" name="table_id" class="hidden" value="client_destination_ledger">5. 取引先持込先台帳
+                                                <input class="hidden" type="file" name="file" id="file_05" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_05')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_05"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_05"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_05" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_05');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_05" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('05');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_05" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_06" name="table_id" class="hidden" value="client_material_unit_price_ledger">6. 取引先材料別単価台帳
+                                                <input class="hidden" type="file" name="file" id="file_06" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_06')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_06"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_06"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_06" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_06');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_06" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('06');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_06" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_07" name="table_id" class="hidden" value="order_ledger">7. 販売実績台帳
+                                                <input class="hidden" type="file" name="file" id="file_07" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_07')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_07"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_07"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_07" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_07');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_07" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('07');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_07" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_08" name="table_id" class="hidden" value="calendar">8. 暦
+                                                <input class="hidden" type="file" name="file" id="file_08" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_08')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_08"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_08"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_08" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_08');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_08" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('08');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_08" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_09" name="table_id" class="hidden" value="staff_ledger">9. 従業員台帳
+                                                <input class="hidden" type="file" name="file" id="file_09" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_09')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_09"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_09"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_09" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_09');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_09" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('09');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_09" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_10" name="table_id" class="hidden" value="ticket_sales_ledger">10. 伝票_売上入金台帳
+                                                <input class="hidden" type="file" name="file" id="file_10" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_10')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_10"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_10"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_10" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_10');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_10" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('10');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_10" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_11" name="table_id" class="hidden" value="client_s_material_ledger">11. 取引先S材料台帳
+                                                <input class="hidden" type="file" name="file" id="file_11" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_11')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_11"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_11"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_11" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_11');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_11" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('11');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_11" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_12" name="table_id" class="hidden" value="client_quotation_ledger">12. 取引先見積台帳
+                                                <input class="hidden" type="file" name="file" id="file_12" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_12')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_12"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_12"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_12" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_12');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_12" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('12');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_12" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_13" name="table_id" class="hidden" value="work_ledger">13. 作業台帳
+                                                <input class="hidden" type="file" name="file" id="file_13" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_13')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_13"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_13"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_13" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_13');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_13" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('13');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_13" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left text-sm font-medium text-gray-900">
+                                                <input id="table_id_14" name="table_id" class="hidden" value="direction_ledger">14. 方向台帳
+                                                <input class="hidden" type="file" name="file" id="file_14" multiple="multiple" accept=".csv , .xlsx , .xls" onchange="getSelectedFileName('file_14')">
+                                            </td>
+                                            <td class="text-sm text-gray-700 px-6 py-2 whitespace-nowrap"><span id="update_date_id_14"></span></td>
+                                            <td class="text-sm text-gray-700 px-6 py-2"><span class="text-xs break-all" id="sel_file_14"></span></td>
+                                            <td class="text-sm text-gray-700 whitespace-nowrap">
+                                                <div class="grid grid-cols-5 gap-y-0 justify-items-center">
+                                                    <button type="button" id="choose_file_14" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded-full text-sm text-center transition" onclick="selectUploadFile('file_14');"><i class="fas fa-folder-open fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button type="button" id="btn_upload_14" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" onclick="uploadSelectedFile('14');" disabled><i class="fas fa-upload fa-1x mx-auto my-auto"></i></button>
+                                                    <hr class="my-auto w-4/5 h-1 bg-gray-100 border-0 dark:bg-gray-100">
+                                                    <button id="btn_import_14" type="button" class="w-12 h-12 text-gray-700 bg-gray-300 hover:bg-gray-400 disabled:text-gray-400 disabled:hover:bg-gray-100 disabled:bg-gray-100 rounded-full text-sm text-center transition" disabled><i class="fa-solid fa-file-import fa-1x mx-auto my-auto"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- - !!!! ------END------ !!!!!-->
+        </div>
+
+        <!-- Site Configuration Section -->
+        <div class="grid grid-cols-2 gap-y-2 rounded border p-4 bg-slate-100">
+            <span class="col-span-2 text-gray-700 text-2xl font-bold">
+                <i class="fa-solid fa-user-lock fa-xs mr-3"></i>設定
+            </span>
+
+            <div class="grid col-span-2">
+                <form class="grid gap-y-2" id="site_config_form" method="POST" action="#">
+                <div class="grid col-span-2 grid-cols-2">
+                    <span class="my-auto ml-3 text-sm text-gray-700 font-bold">ピンコード有無設定</span>
+                    <div class="my-auto flex ml-5">
+                        <label class="flex cursor-pointer">
+                            <div class="relative">
+                                <input name="site_mkey_enable" class="sr-only" type="checkbox" onchange="toggleInputDisable(this)">
+                                <div class="block border bg-white w-14 h-8 rounded-full" for="{{ user.id }}"></div>
+                                <div class="dot absolute left-1 top-1 bg-gray-200 w-6 h-6 rounded-full transition" for="{{ user.id }}"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-span-2 border rounded py-1 px-3 grid bg-slate-50 gap-y-2">
+                    <div class="grid grid-cols-3">
+                        <span class="my-auto text-sm text-gray-700 font-bold">新しいピンコード</span>
+                        <div class="my-auto ml-5">
+                            <input name="set_password" class="mt-1 block w-60 px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                            focus:outline-none focus:border-sky-500 focus:ring-1 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none transition" type="password" autocomplete="off">
+                        </div>
+                        <span id="new_pass_err_msg" class="my-auto text-sm text-red-700"></span>
+                    </div>
+
+                    <div class="grid grid-cols-3">
+                        <span class="my-auto text-sm text-gray-700 font-bold">新しいピンコード(確認)</span>
+                        <div class="my-auto ml-5">
+                            <input name="set_password_confirm" class="mt-1 block w-60 px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                            focus:outline-none focus:border-sky-500 focus:ring-1 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none transition" type="password" autocomplete="off">
+                        </div>
+                        <span id="confirm_pass_err_msg" class="my-auto text-sm text-red-700"></span>
+                    </div>
+
+                    <div class="grid grid-cols-3">
+                        <div class="my-auto ml-5 col-start-2">
+                            <label class="flex items-center space-x-2">
+                                <input name="mask_password" type="checkbox" class="rounded focus:ring-0 focus:ring-offset-0 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none transition" onchange="togglePasswordMask(this)">
+                                <div class="text-slate-900 text-sm dark:text-slate-400">
+                                    パスワードを表示する
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-start-3 justify-self-end">
+                            <button id="m_pass_submit" class="border-md rounded text-slate-50 bg-blue-400 hover:bg-blue-500 text-sm font-bold px-8 py-2 text-center transition" type="submit">適用</button>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+
+            <!-- radioエリア -->
+            <div>
+                <div class="my-auto ml-3 text-sm text-gray-700 font-bold">PDF印刷設定</div>
+                <div class="my-auto ml-5 text-xs text-red-400 font-bold">*クリックしてアップデート</div>
+            </div>
+            <div class="col-span-2 border rounded py-3 px-3 grid bg-slate-50 gap-y-3">
+                <!-- 税の計算方法 -->
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">消費税額算定方式<span class="text-red-400">（重要）</span></span>
+                    <div class="col-span-2 grid grid-cols-3">
+                        <div class="col-span-2 grid grid-cols-3">
+                            <label class="inline-flex items-center mr-6 col-start-1">
+                                <input type="radio" class="form-radio" name="pick_tax_cal" value="ceil" checked onclick="updatePrintOptions()">
+                                <span class="ml-2 text-sm">切り上げ</span>
+                            </label>
+                            <label class="inline-flex items-center mr-6 col-start-2">
+                                <input type="radio" class="form-radio" name="pick_tax_cal" value="floor" onclick="updatePrintOptions()">
+                                <span class="ml-2 text-sm">切り捨て</span>
+                            </label>
+                            <label class="inline-flex items-center mr-6 col-start-3">
+                                <input type="radio" class="form-radio" name="pick_tax_cal" value="round" onclick="updatePrintOptions()">
+                                <span class="ml-2 text-sm">四捨五入</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 税計算単位 -->
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">消費税計算単位<span class="text-red-400">（重要）</span></span>
+                    <div class="col-span-2 grid grid-cols-3">
+                        <div class="col-span-2 grid grid-cols-3">
+                            <label class="inline-flex items-center mr-6 col-start-1" title="税引前金額をすべて合算した後、消費税額を算定します。">
+                                <input type="radio" class="form-radio" name="pick_tax_calculation_method" value="total" checked onclick="updatePrintOptions()">
+                                <span class="ml-2 text-sm">総額計算</span>
+                            </label>
+                            <label class="inline-flex items-center mr-6 col-start-2" title="請求書の各明細行ごとに消費税額算定方式に従って消費税額を算定し、合算します。">
+                                <input type="radio" class="form-radio" name="pick_tax_calculation_method" value="individual" onclick="updatePrintOptions()">
+                                <span class="ml-2 text-sm">個別計算</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">請求書を横置き仕様にする</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid grid-cols-3">
+                        <label class="inline-flex items-center mr-6 col-start-1">
+                            <input type="radio" class="form-radio" name="invoice_orientation" value="portrait" checked onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">縦置き</span>
+                        </label>
+                        <label class="inline-flex items-center col-start-2">
+                            <input type="radio" class="form-radio" name="invoice_orientation" value="landscape" onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">横置き</span>
+                        </label>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Layout -->
+                <div id="invoice_layout_container" class="grid grid-cols-3 hidden">
+                    <span class="my-auto text-sm text-gray-700 font-bold">帳票レイアウト</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid grid-cols-3">
+                        <label class="inline-flex items-center mr-6 col-start-1">
+                            <input type="radio" class="form-radio" name="invoice_layout" value="default" checked onclick="updatePrintOptions(); toggleHeaderSettingsButton()">
+                            <span class="ml-2 text-sm">基本</span>
+                        </label>
+                        <label class="inline-flex items-center mr-6 col-start-2">
+                            <input type="radio" class="form-radio" name="invoice_layout" value="layout_2" onclick="updatePrintOptions(); toggleHeaderSettingsButton()">
+                            <span class="ml-2 text-sm">商品名拡張</span>
+                        </label>
+                        <button type="button" id="header_settings_btn" @click="headerSettingsModal = true; loadHeaderSettings()" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded text-xs hidden">
+                            <i class="fas fa-cog"></i> ヘッダー設定
+                        </button>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Font Size -->
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">請求書の文字サイズ(pt)</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid bg-white rounded-md">
+                        <input type="number" class="w-20 px-2 py-1 border border-slate-300 rounded-md text-sm shadow-sm"
+                            name="invoice_font_size" value="10" min="6" max="20" onchange="updatePrintOptions()">
+                    </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">納品書の枚数</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid grid-cols-3">
+                        <label class="inline-flex items-center mr-6 col-start-1">
+                            <input type="radio" class="form-radio" name="delivery_notes_per_page" value="2" checked onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">2枚/ページ</span>
+                        </label>
+                        <label class="inline-flex items-center col-start-2">
+                            <input type="radio" class="form-radio" name="delivery_notes_per_page" value="1" onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">1枚/ページ</span>
+                        </label>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">作業指示書の枚数</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid grid-cols-3">
+                        <label class="inline-flex items-center mr-6 col-start-1">
+                            <input type="radio" class="form-radio" name="specific_tables_sheets" value="3" checked onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">3枚綴り</span>
+                        </label>
+                        <label class="inline-flex items-center mr-6 col-start-2">
+                            <input type="radio" class="form-radio" name="specific_tables_sheets" value="2" onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">2枚綴り</span>
+                        </label>
+                        <label class="inline-flex items-center col-start-3">
+                            <input type="radio" class="form-radio" name="specific_tables_sheets" value="1" onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">1枚綴り</span>
+                        </label>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                    <span class="my-auto text-sm text-gray-700 font-bold">ピッキング表の取引先名と原体名の表示</span>
+                    <div class="col-span-2 grid grid-cols-3">
+                    <div class="col-span-2 grid grid-cols-3">
+                        <label class="inline-flex items-center mr-6 col-start-1">
+                            <input type="radio" class="form-radio" name="pick_client_mate_name" value="1" checked onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">通常</span>
+                        </label>
+                        <label class="inline-flex items-center mr-6 col-start-2">
+                            <input type="radio" class="form-radio" name="pick_client_mate_name" value="2" onclick="updatePrintOptions()">
+                            <span class="ml-2 text-sm">読みに変更</span>
+                        </label>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business information -->
+        <div class="mt-5">
+            <div class="grid grid-cols-2 gap-y-2 rounded border p-4 bg-slate-100">
+                <span class="col-span-2 text-gray-700 text-2xl font-bold">
+                    <i class="fa-solid fa-building-user fa-xs mr-3"></i>ビジネス情報
+                </span>
+                <div class="grid col-span-2">
+                    <form class="grid gap-y-2" id="business_info_form" enctype="multipart/form-data">
+                        <div class="col-span-2 border rounded py-3 px-3 grid bg-slate-50 gap-y-2">
+                            <div class="grid grid-cols-12">
+                                <label for="company_name" class="col-span-2 my-auto text-xs text-gray-700 font-bold">会社名</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <input name="company_name" id="company_name" class="mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" required type="text" autocomplete="off">
+                                </div>
+                                <span id="company_name_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="company_address" class="col-span-2 my-auto text-xs text-gray-700 font-bold">住所</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <textarea name="company_address" id="company_address" class="mt-1 w-full px-2 py-3 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" type="text" autocomplete="off">
+                                    </textarea>
+                                </div>
+                                <span id="address_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="tel" class="col-span-2 my-auto text-xs text-gray-700 font-bold">電話番号</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <input name="tel" id="tel" class="mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" type="text" autocomplete="off" >
+                                </div>
+                                <span id="tel_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="fax" class="col-span-2 my-auto text-xs text-gray-700 font-bold">ファクス</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <input name="fax" id="fax" class="mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" type="text" autocomplete="off">
+                                </div>
+                                <span id="fax_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="tax_id" class="col-span-2 my-auto text-xs text-gray-700 font-bold">納税者番号</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <input name="tax_id" id="tax_id" class="mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" type="text" autocomplete="off">
+                                </div>
+                                <span id="tax_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <!-- 応対メール設定 (mobile_order_app feature) -->
+                            <div class="grid grid-cols-12">
+                                <label for="email_for_info" class="col-span-2 my-2 text-xs text-gray-700 font-bold">メール (顧客対応用)​</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <input name="email_for_info" id="email_for_info" class="mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                    focus:outline-none focus:border-sky-500 focus:ring-1 transition" type="text" autocomplete="off">
+                                </div>
+                                <span id="email_for_info_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <!-- 注文締め切り設定 -->
+                            <div class="grid grid-cols-12">
+                                <label for="deadline_text" class="col-span-2 my-auto text-xs text-gray-700 font-bold">
+                                    注文締め切りテキスト
+                                </label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <div class="grid grid-cols-10 gap-2">
+                                        <input name="deadline_text" id="deadline_text"
+                                            class="col-span-7 mt-1 w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm
+                                            focus:outline-none focus:border-sky-500 focus:ring-1 transition"
+                                            type="text" autocomplete="off"
+                                            placeholder="例: 注文締め切りは{x}までです。"
+                                        >
+                                        <div class="col-span-3 flex gap-2 mt-1">
+                                            <label for="deadline_time" class="my-auto text-xs text-gray-700 font-bold">締め切り時間</label>
+                                            <input name="deadline_time" id="deadline_time"
+                                                class="mt-1 px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm
+                                                focus:outline-none focus:border-sky-500 focus:ring-1 transition"
+                                                type="time">
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-400 mt-1">{x} の部分に締め切り時間が表示されます</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="bank_account" class="col-span-2 my-auto text-xs text-gray-700 font-bold">振込先</label>
+                                <div class="col-span-10 my-auto ml-5">
+                                    <div id="bank_account_container">
+                                        <!-- ここにbank_account個々の入力領域が表示されます。 -->
+                                        <div class="mt-0 mb-2 flex items-center w-full">
+                                            <span class="mr-2 text-sm text-gray-600 font-bold">0.</span>
+                                            <div class="flex-grow w-full">
+                                                <input type="text" name="bank_account" class="w-full px-2 py-1 bg-white border border-slate-300 rounded-md text-sm shadow-sm" value="○○銀行 ○○支店 普通 1234567 カブシキガイシャ○○">
+                                            </div>
+                                            <button type="button" class="ml-2 px-3 py-1 bg-green-500 text-white border border-green-500 rounded-md hover:bg-green-600 transition default-bank-btn"><i class="fas fa-star"></i></button>
+                                            <button type="button" class="ml-2 text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
+                                        </div>
+                                        <button type="button" class="w-full mt-2 px-4 py-2 text-black rounded-md flex items-center justify-center"><i class="fas fa-plus mr-2"></i>振込先追加</button>
+                                    </div>
+                                    <div id="bank_account_error" class="hidden text-red-500 text-sm mt-2 text-right"></div>
+                                </div>
+                                <span id="bank_err_msg" class="col-span-10 col-start-3 my-auto text-sm text-red-700"></span>
+                            </div>
+
+                            <div class="grid grid-cols-12">
+                                <label for="image" class="col-span-2 text-xs text-gray-700 font-bold">印鑑</label>
+                                <div class="my-auto ml-5 grid col-span-10 grid-rows-5">
+                                    <input name="image" id="image" type="file" class="mt-1 w-60 border rounded-md text-sm text-slate-500
+                                    file:mr-4 file:py-1 file:px-4 file:rounded-md
+                                    file:border-0 file:text-sm file:font-semibold
+                                    file:bg-slate-50 file:text-slate-700
+                                    hover:file:bg-slate-100"/>
+                                    <span class="text-xs text-red-400">印鑑ファイルは以下の条件よりアップロードしてください</span>
+                                    <span class="text-xs text-red-400">・PNG または JPG 形式の画像</span>
+                                    <span class="text-xs text-red-400">・画像サイズは 100x100 ピクセルの正方形背景は白にしてください。</span>
+                                    <span class="text-xs text-red-400">・ファイル名は英字、数字、ピリオド (.)、アンダーバー (_) のみ使用してください。</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-span-2 grid grid-cols-2">
+                            <div class="col-start-2 justify-self-end">
+                                <button id="business_submit" class="border-md rounded text-slate-50 bg-blue-400 hover:bg-blue-500 text-sm font-bold px-8 py-2 text-center transition" type="submit">確定</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Business information -->
+
+    </div>
+
+    <!-- start Success change Masterpassword modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="successfullyModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="successfullyModal"
+            @click.away="successfullyModal = false"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-gray-100 px-4 pt-1"><div class="text-left w-full"></div></div>
+                <div class="bg-gray-100 px-4 pt-3">
+                    <div class="text-center w-full text-green-500"><i class="fa-solid fa-circle-check fa-2xl"></i></div>
+                </div>
+                <div class="bg-gray-100 px-4 pt-4 pb-3 text-center">
+                    <span class="text-lg font-bold text-gray-700">設定を変更終了しました。</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Success change Masterpassword modal -->
+
+    <!-- start Confirm Delete Date modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="confirmDeleteDateModal"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="confirmDeleteDateModal" x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="grid grid-cols-3 bg-white px-4 pt-1 pb-2">
+                    <div class="col-span-2 text-left w-full my-auto">
+                        <h3 id="modal-title" class="text-xl font-bold leading-6 text-left font-bold text-gray-700">処理確認</h3>
+                    </div>
+                    <div class="col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="confirmDeleteDateModal = false"></i>
+                    </div>
+                </div>
+                <div class="bg-gray-100 px-4 pt-2 pb-2">
+                    <div class="text-center w-full">
+                        <span id="tbl_name_delete" class="text-lg font-bold text-gray-700"></span>
+                        <span class="text-lg font-bold text-gray-700">を削除しますか？</span>
+                    </div>
+                </div>
+                <div class="bg-gray-100 px-4 pt-4 pb-3 text-center">
+                    <button id="confirm_id" onclick="clearDatabase(table_name.value)" type="submit" @click="confirmDeleteDateModal = false" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-400 sm:ml-3 sm:w-auto sm:text-sm">確定</button>
+                    <button type="button" @click="confirmDeleteDateModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium bg-zinc-200 hover:bg-zinc-300  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">戻る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Confirm Delete Date modal -->
+
+    <!-- Start Loading Modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto" x-show="blockModal" x-cloak aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="blockModal" x-cloak class="inline-block align-bottom bg-opacity-75 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-[1770px] sm:w-full sm:h-[890px]">
+                <div class="mt-40 pt-40 text-center">
+                    <i class="fa-solid fa-spinner fa-spin-pulse fa-8x text-white mb-10"></i>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Loading Modal -->
+
+    <!-- start Success Business Information modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto" x-show="successBusinessInfoModal" x-cloak aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="successBusinessInfoModal" @click.away="successBusinessInfoModal = false" x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-gray-100 px-4 pt-1"><div class="text-left w-full"></div></div>
+                <div class="bg-gray-100 px-4 pt-3">
+                    <div class="text-center w-full text-green-500"><i class="fa-solid fa-circle-check fa-2xl"></i></div>
+                </div>
+                <div class="bg-gray-100 px-4 pt-4 pb-3 text-center">
+                    <span class="text-lg font-bold text-gray-700">ビジネス情報を保存しました。</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Header Settings Modal -->
+    <div id="header_settings_modal" class="fixed z-10 inset-0 overflow-y-auto" x-show="headerSettingsModal" x-cloak aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="headerSettingsModal" x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle"
+            style="width: 80vw !important; max-width: 80vw !important;">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:text-left w-full">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-2xl leading-6 font-bold text-gray-900" id="modal-title">請求書ヘッダー設定</h3>
+                                <button @click="headerSettingsModal = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                    <i class="fas fa-times fa-lg"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 mb-2">
+                                <p class="text-gray-600 font-bold mb-2">使用するヘッダープリセットを選択してください。</p>
+                                <div class="space-y-2">
+                                    <div class="text-blue-800 text-sm flex items-start">
+                                        <i class="fas fa-info-circle mt-0.5 mr-2 text-blue-500"></i>
+                                        <span>各ボックスを<strong class="text-blue-900 border-blue-300">ドラッグ＆ドロップ</strong>することで、PDFヘッダーの<strong class="text-blue-900 border-blue-300">順序を調整</strong>できます。</span>
+                                    </div>
+                                    <div class="text-red-700 text-sm mt-1 flex items-start">
+                                        <i class="fas fa-exclamation-circle mt-0.5 mr-2 text-red-500"></i>
+                                        <span>チェックを外すと、その項目は帳票に<strong class="text-red-900 border-red-300">表示されません</strong>。</span>
+                                    </div>
+                                    <div class="text-gray-500 text-xs mt-1">
+                                        ※ 改行を希望される場合は <code>&lt;br&gt;</code> を使用してください。（例：入数&lt;br&gt;単位）
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="header_settings_list" class="mt-4 space-y-8 max-h-[70vh] overflow-y-auto overflow-x-hidden p-1">
+                                <!-- List items will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end gap-x-3">
+                    <button type="button" class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-500 text-base font-medium text-white hover:bg-gray-600 sm:w-auto sm:text-sm" @click="headerSettingsModal = false">キャンセル</button>
+                    <button type="button" class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-400 text-base font-medium text-white hover:bg-green-500 sm:w-auto sm:text-sm" onclick="saveHeaderSettings()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+  <!-- block script の内容 -->
+<script>
+    const janSupport = false; // モックアップ用ダミー値
+    const MopbileOrderAppSupport = true; // モックアップ用ダミー値（機能表示のため true）
+
+    $( document ).ready(function() {
+        // モックアップではAJAX呼び出しはスキップ
+        console.log('モックアップモード: AJAX呼び出しはスキップされます');
+        getPrintOptions();
+    });
+
+    var orientation_radios = document.getElementsByName('invoice_orientation');
+    var delivery_notes_per_page_radios = document.getElementsByName('delivery_notes_per_page');
+    var specific_tables_sheets_radios = document.getElementsByName('specific_tables_sheets');
+    var pick_client_mate_name_radios = document.getElementsByName('pick_client_mate_name');
+    var pick_tax_cal_radios = document.getElementsByName('pick_tax_cal');
+    var pick_tax_calculation_method_radios = document.getElementsByName('pick_tax_calculation_method');
+    var invoice_layout_radios = document.getElementsByName('invoice_layout');
+    var invoice_font_size_input = document.getElementsByName('invoice_font_size');
+    var current_print_option_id = null;
+
+    function getPrintOptions() {
+        // モックアップではデフォルト値をそのまま使用
+        checkOrientation();
+        toggleHeaderSettingsButton();
+    }
+
+    function checkOrientation() {
+        var isLandscape = false;
+        for (let i = 0; i < orientation_radios.length; i++) {
+            if (orientation_radios[i].checked && orientation_radios[i].value === 'landscape') {
+                isLandscape = true;
+                break;
+            }
+        }
+        var container = document.getElementById('invoice_layout_container');
+        if(container){
+            if (isLandscape) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+    }
+
+    function updatePrintOptions() {
+        checkOrientation();
+        console.log('モックアップ: 印刷オプション更新（実際のAPI呼び出しはスキップ）');
+    }
+
+    function toggleHeaderSettingsButton() {
+        const layout2Radio = document.querySelector('input[name="invoice_layout"][value="layout_2"]');
+        const settingsBtn = document.getElementById('header_settings_btn');
+        if (settingsBtn) {
+            if (layout2Radio && layout2Radio.checked) {
+                settingsBtn.classList.remove('hidden');
+            } else {
+                settingsBtn.classList.add('hidden');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleHeaderSettingsButton();
+    });
+
+    var currentHeaderSettings = [];
+    var currentHeaderIndex = 0;
+
+    const INVOICE_HEADERS_DEF = [
+        { key: 'end_destination_name', label: '配送先', width: '120px' },
+        { key: 'material_name', label: '商品名', width: '120px' },
+        { key: 'producing_area', label: 'ラベル', width: '140px' },
+        { key: 'shape_size_etc', label: '形状大きさ等', width: '160px' },
+        { key: 'quantity_per_package', label: '入数', width: '120px' },
+        { key: 'unit_of_quantity_per_package', label: '入数単位', width: '140px' },
+        { key: 'quantity_per_unit', label: '注文容量', width: '140px' },
+        { key: 'unit', label: '注文単位', width: '140px' },
+        { key: 'quantity', label: '注文数量', width: '140px' },
+        { key: 'net_unit_price', label: '単価', width: '120px' },
+        { key: 'net_total_price', label: '金額', width: '120px' }
+    ];
+
+    const DEFAULT_INVOICE_HEADERS = {
+        'end_destination_name': '配送先',
+        'material_name': '商品名',
+        'producing_area': 'ラベル',
+        'shape_size_etc': '形状大きさ等',
+        'quantity_per_package': '入数',
+        'unit_of_quantity_per_package': '入数単位',
+        'quantity_per_unit': '注文容量',
+        'unit': '注文単位',
+        'quantity': '注文数量',
+        'net_unit_price': '単価',
+        'net_total_price': '金額'
+    };
+
+    function loadHeaderSettings() {
+        const defaultOrder = INVOICE_HEADERS_DEF.map(col => col.key);
+        currentHeaderSettings = [{ name: '基本 (Default)', headers: Object.assign({}, DEFAULT_INVOICE_HEADERS), hidden_columns: [], column_order: defaultOrder }];
+        currentHeaderIndex = 0;
+        renderHeaderSettingsList();
+    }
+
+    function addNewHeaderPreset() {
+        const defaultOrder = currentHeaderSettings.length > 0 && currentHeaderSettings[0].column_order ?
+                             [...currentHeaderSettings[0].column_order] :
+                             INVOICE_HEADERS_DEF.map(col => col.key);
+        const newPreset = { name: '新しい設定', headers: Object.assign({}, DEFAULT_INVOICE_HEADERS), hidden_columns: [], column_order: defaultOrder };
+        currentHeaderSettings.push(newPreset);
+        currentHeaderIndex = currentHeaderSettings.length - 1;
+        renderHeaderSettingsList();
+    }
+
+    function deleteHeaderPreset(index) {
+        if (index === 0) { alert('デフォルト設定は削除できません。'); return; }
+        if (confirm('この設定を削除しますか？')) {
+            currentHeaderSettings.splice(index, 1);
+            if (currentHeaderIndex >= currentHeaderSettings.length) { currentHeaderIndex = Math.max(0, currentHeaderSettings.length - 1); }
+            renderHeaderSettingsList();
+        }
+    }
+
+    function renderHeaderSettingsList() {
+        const container = document.getElementById('header_settings_list');
+        if (!container) return;
+        container.innerHTML = '';
+        container.className = 'flex flex-col gap-2 p-4 bg-gray-50 rounded-lg max-h-[70vh] overflow-y-auto';
+        currentHeaderSettings.forEach((setting, index) => {
+            const isDefault = (index === 0);
+            const isSelected = (index === currentHeaderIndex);
+            const card = document.createElement('div');
+            card.className = `overflow-hidden border rounded-md shadow-sm transition-all duration-200 ${isSelected ? 'ring-2 ring-blue-500 bg-white' : 'bg-gray-50 border-gray-200'}`;
+            const topHeader = document.createElement('div');
+            topHeader.className = `flex items-center justify-between px-2 my-2 ${isSelected ? 'bg-blue-50' : 'bg-white'}`;
+            const leftSide = document.createElement('div');
+            leftSide.className = 'flex items-center space-x-3 flex-1 gap-4';
+            const radio = document.createElement('input');
+            radio.type = 'radio'; radio.name = 'header_preset_select';
+            radio.className = 'w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer';
+            radio.checked = isSelected;
+            radio.onchange = () => { currentHeaderIndex = index; renderHeaderSettingsList(); };
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = `bg-transparent focus:ring-0 font-bold text-gray-800 px-2 text-lg w-full max-w-md ${isDefault ? 'cursor-not-allowed border-0' : 'hover:bg-gray-100 rounded-md px-2 py-1 border-none'}`;
+            nameInput.value = setting.name || `Preset ${index + 1}`;
+            nameInput.disabled = isDefault;
+            nameInput.onchange = (e) => { setting.name = e.target.value; };
+            leftSide.appendChild(radio); leftSide.appendChild(nameInput);
+            const rightSide = document.createElement('div');
+            if (!isDefault) {
+                const delBtn = document.createElement('button');
+                delBtn.className = 'text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-full transition-colors';
+                delBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                delBtn.onclick = () => deleteHeaderPreset(index);
+                rightSide.appendChild(delBtn);
+            }
+            topHeader.appendChild(leftSide); topHeader.appendChild(rightSide);
+            card.appendChild(topHeader);
+            const sortArea = document.createElement('div');
+            sortArea.className = 'p-3 overflow-x-auto bg-white rounded-b-xl';
+            const listWrapper = document.createElement('div');
+            listWrapper.className = 'flex px-2 space-x-2 pb-2 min-h-[100px] items-stretch';
+            const order = setting.column_order || INVOICE_HEADERS_DEF.map(c => c.key);
+            order.forEach(colKey => {
+                const colDef = INVOICE_HEADERS_DEF.find(c => c.key === colKey);
+                if (!colDef) return;
+                const colLabel = setting.headers && setting.headers[colKey] ? setting.headers[colKey] : colDef.label;
+                const isHidden = setting.hidden_columns && setting.hidden_columns.includes(colKey);
+                const item = document.createElement('div');
+                item.className = `flex flex-col justify-between w-[200px] flex-shrink-0 border rounded-lg p-2 transition-all ${isHidden ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-blue-50/30 border-blue-100 shadow-sm'}`;
+                item.setAttribute('data-id', colKey);
+                const headRow = document.createElement('div'); headRow.className = 'flex items-center justify-between mb-2';
+                const visibilityBtn = document.createElement('input');
+                visibilityBtn.type = 'checkbox';
+                visibilityBtn.className = 'h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
+                visibilityBtn.checked = !isHidden; visibilityBtn.disabled = isDefault;
+                visibilityBtn.onchange = (e) => {
+                    if (!setting.hidden_columns) setting.hidden_columns = [];
+                    if (e.target.checked) { setting.hidden_columns = setting.hidden_columns.filter(k => k !== colKey); }
+                    else { if (!setting.hidden_columns.includes(colKey)) setting.hidden_columns.push(colKey); }
+                    renderHeaderSettingsList();
+                };
+                const systemLabel = document.createElement('span');
+                systemLabel.className = 'text-[10px] text-gray-400 font-medium truncate ml-1 flex-1';
+                systemLabel.innerText = colDef.label;
+                headRow.appendChild(visibilityBtn); headRow.appendChild(systemLabel);
+                const labelInput = document.createElement('input');
+                labelInput.className = `w-full text-sm border rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 outline-none ${isDefault ? 'bg-transparent border-dashed text-gray-500' : 'bg-white border-gray-200'}`;
+                labelInput.value = colLabel; labelInput.placeholder = colDef.label; labelInput.disabled = isDefault;
+                labelInput.onchange = (e) => { if (!setting.headers) setting.headers = {}; setting.headers[colKey] = e.target.value; };
+                item.appendChild(headRow); item.appendChild(labelInput);
+                listWrapper.appendChild(item);
+            });
+            sortArea.appendChild(listWrapper); card.appendChild(sortArea); container.appendChild(card);
+            new Sortable(listWrapper, {
+                animation: 150, ghostClass: 'bg-blue-100', filter: 'input, checkbox', preventOnFilter: false,
+                onEnd: function () {
+                    const newOrder = [];
+                    listWrapper.querySelectorAll('[data-id]').forEach(el => { newOrder.push(el.getAttribute('data-id')); });
+                    setting.column_order = newOrder;
+                    if (currentHeaderIndex !== index) { currentHeaderIndex = index; renderHeaderSettingsList(); }
+                }
+            });
+        });
+        const addBtn = document.createElement('button');
+        addBtn.className = 'w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all font-bold flex items-center justify-center space-x-2';
+        addBtn.innerHTML = '<i class="fas fa-plus"></i> <span>新しいプリセットを追加</span>';
+        addBtn.onclick = addNewHeaderPreset;
+        container.appendChild(addBtn);
+    }
+
+    function saveHeaderSettings() {
+        alert('モックアップ: 保存しました（実際のAPI呼び出しはスキップ）');
+    }
+</script>
+
+<script>
+    var flagSelect = false;
+    var confirmButtonModal = document.getElementById('confirm_button_delete');
+    var circleDeleteIcon = document.getElementById('circle_delete_id');
+    var successDeleteIcon = document.getElementById('success_delete_id');
+
+    $("#table_name").on('change', function(e) {
+        flagSelect = true;
+        circleDeleteIcon.classList.add('hidden');
+        successDeleteIcon.classList.add('hidden');
+        checkFlagDeleteStatus();
+    });
+
+    function checkFlagDeleteStatus() { if (flagSelect === true){ enableButtonDelete(); }; };
+
+    function enableButtonDelete() {
+        let tableName = document.getElementById('table_name').value;
+        confirmButtonModal.removeAttribute('disabled');
+        let tblNameDelete = document.getElementById('tbl_name_delete');
+        const names = {
+            'client_ledger': '「取引先台帳」', 'form_ledger': '「注文形態」', 'package_ledger': '「外装形態」',
+            'material_ledger': '「原体台帳」', 'client_destination_ledger': '「取引先持込先台帳」',
+            'client_material_unit_price_ledger': '「取引先材料別単価台帳」', 'order_ledger': '「販売実績台帳」',
+            'calendar': '「暦」', 'staff_ledger': '「従業員台帳」', 'ticket_sales_ledger': '「伝票_売上入金台帳」',
+            'client_s_material_ledger': '「取引先S材料台帳」', 'client_quotation_ledger': '「取引先見積台帳」',
+            'work_ledger': '「作業台帳」', 'direction_ledger': '「方向台帳」'
+        };
+        tblNameDelete.innerHTML = names[tableName] || tableName;
+    };
+
+    function clearDatabase(tblName){
+        successDeleteIcon.classList.add('hidden');
+        circleDeleteIcon.classList.remove('hidden');
+        setTimeout(function() {
+            circleDeleteIcon.classList.add('hidden');
+            successDeleteIcon.classList.remove('hidden');
+            confirmButtonModal.setAttribute('disabled', true);
+        }, 800);
+    }
+</script>
+
+<script>
+    $("#site_config_form").submit(function (e) {
+        e.preventDefault();
+        alert('モックアップ: 設定を保存しました');
+    });
+
+    function collectBankAccounts() {
+        const bankAccounts = [];
+        const inputs = document.querySelectorAll('input[name="bank_account"]');
+        inputs.forEach((input) => { const value = input.value.trim(); if (value) bankAccounts.push(value); });
+        return bankAccounts;
+    }
+
+    function toPostgresArray(arr) { return '{' + arr.map(v => `"${v.replace(/"/g, '\\"')}"`).join(',') + '}'; }
+
+    $("#business_info_form").submit(function(e) {
+        e.preventDefault();
+        alert('モックアップ: ビジネス情報を保存しました');
+    });
+
+    function clearErrorMessageStatus() {
+        $('input[name=set_password').removeClass('bg-red-200 text-red-500');
+        $('#new_pass_err_msg').html('');
+        $('input[name=set_password_confirm').removeClass('bg-red-200 text-red-500');
+        $('#confirm_pass_err_msg').html('');
+    };
+    function toggleInputDisable(obj) {
+        $('input[name=mask_password').prop('disabled', !obj.checked);
+        $('input[name=set_password').prop('disabled', !obj.checked);
+        $('input[name=set_password_confirm').prop('disabled', !obj.checked);
+    };
+    function togglePasswordMask(obj) {
+        if(obj.checked == true) {
+            $('input[name=set_password')[0].type = 'text';
+            $('input[name=set_password_confirm')[0].type = 'text';
+        } else {
+            $('input[name=set_password')[0].type = 'password';
+            $('input[name=set_password_confirm')[0].type = 'password';
+        }
+    };
+</script>
+<script>
+    var flag1 = false;
+    $('[name="file"]').on('change', function(e) {
+        flag1 = true;
+        const id = e.target.id.replace('file_', '');
+        checkFlagStatus(id);
+    });
+    function checkFlagStatus(id) { if (flag1 === true){ enableButton(id); }; };
+    function enableButton(id) { let confirmButton = document.getElementById('btn_upload_' + id); confirmButton.removeAttribute('disabled'); };
+
+    var csrfToken = 'MOCKUP_CSRF_TOKEN';
+
+    function uploadSelectedFile(obj){ alert('モックアップ: ファイルアップロード (' + obj + ')'); };
+    function enableBtnUpload(fileDir){ let btnImport = document.getElementById('btn_import_' + fileDir); btnImport.removeAttribute('disabled'); btnImport.setAttribute('onclick', 'importFile("'+ fileDir + '")'); };
+    function importFile(id){ alert('モックアップ: インポート (' + id + ')'); };
+    function selectUploadFile(obj){ $("#" + obj).click(); };
+    function getSelectedFileName(obj){
+        let file = $('#'+ obj)[0].files[0];
+        if (file){
+            $("#sel_"+ obj).html(file.name);
+            $('#choose_'+ obj).html('<i class="text-slate-200 fas fa-check-circle fa-1x mx-auto my-auto"></i>');
+            $('#choose_'+ obj).addClass('bg-green-600');
+        }
+    };
+</script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>

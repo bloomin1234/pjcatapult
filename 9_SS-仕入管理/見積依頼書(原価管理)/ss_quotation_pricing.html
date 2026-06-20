@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>見積依頼書(原価管理) — SMART STOCK [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style の内容 -->
+  <style>
+    [x-cloak] {
+        display: none
+    }
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+         margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .list-container {
+        height: calc(100vh - 300px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col"
+x-cloak
+x-data="{'createQuotationModal': false, 'dataDoesNotExistModal': false, 'deleteOrderModal': false, 'deleteThisDataModal': false, 'registeredLedgerModal' : false,
+        'materialLedgerModal': false, 'saveDataModal': false, 'confirmDataModal': false, 'confirmCopyModal': false}">
+    <!-- menu section -->
+    <div class="p-2 mb-1 bg-neutral-100 rounded-md">
+        <div class="grid grid-cols-12 gap-1">
+            <div class="grid grid-rows-4 gap-1">
+                <a href="#" role="button" class="row-span-2">
+                   <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i>戻る</div>
+                </a>
+            </div>
+            <div class="col-span-1 grid grid-cols-4 grid-rows-2 gap-1">
+                <div class="col-span-4 row-span-1 text-center rounded h-[37px] flex items-center justify-center">
+                    <span class="text-base font-bold">⾒積管理</span>
+                </div>
+            </div>
+            <div class="col-span-2 grid grid-rows-2 gap-1">
+                <div class="row-span-1 grid grid-cols-8 border rounded my-auto">
+                    <input id="year_id" class="col-span-3 border-white bg-white text-center h-[37px] rounded-l" type="number" min="2020" max="2100" data-value=" ">
+                    <div class="bg-blue-100 text-center h-[37px] flex items-center justify-center">年</div>
+                    <input id="month_id" class="col-span-3 border-white bg-white text-center h-[37px]" type="number" min="1" max="12" data-value=" ">
+                    <div class="bg-blue-100 rounded-r text-center h-[37px] flex items-center justify-center">月</div>
+                </div>
+                <div class="row-span-1 grid grid-cols-8 gap-x-1">
+                    <a id="prev_date" class="col-span-4 bg-blue-700 text-white hover:bg-blue-700 font-bold rounded text-center flex items-center justify-center h-full transition" href="#" role="button" onclick="goToPreviousMonth()"><i class="fa-solid fa-angle-left mr-2"></i>前月</a>
+                    <a id="next_date" class="col-span-4 bg-blue-700 text-white hover:bg-blue-700 font-bold rounded text-center flex items-center justify-center h-full transition" href="#" role="button" onclick="goToNextMonth()">翌月<i class="fa-solid fa-angle-right ml-2"></i></a>
+                </div>
+            </div>
+            <div class="col-span-2 grid grid-rows-2 gap-1">
+                <div class="row-span-1 grid grid-cols-8 border rounded my-auto">
+                    <div class="col-span-2 bg-blue-100 rounded-l text-center h-[37px] flex items-center justify-center">取引先</div>
+                    <input id="client_id" class="col-span-2 bg-white h-[37px] text-center border-r" readonly data-value=" ">
+                    <input id="client_name" class="col-span-4 bg-white h-[37px] text-center rounded-r" readonly data-value=" ">
+                </div>
+                <div class="row-span-1 grid grid-cols-8 border rounded my-auto">
+                    <div class="col-span-2 bg-blue-100 rounded-l text-center h-[37px] flex items-center justify-center">発泡区分</div>
+                    <input id="estimation_id" class="col-span-6 bg-white h-[37px] text-center rounded-r" readonly data-value=" ">
+                </div>
+            </div>
+            <div class="col-start-8 col-span-1 my-auto">
+                <button id="btn_save" type="button" class="bg-yellow-200 border-x-yellow-300 border-y-yellow-400 rounded border-4 h-[70px] text-center w-full" disabled form="form_detail" onclick="saveDataToDb()">
+                    <div class="flex items-center justify-center">
+                        デ－タ更新
+                    </div>
+                </button>
+            </div>
+            <!-- <div class="col-start-9 col-span-1 my-auto">
+                <button type="button" class="text-center w-full" @click="underConstructionModal = true">
+                    <div class="bg-blue-700 hover:bg-blue-700 hover:font-bold rounded border-4 border-x-blue-800 border-y-blue-700 h-[70px] flex items-center justify-center">再取得</div>
+                </button>
+            </div> -->
+            <div class="col-start-9 col-span-1 my-auto">
+                <button id="btn_report" type="button" class="bg-yellow-200 border-x-yellow-300 border-y-yellow-400 rounded border-4 h-[70px] text-center w-full text-center w-full" disabled onclick="generateReport()">
+                    <div class="flex items-center justify-center">見積印刷</div>
+                </button>
+            </div>
+            <div class="col-start-10 col-span-1 my-auto">
+
+            </div>
+            <div class="col-span-2 grid grid-cols-4 grid-rows-4 mr-2">
+                <span class="row-start-4 row-span-1 col-span-4 bg-blue-100 text-red-800 text-sm h-full flex items-center justify-center">商品をダブルクリックで追加されます</span>
+                <!-- <div class="col-start-1 col-span-2 row-start-2 row-span-3 grid grid-row-span-4 h-[70px] my-auto">
+                    <div class="row-span-2 bg-blue-100 text-sm h-full mt-1 rounded-tl rounded-tr flex items-center justify-center">商品番号</div>
+                    <input id="ingredient_number" class="row-span-2 rounded-bl rounded-br bg-white text-sm w-full h-full text-center" readonly>
+                </div>
+                <button type="button" class="row-start-2 row-span-3 col-start-3 col-span-2 mt-1 ml-1 text-center" onclick="materialData()">
+                    <div class="bg-[#feb888] hover:bg-orange-400 hover:font-bold rounded border-4 border-x-[#866441] border-y-[#ffc28f] h-[70px] flex items-center justify-center">商品更新</div>
+                </button> -->
+            </div>
+        </div>
+    </div>
+    <!-- content section -->
+    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] rounded-md drop-shadow flex-1 h-full overflow-hidden">
+        <div class="grid grid-cols-15 h-full">
+            <!-- 取引先台帳 -->
+            <div class="col-span-2 grid grid-rows-3 mr-2">
+                <div class="bg-blue-700 rounded mb-1 py-1 text-sm text-white font-bold flex items-center justify-center">取引先台帳</div>
+                <div class="row-start-2 border row-span-2 grid grid-cols-4 bg-blue-200">
+                    <div class="text-sm border-r flex items-center justify-center">番号</div>
+                    <div class="col-span-2 border-r text-sm flex items-center justify-center">取引先名</div>
+                    <div class="text-sm flex items-center justify-center">発泡<br>区分</div>
+                </div>
+            </div>
+            <div class="row-start-2 col-span-2 mr-2 list-container">
+                <div id="client_list" class="h-[22px]"></div>
+                <!-- javascript section -->
+            </div>
+
+            <!-- 見積履歴 -->
+            <div class="col-span-2 grid grid-rows-3 mr-2">
+                <div class="bg-blue-700 rounded mb-1 py-1 text-sm text-white font-bold flex items-center justify-center">見積履歴</div>
+                <div class="row-start-2 row-span-2 grid grid-cols-6 border bg-blue-200">
+                    <div class="col-span-2 border-r text-sm flex items-center justify-center">年月</div>
+                    <div class="col-span-4 text-sm flex items-center justify-center">取引先名</div>
+                </div>
+            </div>
+            <div class="row-start-2 col-span-2 mr-2 list-container">
+                <div id="quotation_list" class="h-[22px]"></div>
+                <!-- javascript section -->
+            </div>
+
+            <!-- 取引先別見積台帳 -->
+            <div class="col-span-9 grid grid-rows-3 mr-2">
+                <div class="bg-blue-700 rounded mb-1 py-1 text-sm text-white font-bold flex items-center justify-center">取引先別見積台帳</div>
+                <div class="row-start-2 row-span-2 grid grid-cols-26">
+                    <div class="col-span-1 border text-sm bg-blue-200 flex items-center justify-center">No</div>
+                    <div class="col-span-1 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">商品No</div>
+                    <div class="col-span-4 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">商品名</div>
+                    <div class="col-span-1 border-r border-t border-b text-sm bg-[#ffd966] flex items-center justify-center">S</div>
+                    <div class="col-span-1 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">規格<br>cd</div>
+                    <div class="col-span-1 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">ラベル</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">形状<br>大きさ等</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm flex items-center justify-center bg-blue-400
+                    ">入数</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">入数<br>単位</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">注文<br>容量</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">容量<br>単位</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-200 flex items-center justify-center">販売単価</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-blue-400 flex items-center justify-center">見積単価<br>(入数)</div>
+                    <div class="col-span-2 border-r border-t border-b text-sm bg-[#f4b183] flex items-center justify-center">見積単価<br>(注文)</div>
+                    <div class="col-span-1"></div>
+                </div>
+            </div>
+            <div class="row-start-2 col-span-9 list-container mr-2">
+                <form method="post" id="form_detail">
+                    <div id="detail_order" class="h-[22px]">
+                        <!-- javascript section -->
+                    </div>
+                </form>
+            </div>
+
+            <!-- 商品台帳 -->
+            <div class="col-span-2 grid grid-rows-3 mr-1">
+                <div class="bg-blue-700 rounded mb-1 py-1 text-sm text-white font-bold flex items-center justify-center">商品台帳</div>
+                <div class="row-start-2 border row-span-2 grid grid-cols-4 bg-blue-200">
+                    <div class="text-sm border-r flex items-center justify-center">番号</div>
+                    <div class="col-span-3 text-sm flex items-center justify-center">商品名</div>
+                </div>
+            </div>
+            <div class="row-start-2 col-span-2 mr-1 list-container">
+                <div id="material_list" class="h-[22px]"></div>
+                <!-- javascript section -->
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal section  -->
+    <!-- Start create a quotation modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="createQuotationModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="createQuotationModal"
+            @click.away="createQuotationModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="createQuotationModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>販売実績から見積台帳を作成しますか？</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" id="create_quotation_btn" @click="createQuotationModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="createQuotationModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End create a quotation Modal -->
+    <!-- Start Sales data does not exist modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="dataDoesNotExistModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="dataDoesNotExistModal"
+            @click.away="dataDoesNotExistModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="dataDoesNotExistModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700">販売データが存在しません。処理を中止します</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" @click="dataDoesNotExistModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Sales data does not exist Modal -->
+    <!-- Start delete order modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="deleteOrderModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="deleteOrderModal"
+            @click.away="deleteOrderModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="deleteOrderModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span id="record_by_order" class="text-lg text-gray-700 hidden"></span>
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>削除しますか？</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button id="confirm_delete_order" type="submit" @click="deleteOrderModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="deleteOrderModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End delete order Modal -->
+    <!-- Start delete this data modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="deleteThisDataModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="deleteThisDataModal"
+            @click.away="deleteThisDataModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="deleteThisDataModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <span id="year_month" class="hidden"></span>
+                    <span id="quotation_id" class="hidden"></span>
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>このデータを削除しますか？</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" id="confirm_de_quotation" @click="deleteThisDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="deleteThisDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End delete this data Modal -->
+    <!-- Start registered in the ledger modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="registeredLedgerModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="registeredLedgerModal"
+            @click.away="registeredLedgerModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="registeredLedgerModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>台帳に未登録です。新規追加しますか？</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" id="registered_material" @click="registeredLedgerModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="registeredLedgerModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End registered in the ledger Modal -->
+    <!-- Start Supplier's raw material shape ledger modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="materialLedgerModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="materialLedgerModal"
+            @click.away="materialLedgerModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full"
+            >
+                <!-- Header -->
+                <div class="bg-lime-900 px-4 py-3">
+                    <div class="grid grid-cols-12 p-1 h-10">
+                        <h3 class="col-span-3 text-gray-700 text-lg text-gray-700 bg-[#9dc3e6] text-center p-1">
+                            取引先商品形状台帳
+                        </h3>
+                        <h3 class="col-span-3 text-gray-700 text-lg text-gray-700 bg-[#ffd966] text-center p-1 ml-2">
+                            ↓をダブルクリックで追加
+                        </h3>
+                        <div class="col-start-8 col-span-1">
+                            <button type="button" id="add_material_btn" @click="materialLedgerModal = false" class="text-center rounded border-4 bg-[#feb888] hover:bg-orange-400 font-bold border-x-[#866441] border-y-[#ffc28f] w-full h-full flex items-center justify-center">
+                                新規追加
+                            </button>
+                        </div>
+                        <div class="col-start-12 col-span-1 text-right w-full my-auto pr-2">
+                            <i class="fa-solid fa-xmark fa-xl text-gray-900 hover:text-red-600 cursor-pointer" @click="materialLedgerModal = false"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- content -->
+                <div class="flex flex-col">
+                    <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="min-w-full sm:px-6 lg:px-8">
+                            <div class="overflow-hidden">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="border bg-blue-200">
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[100px] py-4 border-r">規格コード</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">ラベル</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[150px] py-4 border-r">形状大きさ等</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">入数</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">入数単位</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">注文容量</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">注文単位</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">単位重量</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4 border-r">販売単価</th>
+                                            <th scope="col" class="text-center text-sm text-gray-900 w-[80px] py-4">単品単価</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="material_shape_ledger">
+                                        <!-- javascript section -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Supplier's raw material shape ledger modal -->
+    <!-- Start Rewrite server data modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="saveDataModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="saveDataModal"
+            @click.away="saveDataModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="saveDataModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>サーバーのデータを書き換えます</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" onclick="saveDetail()" @click="saveDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="saveDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Rewrite server data Modal -->
+    <!-- Start copy server data modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="confirmCopyModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="confirmCopyModal"
+            @click.away="confirmCopyModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="confirmCopyModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="mt-3 ml-8">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-xl text-blue-500 mr-3"></i>データをコピーしますか?</span><br>
+                    </div>
+                    <div class="text-center mt-2 ml-3">
+                        <span class="text-base text-gray-700">選択した月が見積表の情報と一致する場合は上書きされます。</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <button type="submit" onclick="saveDetail()" @click="confirmCopyModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2">
+                        確定
+                    </button>
+                    <button type="button" @click="confirmCopyModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End copy server data Modal -->
+    <!-- Start confirm the data modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="confirmDataModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="confirmDataModal"
+            @click.away="confirmDataModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-1 text-left my-auto">
+                        <h3 class="text-xl text-left text-gray-600">
+                            処理確認
+                        </h3>
+                    </div>
+                    <div class="col-start-3 col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="confirmDataModal = false"></i>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="bg-gray-100 pt-2 pb-2">
+                    <div class="text-center mt-3">
+                        <span class="text-lg text-gray-700"><i class="fa-solid fa-circle-question fa-2xl text-blue-500 mr-3"></i>データを確定しますか？</span>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="bg-gray-100 px-4 pt-2 pb-5 text-center">
+                    <a type="button" id="btn_save_print" @click="confirmDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 cursor-pointer">
+                        確定
+                    </a>
+                    <a type="button" id="btn_print" @click="confirmDataModal = false" class="mt-3 text-sm bg-zinc-200 hover:bg-zinc-300 font-bold inline-flex justify-center rounded-md border border-gray-300 px-5 py-2 ml-5">
+                        戻る
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End confirm the data Modal -->
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+    function checkJanSupport() { return true; }
+  </script>
+
+<script>
+    // グローバルで使用するjanSupport定数の設定
+    const janSupport = checkJanSupport();
+
+    var setToYear = document.getElementById('year_id');
+    var setMonth = document.getElementById('month_id');
+    // Get the current date
+    var currentDate = new Date();
+    // Define a variable to store the current month and year
+    var currentMonth = currentDate.getMonth() + 1; // Adding 1 to the month since it is zero-based
+    var currentYear = currentDate.getFullYear();
+    // Function to update the month and year display
+    function updateMonthYearText() {
+        setToYear.value = currentYear;
+        setMonth.value = currentMonth.toString().padStart(2, '0');
+    }
+    // Function to go to the previous month
+    function goToPreviousMonth() {
+        currentMonth--;
+        if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        updateMonthYearText();
+    }
+    // Function to go to the next month
+    function goToNextMonth() {
+        currentMonth++;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        updateMonthYearText();
+    }
+
+    setMonth.addEventListener("input", function() {
+        let value = parseInt(setMonth.value);
+        if (value < parseInt(setMonth.min)){
+            setMonth.value = setMonth.min;
+        }else if(value > parseInt(setMonth.max)){
+            setMonth.value = setMonth.max;
+        }else{
+            currentMonth = setMonth.value.toString().padStart(2, '0');;
+            currentYear = setToYear.value;
+        }
+    });
+    setToYear.addEventListener("input", function() {
+        let value = parseInt(setToYear.value);
+        if (value < parseInt(setToYear.min)){
+            setToYear.value = setToYear.min;
+        }else if(value > parseInt(setToYear.max)){
+            setToYear.value = setToYear.max;
+        }else{
+            currentMonth = setMonth.value.toString().padStart(2, '0');;
+            currentYear = setToYear.value;
+        }
+    });
+</script>
+
+<!-- include: common/resolveNumericInput.html -->
+
+<script>
+    $(document).ready(function() {
+        clientData();
+        materialData();
+        updateMonthYearText();
+    });
+
+    var divClientName;
+    var flag1 = false;
+    var flag2 = false;
+
+    // function show data client list of database
+    function clientData(){
+        $.ajax({
+            url: '#',
+            dataType: 'json',
+            success: function (data) {
+                let divClientList = document.getElementById('client_list');
+                divClientList.innerHTML = '';
+
+                let clientListObj = data.client_list;
+                for (let id in clientListObj) {
+                    let divMain = document.createElement('div');
+                    divMain.classList.add('grid', 'grid-cols-4', 'group', 'text-base', 'bg-white');
+
+                    let divClientId = document.createElement('div');
+                    divClientId.classList.add('col-span-1', 'group-hover:font-bold', 'group-hover:bg-[#f7b580]', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white');
+                    divClientId.innerHTML = clientListObj[id].client_id;
+
+                    divClientName = document.createElement('div');
+                    divClientName.classList.add('div-client', 'col-span-2', 'grid');
+                    divClientName.setAttribute('onclick', 'setClientDate('+ clientListObj[id].client_id +', "' + clientListObj[id].client_name + '", '+ clientListObj[id].is_estimation_foamed_styrol +')');
+
+                    let spanClientName = document.createElement('span');
+                    spanClientName.classList.add('group-hover:text-zinc-800', 'group-hover:font-bold', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'pl-1');
+                    spanClientName.innerHTML = clientListObj[id].client_name;
+
+                    let divEstimation = document.createElement('div');
+                    divEstimation.classList.add('col-span-1', 'group-hover:font-bold', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'text-center');
+                    divEstimation.setAttribute('ondblclick', 'changeEstimation('+ clientListObj[id].client_id +', ' + clientListObj[id].is_estimation_foamed_styrol + ', '+ clientListObj[id].id +')');
+                    if(clientListObj[id].is_estimation_foamed_styrol === true){
+                        divEstimation.classList.add('bg-[#22b14c]');
+                        divEstimation.innerHTML = '9';
+                    }else if(clientListObj[id].is_estimation_foamed_styrol === false){
+                        divEstimation.classList.add('bg-white');
+                        divEstimation.innerHTML = '0';
+                    }else{
+                        divEstimation.classList.add('bg-white');
+                    }
+
+                    divClientName.append(spanClientName);
+                    divMain.append(divClientId, divClientName, divEstimation);
+                    divClientList.append(divMain);
+                }
+            }
+        })
+    }
+
+    // function show data of material list
+    var divMaterialName;
+    function materialData(){
+        $.ajax({
+            url: '#',
+            dataType: 'json',
+            success: function (data) {
+                let divMaterialList = document.getElementById('material_list');
+                divMaterialList.innerHTML = '';
+
+                let materialListObj = data.material_list;
+                for (let id in materialListObj) {
+                    let divMain = document.createElement('div');
+                    divMain.classList.add('grid', 'grid-cols-4', 'group', 'text-base', 'bg-white');
+
+                    divMaterialId = document.createElement('div');
+                    divMaterialId.classList.add('col-span-1', 'group-hover:font-bold', 'group-hover:bg-blue-100', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'text-center');
+                    divMaterialId.innerHTML = materialListObj[id].material_id;
+
+                    divMaterialName = document.createElement('div');
+                    divMaterialName.classList.add('col-span-3', 'grid');
+                    divMaterialName.setAttribute('ondblclick', 'materialsDetails('+ materialListObj[id].material_id +', "' + materialListObj[id].material_name + '")');
+
+                    let spanMaterialName = document.createElement('span');
+                    spanMaterialName.classList.add('group-hover:text-zinc-800', 'group-hover:font-bold', 'group-hover:bg-blue-100', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'pl-2');
+                    spanMaterialName.innerHTML = materialListObj[id].material_name;
+
+                    divMaterialName.append(spanMaterialName);
+                    divMain.append(divMaterialId, divMaterialName);
+                    divMaterialList.append(divMain);
+                }
+            }
+        })
+    }
+
+    // function set value in input field when click at client
+    function setClientDate(clientId, clientName, estimationOfNumber){
+        flag1 = false;
+        flag2 = false;
+        let setClientId = document.getElementById('client_id');
+        let setClientName = document.getElementById('client_name');
+        let setEstimationNumber = document.getElementById('estimation_id');
+
+        setClientId.value = clientId;
+        setClientName.value = clientName;
+
+        if(estimationOfNumber === false){
+            setEstimationNumber.value = 0;
+        }else if(estimationOfNumber === true){
+            setEstimationNumber.value = 9;
+        }else{
+            setEstimationNumber.value = 0;
+        }
+        let setYearMonth = setToYear.value + setMonth.value.toString().padStart(2, '0');
+        setTagColorDiv();
+        quotationList(clientId);
+        detailQuotations(setYearMonth, '0');
+    }
+
+    // function change estimation number of client
+    function changeEstimation(clientId, estimationNumber, pkId){
+        if(estimationNumber === true){
+            estimationNumber = 0;
+        }else{
+            estimationNumber = 9;
+        }
+        $.ajax({
+            url: '#',
+            data:{
+                'client_id': clientId,
+                'estimation_foam_status': estimationNumber
+            },
+            dataType: 'json',
+            success: function (data) {
+                clientData();
+            }
+        })
+    }
+
+    function setTagColorDiv(){
+        let previousDiv = null;
+        $('#client_list').on('click', '.div-client', function() {
+            $(this).addClass('bg-[#f7b580]');
+            if (previousDiv !== null) {
+                previousDiv.removeClass('bg-[#f7b580]').addClass('bg-white');
+            }
+            previousDiv = $(this);
+            disableButton();
+        });
+    }
+
+    var divQuotationYearMonth;
+    var createQuotationBtn;
+
+    // function show quotation list data by client, month and year
+    function quotationList(clientId){
+        $.ajax({
+            url: '#',
+            data:{
+                'client_id': clientId
+            },
+            dataType: 'json',
+            success: function (data) {
+                let divQuotationList = document.getElementById('quotation_list');
+                divQuotationList.innerHTML = '';
+
+                let quotationListObj = data.quotation_list;
+                if(quotationListObj === 'Not found'){
+                    divClientName.setAttribute('x-show', 'createQuotationModal = true');
+
+                    createQuotationBtn = document.getElementById('create_quotation_btn');
+                    createQuotationBtn.setAttribute('onclick', 'checkSalesData('+ clientId + ')');
+                }else{
+                    for (let id in quotationListObj) {
+                        let divMain = document.createElement('div');
+                        divMain.classList.add('grid', 'grid-cols-6', 'group', 'text-base', 'bg-white', 'div-quotation');
+
+                        divQuotationYearMonth = document.createElement('div');
+                        divQuotationYearMonth.classList.add('col-span-2', 'group-hover:font-bold', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white');
+                        divQuotationYearMonth.innerHTML = quotationListObj[id].year_month;
+                        divQuotationYearMonth.setAttribute('ondblclick', 'showModalDe(' + quotationListObj[id].year_month + ', ' + quotationListObj[id].client_id + ')');
+
+                        let divQuotationName = document.createElement('div');
+                        divQuotationName.classList.add('col-span-4', 'grid');
+
+                        let spanQuotationName = document.createElement('span');
+                        spanQuotationName.classList.add('group-hover:text-zinc-800', 'group-hover:font-bold', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'border-r', 'border-b', 'border-gray-200', 'pl-2');
+                        spanQuotationName.innerHTML = quotationListObj[id].client_name;
+                        spanQuotationName.setAttribute('onclick', 'detailQuotations(' + quotationListObj[id].year_month + ', ' + quotationListObj[id].client_id + ')');
+
+                        divQuotationName.append(spanQuotationName);
+                        divMain.append(divQuotationYearMonth, divQuotationName);
+                        divQuotationList.append(divMain);
+                    }
+                }
+            }
+        })
+    }
+
+    function setTagColorQuotation(){
+        $('#quotation_list').on('click','.div-quotation',function () {
+            $(this).parent().find('.div-quotation').removeClass('bg-[#f7b580]');
+            $(this).addClass('bg-[#f7b580]');
+        });
+    }
+
+    function showModalDe(quotationYearMonth, quotationClientId){
+        divQuotationYearMonth.setAttribute('x-show', 'deleteThisDataModal = true');
+        let yearMonthId = document.getElementById('year_month');
+        let quotationId = document.getElementById('quotation_id');
+
+        yearMonthId.innerHTML = quotationYearMonth;
+        quotationId.innerHTML = quotationClientId;
+
+        let confirmDeQuotation = document.getElementById('confirm_de_quotation');
+        confirmDeQuotation.setAttribute('onclick', 'deleteQuotation(' + quotationYearMonth + ', ' + quotationClientId + ')');
+        disableButton();
+    }
+
+    // function delete quotation data
+    function deleteQuotation(yearMonth, clientId){
+        $.ajax({
+            url: '#',
+            data:{
+                'year_month': yearMonth,
+                'client_id': clientId
+            },
+            dataType: 'json',
+            success: function (data) {
+                quotationAfterDelete(clientId);
+                // quotationList(clientId);
+                let divOrderMaterial = document.getElementById('detail_order');
+                divOrderMaterial.innerHTML = '';
+            }
+        })
+    }
+
+    // function show data again after confirm delete in modal
+    function quotationAfterDelete(clientId){
+        $.ajax({
+            url: '#',
+            data:{
+                'client_id': clientId
+            },
+            dataType: 'json',
+            success: function (data) {
+                let divQuotationList = document.getElementById('quotation_list');
+                let divOrderMaterial = document.getElementById('detail_order');
+
+                let quotationListObj = data.quotation_list;
+
+                if(quotationListObj === 'Not found'){
+                    divQuotationList.innerHTML = '';
+                    divOrderMaterial.innerHTML = '';
+                }else{
+                    quotationList(clientId);
+                }
+            }
+        })
+    }
+
+    // data check function whether there is data or not
+    function checkSalesData(checkClient){
+        $.ajax({
+            url: '#',
+            data:{
+                'client_id': checkClient,
+                'year': year_id.value,
+                'month': month_id.value
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.ret === 'Sales data not found'){
+                    createQuotationBtn.setAttribute('x-show', 'dataDoesNotExistModal = true');
+                }else{
+                    quotationList(checkClient);
+                }
+            }
+        })
+    }
+    // function show detail data by quotation
+    var divMainMaterial;
+    var btnDelete;
+
+    function populateUnitOptions(selectElement, defaultValue) {
+        const units = ['', 'kg', 'ｹｰｽ', 'ｾｯﾄ', 'ﾊﾟｯｸ', '個', '切', '束', '袋', '本', '枚', '粒', '基'];
+
+        units.forEach(unit => {
+            let option = document.createElement('option');
+            option.innerHTML = unit || defaultValue || '';
+            if (unit === '') {
+                option.innerHTML = defaultValue || '';
+            }
+            option.setAttribute('value', unit || defaultValue || '');
+            if (unit === defaultValue) {
+                option.setAttribute('selected', true);
+            }
+            selectElement.append(option);
+        });
+    }
+
+    function calcQuotationOrderPrice(rowId) {
+        if (!janSupport) return;
+        let row = document.getElementById(rowId);
+        if (!row) return;
+
+        // keys: [..., 'selling_unit_price', 'price_per_package', 'estimated_unit_price']
+        // indices: ..., 12, 13, 14
+        let inputs = row.querySelectorAll('input, select');
+        let qtyPackage = parseFloat(inputs[8].value) || 0;
+        let pricePerPackage = parseFloat(inputs[13].value) || 0;
+
+        if (qtyPackage > 0) {
+            let result = pricePerPackage * qtyPackage;
+            inputs[14].value = Math.round(result * 10) / 10;
+        }
+    }
+
+    function detailQuotations(yearAndMonth, client){
+        enableButton();
+        let yearId = document.getElementById('year_id');
+        let monthId = document.getElementById('month_id');
+
+        let valueYear = yearAndMonth.toString().substr(0, 4);
+        let valueMonth = yearAndMonth.toString().substr(4);
+
+        let newDateQuotations = new Date(valueYear);
+        newDateQuotations.setMonth(valueMonth);
+
+        currentMonth = newDateQuotations.getMonth();
+        currentYear = newDateQuotations.getFullYear();
+
+        yearId.value =  valueYear;
+        monthId.value =  valueMonth;
+
+        $.ajax({
+            url: '#',
+            data:{
+                'year_month': yearAndMonth,
+                'client_id': client
+            },
+            dataType: 'json',
+            success: function (data) {
+                let divOrderMaterial = document.getElementById('detail_order');
+                divOrderMaterial.innerHTML = '';
+
+                let quotationDetailsListObj = data.quotation_details;
+                for (let id in quotationDetailsListObj) {
+                    divMainMaterial = document.createElement('div');
+                    divMainMaterial.classList.add('grid', janSupport ? 'grid-cols-26' : 'grid-cols-24', 'text-base', 'row-record', 'display');
+                    divMainMaterial.setAttribute('id', 'record_' + quotationDetailsListObj[id].record_id);
+
+                    let divRecordId = document.createElement('div');
+                    divRecordId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputRecordId = document.createElement('input');
+                    inputRecordId.classList.add('w-full', 'h-full', 'text-center');
+                    inputRecordId.setAttribute('disabled', true);
+                    inputRecordId.value = quotationDetailsListObj[id].record_id;
+
+                    let inputPkId = document.createElement('input');
+                    inputPkId.setAttribute('type', 'hidden');
+                    inputPkId.value = quotationDetailsListObj[id].id;
+
+                    let divMaterialId = document.createElement('div');
+                    divMaterialId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputMaterialId = document.createElement('input');
+                    inputMaterialId.classList.add('w-full', 'h-full', 'text-center');
+                    inputMaterialId.setAttribute('disabled', true);
+                    inputMaterialId.value = quotationDetailsListObj[id].material_id;
+
+                    let divMaterialName = document.createElement('div');
+                    divMaterialName.classList.add('col-span-4', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputMaterialName = document.createElement('input');
+                    inputMaterialName.classList.add('w-full', 'h-full', 'pl-1');
+                    inputMaterialName.setAttribute('disabled', true);
+                    inputMaterialName.value = quotationDetailsListObj[id].material_name;
+
+                    let divMaterialDivision = document.createElement('div');
+                    divMaterialDivision.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#ffd966]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputMaterialDivision = document.createElement('input');
+                    inputMaterialDivision.classList.add('w-full', 'h-full', 'text-center');
+                    inputMaterialDivision.setAttribute('disabled', true);
+                    inputMaterialDivision.value = quotationDetailsListObj[id].material_division;
+
+                    let divStandardId = document.createElement('div');
+                    divStandardId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputStandardId = document.createElement('input');
+                    inputStandardId.classList.add('w-full', 'h-full', 'text-center');
+                    inputStandardId.setAttribute('disabled', true);
+                    inputStandardId.value = quotationDetailsListObj[id].standard_id;
+
+                    let divProducingArea = document.createElement('div');
+                    divProducingArea.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-white', 'h-auto');
+
+                    let inputProducingArea = document.createElement('input');
+                    inputProducingArea.classList.add('w-full', 'h-full', 'pl-1', 'border-white', 'focus:border-gray-400', 'focus:ring-0');
+                    inputProducingArea.setAttribute('type', 'text');
+                    inputProducingArea.value = quotationDetailsListObj[id].producing_area;
+
+                    let divShapeSizeEtc = document.createElement('div');
+                    divShapeSizeEtc.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'bg-white', 'h-auto');
+
+                    let inputShapeSizeEtc = document.createElement('input');
+                    inputShapeSizeEtc.classList.add('w-full', 'h-full', 'pl-1', 'border-white', 'focus:border-gray-400', 'focus:ring-0');
+                    inputShapeSizeEtc.setAttribute('type', 'text');
+                    inputShapeSizeEtc.value = quotationDetailsListObj[id].shape_size_etc;
+
+                    let divQuantityPerPackage = document.createElement('div');
+                    divQuantityPerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputQuantityPerPackage = document.createElement('input');
+                    inputQuantityPerPackage.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+                    inputQuantityPerPackage.setAttribute('type', 'text');
+                    inputQuantityPerPackage.setAttribute('onchange', "if(resolveNumericInput(this)) { calcQuotationOrderPrice('record_" + quotationDetailsListObj[id].record_id + "') }");
+                    inputQuantityPerPackage.value = quotationDetailsListObj[id].quantity_per_package;
+
+                    let divUnitOfQuantityPerPackage = document.createElement('div');
+                    divUnitOfQuantityPerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let selectUnitOfQuantityPerPackage = document.createElement('select');
+                    selectUnitOfQuantityPerPackage.classList.add('inline-flex', 'justify-center', 'w-full', 'h-full', 'border', 'shadow-sm', 'px-1', 'py-0.5', 'bg-white', 'text-sm', 'text-gray-700', 'hover:bg-gray-50');
+                    populateUnitOptions(selectUnitOfQuantityPerPackage, quotationDetailsListObj[id].unit_of_quantity_per_package);
+
+                    let divQuantityPerUnit = document.createElement('div');
+                    divQuantityPerUnit.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputQuantityPerUnit = document.createElement('input');
+                    inputQuantityPerUnit.classList.add('text-center', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+                    inputQuantityPerUnit.setAttribute('type', 'number');
+                    inputQuantityPerUnit.setAttribute('onkeypress', 'return event.charCode !== 45');
+                    inputQuantityPerUnit.value = quotationDetailsListObj[id].quantity_per_unit;
+
+                    let divUnit = document.createElement('div');
+                    divUnit.classList.add('col-span-2', 'border-r', 'border-b', 'pt-1', 'pl-3', 'pr-3', 'pb-1', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let selectUnit = document.createElement('select');
+                    selectUnit.classList.add('inline-flex', 'justify-center', 'w-full', 'h-full', 'border', 'shadow-sm', 'px-1', 'py-0.5', 'bg-white', 'text-base', 'text-gray-700', 'hover:bg-gray-50');
+                    populateUnitOptions(selectUnit, quotationDetailsListObj[id].unit);
+
+                    let divSellingUnitPrice = document.createElement('div');
+                    divSellingUnitPrice.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputPricePerPackage = document.createElement('input');
+                    let inputSellingUnitPrice = document.createElement('input');
+
+                    // 販売単価は常に表示（JANかどうかにかかわらず）
+                    inputSellingUnitPrice.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+                    inputSellingUnitPrice.setAttribute('type', 'text');
+                    inputSellingUnitPrice.setAttribute('onchange', "resolveNumericInput(this)");
+                    inputSellingUnitPrice.value = quotationDetailsListObj[id].selling_unit_price;
+                    divSellingUnitPrice.append(inputSellingUnitPrice);
+
+                    let divPricePerPackage;
+                    if (janSupport) {
+                        divPricePerPackage = document.createElement('div');
+                        divPricePerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                        inputPricePerPackage.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+                        inputPricePerPackage.setAttribute('type', 'text');
+                        inputPricePerPackage.setAttribute('onchange', "if(resolveNumericInput(this, 2)) { calcQuotationOrderPrice('record_" + quotationDetailsListObj[id].record_id + "') }");
+                        divPricePerPackage.append(inputPricePerPackage);
+                    } else {
+                        inputPricePerPackage.setAttribute('type', 'hidden');
+                    }
+                    inputPricePerPackage.value = quotationDetailsListObj[id].price_per_package || 1;
+
+                    let divEstimatedUnitPrice = document.createElement('div');
+                    divEstimatedUnitPrice.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-[#f8cbad]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+                    let inputEstimatedUnitPrice = document.createElement('input');
+                    inputEstimatedUnitPrice.classList.add('text-center', 'w-full', 'h-full', 'bg-[#f8cbad]', 'text-base', 'border-[#f8cbad]', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+                    inputEstimatedUnitPrice.setAttribute('type', 'text');
+                    inputEstimatedUnitPrice.setAttribute('onchange', "resolveNumericInput(this)");
+                    inputEstimatedUnitPrice.value = quotationDetailsListObj[id].estimated_unit_price;
+                    divEstimatedUnitPrice.append(inputEstimatedUnitPrice);
+
+                    // No special treatment for oninput needed here anymore, onchange handles everything
+
+                    let divButton = document.createElement('div');
+                    divButton.classList.add('col-span-1', 'p-1', 'my-auto');
+
+                    btnDelete = document.createElement('button');
+                    btnDelete.classList.add('fa-solid', 'fa-trash-can', 'text-xl', 'text-red-500');
+                    btnDelete.setAttribute('type', 'button');
+                    btnDelete.setAttribute('onclick', 'hiddenDivDetail(' + quotationDetailsListObj[id].record_id + ', ' + quotationDetailsListObj[id].id + ')');
+
+                    divRecordId.append(inputRecordId, inputPkId);
+                    divMaterialId.append(inputMaterialId);
+                    divMaterialName.append(inputMaterialName);
+                    divMaterialDivision.append(inputMaterialDivision);
+                    divStandardId.append(inputStandardId);
+                    divProducingArea.append(inputProducingArea);
+                    divShapeSizeEtc.append(inputShapeSizeEtc);
+                    divQuantityPerPackage.append(inputQuantityPerPackage);
+                    divUnitOfQuantityPerPackage.append(selectUnitOfQuantityPerPackage);
+                    divQuantityPerUnit.append(inputQuantityPerUnit);
+                    divUnit.append(selectUnit);
+                    divSellingUnitPrice.append(inputSellingUnitPrice);
+                    divEstimatedUnitPrice.append(inputEstimatedUnitPrice);
+                    divButton.append(btnDelete);
+
+                    divMainMaterial.append(divRecordId, divMaterialId, divMaterialName, divMaterialDivision, divStandardId, divProducingArea, divShapeSizeEtc, divQuantityPerPackage,
+                    divUnitOfQuantityPerPackage, divQuantityPerUnit, divUnit, divSellingUnitPrice);
+                    if (janSupport) {
+                        divMainMaterial.append(divPricePerPackage);
+                    } else {
+                        divMainMaterial.append(inputPricePerPackage); // Always append to keep index
+                    }
+                    divMainMaterial.append(divEstimatedUnitPrice, divButton);
+                    divOrderMaterial.append(divMainMaterial)
+                }
+                setTagColorQuotation();
+            }
+        })
+    }
+
+    // Function showing modal on 削除 button click
+    function hiddenDivDetail(recordNumber, PkID){
+        btnDelete.setAttribute('x-show', 'deleteOrderModal = true');
+        let recordByOrder = document.getElementById('record_by_order');
+        recordByOrder.innerHTML = recordNumber;
+
+        let confirmDeleteOrder = document.getElementById('confirm_delete_order');
+        confirmDeleteOrder.setAttribute('onclick', 'confirmDelete(' + recordNumber + ', ' + PkID + ')');
+    }
+
+    // Clicking the 確定 button will hide the information of that row.
+    var arrayDePk = [];
+    function confirmDelete(recordOfMaterial, pkIDRow){
+        let divRecord = document.getElementById('record_' + recordOfMaterial);
+        divRecord.classList.remove('display');
+        divRecord.classList.add('hidden');
+        arrayDePk.push(pkIDRow);
+    }
+
+    $("#quotation_list").on('click', function(e) {
+        flag1 = true;
+    });
+
+    $("#prev_date").on('click', function(e) {
+        flag2 = true;
+    });
+
+    $("#next_date").on('click', function(e) {
+        flag2 = true;
+    });
+
+    function saveDataToDb(){
+        let saveDataBtn = document.getElementById('btn_save');
+
+        if (flag1 === true && flag2 === true){
+            saveDataBtn.setAttribute('x-show', 'confirmCopyModal   = true');
+        }else{
+            saveDataBtn.setAttribute('x-show', 'saveDataModal  = true');
+        }
+    }
+
+    var keys = ['record_id', 'id', 'material_id', 'material_name', 'material_division', 'standard_id', 'producing_area', 'shape_size_etc', 'quantity_per_package',
+    'unit_of_quantity_per_package', 'quantity_per_unit', 'unit', 'selling_unit_price', 'price_per_package', 'estimated_unit_price'];
+    var arrFromDiv = [];
+    var chunksData = [];
+    var arrData = [];
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    function saveDetail(){
+        let detailDiv =  document.getElementById('detail_order');
+        const displayDivs = detailDiv.getElementsByClassName('display');
+        let yearMonthValue = year_id.value + month_id.value;
+        createDataToArray();
+        if (flag1 === true && flag2 === true){
+            arrData.forEach(obj => {
+                obj["id"] = 0;
+            });
+            arrayDePk = [];
+            sendDataForAjax();
+        }else{
+            sendDataForAjax();
+        }
+    }
+
+    function sendDataForAjax(){
+        let SetYearMonth = year_id.value + month_id.value;
+        $.ajax({
+            url: '#',
+            data: JSON.stringify({
+                'year': year_id.value,
+                'month': month_id.value,
+                'client_id': client_id.value,
+                'client_name': client_name.value,
+                'data': arrData,
+                'delete_ids': arrayDePk}),
+            dataType: "json",
+            type:"POST",
+            headers: { 'X-CSRFToken': csrfToken },
+            success: function (data) {
+                arrFromDiv = [];
+                chunksData = [];
+                arrData = [];
+                arrayDePk = [];
+                quotationList(client_id.value);
+                detailQuotations(SetYearMonth, 0);
+                flag1 = false;
+                flag2 = false;
+            }
+        })
+    }
+
+    // The function takes the data of each input and pushes it into an array.
+    function createDataToArray(){
+        let formDetail = document.getElementById('form_detail');
+
+        let elementsWithShowClass = formDetail.querySelectorAll('.display');
+
+        for(let element of elementsWithShowClass) {
+            let allElements = element.querySelectorAll('*');
+            for (let currentElement  of allElements) {
+                if (currentElement.tagName === 'INPUT' || currentElement.tagName === 'SELECT') {
+                    let data = currentElement.value;
+                    arrFromDiv.push(data);
+                }
+            }
+        }
+
+        const length = arrFromDiv.length;
+        let chunkSize = 15;
+        for (let i = 0; i < length; i += chunkSize) {
+            const chunk = arrFromDiv.slice(i, i + chunkSize);
+            chunksData.push(chunk);
+        }
+
+        let dataToArray = chunksData;
+        for(let detail in dataToArray){
+            let obj = {}; // Initialize obj inside the loop for each chunk
+            for (let j = 0; j < dataToArray[detail].length; j++) {
+                obj[keys[j]] = dataToArray[detail][j];
+            }
+            arrData.push(obj);
+        }
+    }
+
+    // Function to show information for materials that have been order entry on the order page.
+    function materialsDetails(materialNumber, materialName){
+        let ingredientNumber = document.getElementById('ingredient_number');
+        console.log("materialsDetails: ",materialNumber, materialName);
+        ingredientNumber.value = materialNumber;
+        $.ajax({
+            url: '#',
+            data:{
+                'client_id': client_id.value,
+                'material_id': materialNumber
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.ret === 'Material not found'){
+                    divMaterialName.setAttribute('x-show', 'registeredLedgerModal = true');
+                    let btnRegisteredMaterial = document.getElementById('registered_material');
+                    btnRegisteredMaterial.setAttribute('onclick', 'checkDivDetail(' + materialNumber + ', "' + materialName +'", ' + 1 +', "", "", "", "", "", "", "", "")');
+                }else{
+                    divMaterialName.setAttribute('x-show', 'materialLedgerModal = true');
+
+                    let countStandard = data.ret.length - 1;
+                    let lastStandard = data.ret[countStandard].standard_id;
+                    lastStandard = lastStandard + 1
+
+                    let addMaterialBtn = document.getElementById('add_material_btn');
+                    addMaterialBtn.setAttribute('onclick', 'checkDivDetail('+ materialNumber + ', "' + materialName + '", ' + lastStandard + ', "", "", "", "", "", "", "", "", "")');
+
+                    let materialTable = document.getElementById('material_shape_ledger');
+                    materialTable.innerHTML = '';
+
+                    let materialDetailsListObj = data.ret;
+                    for (let id in materialDetailsListObj) {
+                        let tr = document.createElement('tr');
+
+                        let td1 = document.createElement('td');
+                        td1.classList.add('border', 'text-center');
+                        td1.innerHTML = materialDetailsListObj[id].standard_id;
+
+                        let td2 = document.createElement('td');
+                        td2.classList.add('border', 'text-center');
+                        td2.innerHTML = materialDetailsListObj[id].producing_area;
+
+                        let td3 = document.createElement('td');
+                        td3.classList.add('border', 'text-center', 'cursor-pointer');
+                        td3.innerHTML = materialDetailsListObj[id].shape_size_etc;
+                        td3.setAttribute('ondblclick', 'checkDivDetail('+ materialNumber + ', "' + materialName + '" ,' + materialDetailsListObj[id].standard_id + ', "' + materialDetailsListObj[id].producing_area + '", "' + materialDetailsListObj[id].shape_size_etc + '", "'+ materialDetailsListObj[id].quantity_per_package +'", "'+materialDetailsListObj[id].unit_of_quantity_per_package +'", "'+ materialDetailsListObj[id].quantity_per_unit +'", "'+ materialDetailsListObj[id].unit +'", '+ materialDetailsListObj[id].weight_per_unit +', '+ materialDetailsListObj[id].unit_price +', '+ materialDetailsListObj[id].price_per_package +')');
+                        td3.setAttribute('id', 'materials_name');
+
+                        let td4 = document.createElement('td');
+                        td4.classList.add('border', 'text-center');
+                        td4.innerHTML = materialDetailsListObj[id].quantity_per_package;
+
+                        let td5 = document.createElement('td');
+                        td5.classList.add('border', 'text-center');
+                        td5.innerHTML = materialDetailsListObj[id].unit_of_quantity_per_package;
+
+                        let td6 = document.createElement('td');
+                        td6.classList.add('border', 'text-center');
+                        td6.innerHTML = materialDetailsListObj[id].quantity_per_unit;
+
+                        let td7 = document.createElement('td');
+                        td7.classList.add('border', 'text-center');
+                        td7.innerHTML = materialDetailsListObj[id].unit;
+
+                        let td8 = document.createElement('td');
+                        td8.classList.add('border', 'text-center');
+                        td8.innerHTML = materialDetailsListObj[id].weight_per_unit;
+
+                        let td9 = document.createElement('td');
+                        td9.classList.add('border', 'text-center');
+                        td9.innerHTML = materialDetailsListObj[id].unit_price;
+
+                        if (janSupport) {
+                            let td10 = document.createElement('td');
+                            td10.classList.add('border', 'text-center');
+                            td10.innerHTML = materialDetailsListObj[id].price_per_package;
+                            tr.append(td1, td2, td3, td4, td5, td6, td7, td8, td9, td10);
+                        } else {
+                            tr.append(td1, td2, td3, td4, td5, td6, td7, td8, td9);
+                        }
+                        materialTable.append(tr);
+                    }
+                }
+            }
+        })
+    }
+    // function add new row in the quotation detail
+    var maxID = 0;
+    function createDetailMaterial(materialId, materialName, standardNumber, producingArea, shapeSizeEtc, quantityPerPackage, unitOfQuantityPerPackage, quantityPerUnit, unit, weightPerUnit, unitPrice, pricePerPackage){
+        let divOrderMaterial = document.getElementById('detail_order');
+        let divOrderNumber = document.getElementsByClassName('row-record');
+        let divIds = [];
+        for (let i = 0; i < divOrderNumber.length; i++) {
+            const div = divOrderNumber[i];
+            const id = div.id;
+            let numbersOnly = id.replace(/\D/g, '');
+
+            // Add the ID to the array if it exists
+            if (numbersOnly) {
+                divIds.push(numbersOnly);
+            }
+        }
+
+        let highestValue = Math.max(...divIds);
+        if(divIds.length === 0){
+            maxID = 0;
+        }else{
+            maxID = highestValue;
+        }
+
+        maxID++;
+
+        enableButton();
+
+        divMainMaterial = document.createElement('div');
+        divMainMaterial.classList.add('grid', janSupport ? 'grid-cols-26' : 'grid-cols-24', 'text-base', 'row-record', 'display');
+        divMainMaterial.setAttribute('id', 'record_' + maxID);
+
+        let divRecordId = document.createElement('div');
+        divRecordId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputRecordId = document.createElement('input');
+        inputRecordId.classList.add('w-full', 'h-full', 'text-center');
+        inputRecordId.setAttribute('disabled', true);
+        inputRecordId.value = maxID;
+
+        let inputPkId = document.createElement('input');
+        inputPkId.classList.add('w-full', 'h-6', 'text-center', 'text-red-200');
+        inputPkId.setAttribute('disabled', true);
+        inputPkId.value = '0';
+
+        let divMaterialId = document.createElement('div');
+        divMaterialId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputMaterialId = document.createElement('input');
+        inputMaterialId.classList.add('w-full', 'h-full', 'text-center');
+        inputMaterialId.setAttribute('disabled', true);
+        inputMaterialId.value = materialId;
+
+        let divMaterialName = document.createElement('div');
+        divMaterialName.classList.add('col-span-4', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputMaterialName = document.createElement('input');
+        inputMaterialName.classList.add('w-full', 'h-full', 'pl-1');
+        inputMaterialName.setAttribute('disabled', true);
+        inputMaterialName.value = materialName;
+
+        let divMaterialDivision = document.createElement('div');
+        divMaterialDivision.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#ffd966]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputMaterialDivision = document.createElement('input');
+        inputMaterialDivision.classList.add('w-full', 'h-full', 'text-center');
+        inputMaterialDivision.setAttribute('disabled', true);
+        inputMaterialDivision.value = '0';
+
+        let divStandardId = document.createElement('div');
+        divStandardId.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-[#fbe5d6]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputStandardId = document.createElement('input');
+        inputStandardId.classList.add('w-full', 'h-full', 'text-center');
+        inputStandardId.setAttribute('disabled', true);
+        inputStandardId.value = standardNumber;
+
+        let divProducingArea = document.createElement('div');
+        divProducingArea.classList.add('col-span-1', 'border-r', 'border-b', 'border-gray-200', 'bg-white', 'h-auto');
+
+        let inputProducingArea = document.createElement('input');
+        inputProducingArea.classList.add('w-full', 'h-full', 'pl-1', 'border-white', 'focus:border-gray-400', 'focus:ring-0');
+        inputProducingArea.setAttribute('type', 'text');
+        inputProducingArea.value = producingArea;
+
+        let divShapeSizeEtc = document.createElement('div');
+        divShapeSizeEtc.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'bg-white', 'h-auto');
+
+        let inputShapeSizeEtc = document.createElement('input');
+        inputShapeSizeEtc.classList.add('w-full', 'h-full', 'pl-1', 'border-white', 'focus:border-gray-400', 'focus:ring-0');
+        inputShapeSizeEtc.setAttribute('type', 'text');
+        inputShapeSizeEtc.value = shapeSizeEtc;
+
+        let divQuantityPerPackage = document.createElement('div');
+        divQuantityPerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputQuantityPerPackage = document.createElement('input');
+        inputQuantityPerPackage.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+        inputQuantityPerPackage.setAttribute('type', 'text');
+        inputQuantityPerPackage.setAttribute('onchange', "if(resolveNumericInput(this)) { calcQuotationOrderPrice('record_" + maxID + "') }");
+        inputQuantityPerPackage.value = quantityPerPackage;
+
+        let divUnitOfQuantityPerPackage = document.createElement('div');
+        divUnitOfQuantityPerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let selectUnitOfQuantityPerPackage = document.createElement('select');
+        selectUnitOfQuantityPerPackage.classList.add('inline-flex', 'justify-center', 'w-full', 'h-full', 'border', 'shadow-sm', 'px-1', 'py-0.5', 'bg-white', 'text-sm', 'text-gray-700', 'hover:bg-gray-50');
+        populateUnitOptions(selectUnitOfQuantityPerPackage, unitOfQuantityPerPackage);
+
+        let divQuantityPerUnit = document.createElement('div');
+        divQuantityPerUnit.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputQuantityPerUnit = document.createElement('input');
+        inputQuantityPerUnit.classList.add('text-center', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+        inputQuantityPerUnit.setAttribute('type', 'number');
+        inputQuantityPerUnit.setAttribute('onkeypress', 'return event.charCode !== 45');
+        inputQuantityPerUnit.value = quantityPerUnit;
+
+        let divUnit = document.createElement('div');
+        divUnit.classList.add('col-span-2', 'border-r', 'border-b', 'pt-1', 'pl-3', 'pr-3', 'pb-1','border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let selectUnit = document.createElement('select');
+        selectUnit.classList.add('inline-flex', 'justify-center', 'w-full', 'h-full', 'border', 'shadow-sm', 'px-1', 'py-0.5', 'bg-white', 'text-base', 'text-gray-700', 'hover:bg-gray-50');
+        populateUnitOptions(selectUnit, unit);
+
+        let divSellingUnitPrice = document.createElement('div');
+        divSellingUnitPrice.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputPricePerPackage = document.createElement('input');
+        let inputSellingUnitPrice = document.createElement('input');
+
+        // 販売単価は常に表示（JANかどうかにかかわらず）
+        inputSellingUnitPrice.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+        inputSellingUnitPrice.setAttribute('type', 'text');
+        inputSellingUnitPrice.setAttribute('onchange', "resolveNumericInput(this)");
+        inputSellingUnitPrice.value = unitPrice;
+        divSellingUnitPrice.append(inputSellingUnitPrice);
+
+        let divPricePerPackage;
+        if (janSupport) {
+            divPricePerPackage = document.createElement('div');
+            divPricePerPackage.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-white', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+            inputPricePerPackage.classList.add('text-center', 'text-base', 'w-full', 'h-full', 'border-white', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+            inputPricePerPackage.setAttribute('type', 'text');
+            inputPricePerPackage.setAttribute('onchange', "if(resolveNumericInput(this, 2)) { calcQuotationOrderPrice('record_" + maxID + "') }");
+            divPricePerPackage.append(inputPricePerPackage);
+        } else {
+            inputPricePerPackage.setAttribute('type', 'hidden');
+        }
+        inputPricePerPackage.value = pricePerPackage || 1;
+
+        let divEstimatedUnitPrice = document.createElement('div');
+        divEstimatedUnitPrice.classList.add('col-span-2', 'border-r', 'border-b', 'border-gray-200', 'text-center', 'bg-[#f8cbad]', 'flex', 'items-center', 'justify-center', 'h-auto');
+
+        let inputEstimatedUnitPrice = document.createElement('input');
+        inputEstimatedUnitPrice.classList.add('text-center', 'w-full', 'h-full', 'bg-[#f8cbad]', 'text-base', 'border-[#f8cbad]', 'p-0', 'focus:ring-0', 'focus:border-gray-400');
+        inputEstimatedUnitPrice.setAttribute('type', 'text');
+        inputEstimatedUnitPrice.setAttribute('onchange', "resolveNumericInput(this)");
+
+        // 初期見積単価計算(JAN支援時)
+        if (janSupport && quantityPerPackage > 0) {
+            inputEstimatedUnitPrice.value = Math.round((pricePerPackage || 1) * quantityPerPackage);
+        } else {
+            inputEstimatedUnitPrice.value = unitPrice;
+        }
+        divEstimatedUnitPrice.append(inputEstimatedUnitPrice);
+
+        let divButton = document.createElement('div');
+        divButton.classList.add('col-span-1', 'p-1', 'my-auto');
+
+        btnDelete = document.createElement('button');
+        btnDelete.classList.add('bg-[#9dc3e6]', 'hover:bg-blue-300', 'rounded', 'border-4', 'border-x-[#5c7286]', 'border-y-[#aed7fc]', 'w-full', 'text-red-700', 'flex', 'items-center', 'justify-center');
+        btnDelete.setAttribute('type', 'button');
+        btnDelete.innerHTML = '削除';
+        btnDelete.setAttribute('onclick', 'hiddenDivDetail(' + maxID + ', ' + 0 + ')');
+
+        divRecordId.append(inputRecordId, inputPkId);
+        divMaterialId.append(inputMaterialId);
+        divMaterialName.append(inputMaterialName);
+        divMaterialDivision.append(inputMaterialDivision);
+        divStandardId.append(inputStandardId);
+        divProducingArea.append(inputProducingArea);
+        divShapeSizeEtc.append(inputShapeSizeEtc);
+        divQuantityPerPackage.append(inputQuantityPerPackage);
+        // No redundant listener needed
+        divUnitOfQuantityPerPackage.append(selectUnitOfQuantityPerPackage);
+        divQuantityPerUnit.append(inputQuantityPerUnit);
+        divUnit.append(selectUnit);
+
+        divSellingUnitPrice.append(inputSellingUnitPrice);
+        divEstimatedUnitPrice.append(inputEstimatedUnitPrice);
+        divButton.append(btnDelete);
+
+        divMainMaterial.append(divRecordId, divMaterialId, divMaterialName, divMaterialDivision, divStandardId, divProducingArea, divShapeSizeEtc, divQuantityPerPackage,
+        divUnitOfQuantityPerPackage, divQuantityPerUnit, divUnit, divSellingUnitPrice);
+        if (janSupport) {
+            divMainMaterial.append(divPricePerPackage);
+        } else {
+            divMainMaterial.append(inputPricePerPackage);
+        }
+        divMainMaterial.append(divEstimatedUnitPrice, divButton);
+        divOrderMaterial.append(divMainMaterial);
+    }
+
+    function checkDivDetail(materialId, materialName, standardNumber, producingArea, shapeSizeEtc, quantityPerPackage, unitOfQuantityPerPackage, quantityPerUnit, unit, weightPerUnit, unitPrice, pricePerPackage){
+        divMaterialName.setAttribute('x-show', 'registeredLedgerModal = false');
+
+        let clickMaterialsName = document.getElementById('materials_name');
+        divMaterialName.setAttribute('x-show', 'materialLedgerModal = false');
+
+        if(producingArea === "" || producingArea === null ||producingArea === "null"){
+            producingArea = "";
+        }
+        if(shapeSizeEtc === "" || shapeSizeEtc === null ||shapeSizeEtc === "null"){
+            shapeSizeEtc = "";
+        }
+        if(quantityPerPackage === "" || quantityPerPackage === null ||quantityPerPackage === "null"){
+            quantityPerPackage = "";
+        }
+        if(unitOfQuantityPerPackage === "" || unitOfQuantityPerPackage === null ||unitOfQuantityPerPackage === "null"){
+            unitOfQuantityPerPackage = "";
+        }
+        if(quantityPerUnit === "" || quantityPerUnit === null ||quantityPerUnit === "null"){
+            quantityPerUnit = "";
+        }
+        if(unit === "" || unit === null ||unit === "null"){
+            unit = "";
+        }
+        createDetailMaterial(materialId, materialName, standardNumber, producingArea, shapeSizeEtc, quantityPerPackage, unitOfQuantityPerPackage, quantityPerUnit, unit, weightPerUnit, unitPrice, pricePerPackage);
+    }
+
+    function generateReport(){
+        let btnReport = document.getElementById('btn_report');
+        btnReport.setAttribute('x-show', 'confirmDataModal  = true');
+
+        let btnSavePrint = document.getElementById('btn_save_print');
+        btnSavePrint.setAttribute('onclick', 'saveAndPrint()');
+
+        let btnPrint = document.getElementById('btn_print');
+        btnPrint.setAttribute('target', '_blank');
+        // let client_uuid = "{{ client_uuid }}"
+        btnPrint.setAttribute('href', '/generate_quotation_report/?year=' + year_id.value + '&month=' + month_id.value + '&client_id=' + client_id.value + '&foam_division=' + estimation_id.value);
+    }
+
+    function saveAndPrint(){
+        let detailDiv =  document.getElementById('detail_order');
+
+        const displayDivs = detailDiv.getElementsByClassName('display');
+        createDataToArray();
+        if (flag1 === true && flag2 === true){
+            arrData.forEach(obj => {
+                obj["id"] = 0;
+            });
+            arrayDePk = [];
+            sendDataSavAndPrintForAjax();
+        }else{
+            sendDataSavAndPrintForAjax();
+        }
+    }
+
+    function sendDataSavAndPrintForAjax(){
+        let SetYearMonth = year_id.value + month_id.value;
+        $.ajax({
+            url: '#',
+            data: JSON.stringify({
+                'year': year_id.value,
+                'month': month_id.value,
+                'client_id': client_id.value,
+                'client_name': client_name.value,
+                'process_type': 'print_and_save',
+                'data': arrData,
+                'delete_ids': arrayDePk}),
+            dataType: "json",
+            type:"POST",
+            headers: { 'X-CSRFToken': csrfToken },
+            success: function (data) {
+                openSheetPrint();
+                arrFromDiv = [];
+                chunksData = [];
+                arrData = [];
+                arrayDePk = [];
+                quotationList(client_id.value);
+                detailQuotations(SetYearMonth, 0);
+            }
+        })
+    }
+
+    function openSheetPrint(){
+        let urlPrint = "#?" + "year=" + year_id.value + "&month=" + month_id.value + "&client_id=" + client_id.value + "&foam_division=" + estimation_id.value;
+        window.open(urlPrint, '_blank');
+    }
+
+    var btnSaveDetail = document.getElementById('btn_save');
+    var btnReport = document.getElementById('btn_report');
+
+    function enableButton(){
+        btnSaveDetail.removeAttribute('disabled');
+        btnSaveDetail.classList.remove('bg-yellow-200', 'border-x-yellow-300', 'border-y-yellow-400');
+        btnSaveDetail.classList.add('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+
+        btnReport.removeAttribute('disabled');
+        btnReport.classList.remove('bg-yellow-200', 'border-x-yellow-300', 'border-y-yellow-400');
+        btnReport.classList.add('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+    }
+
+    function disableButton(){
+        btnSaveDetail.setAttribute('disabled', true);
+        btnSaveDetail.classList.add('bg-yellow-200', 'border-x-yellow-300', 'border-y-yellow-400');
+        btnSaveDetail.classList.remove('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+
+        btnReport.setAttribute('disabled', true);
+        btnReport.classList.add('bg-yellow-200', 'border-x-yellow-300', 'border-y-yellow-400');
+        btnReport.classList.remove('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+    }
+</script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#1A3A63;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP · SS</div>
+</body>
+</html>

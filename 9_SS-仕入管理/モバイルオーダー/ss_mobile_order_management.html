@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>モバイルオーダー管理 — SMART STOCK [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style -->
+  <style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+    /* styles.cssにないホバー効果 */
+    .btn-hover-red:hover { color: #b91c1c; }
+    .btn-hover-blue:hover { color: #3b82f6; }
+    .btn-hover-gray:hover { background-color: #f3f4f6; }
+    .url-span {
+        font-size: 0.75rem;
+        color: #2563eb;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 0 4px;
+        border-radius: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .prefix-badge {
+        font-size: 0.75rem;
+        color: #2563eb;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-family: monospace;
+    }
+    .status-text-subtle { color: #cbd5e1; font-size: 0.75rem; font-style: italic; }
+    .code-tag {
+        padding: 2px 8px;
+        font-size: 0.875rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #475569;
+        border-radius: 4px;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    /* SS: primary color (green-teal) fallback */
+    .text-primary-500 { color: #10b981; }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- block content -->
+  <form id="csrf-form"></form>
+  <!-- Main Container -->
+  <div class="grid w-full max-w-[1280px] mx-auto mt-20 p-5 border rounded-md shadow-lg bg-slate-50">
+      <!-- Top Navigation -->
+      <div class="mb-5">
+          <a href="#" role="button">
+              <span class="text-sm text-gray-700 my-2 font-bold bg-gray-300 rounded-md px-3 py-2 text-center transition">
+                  <i class="fas fa-home mr-2"></i>メインメニュー
+              </span>
+          </a>
+      </div>
+
+      <div class="grid gap-y-5">
+          <!-- Section Header -->
+          <div class="grid grid-cols-6 gap-y-2 rounded border p-4 bg-slate-100 items-center">
+              <span class="col-span-4 text-gray-700 text-2xl font-bold">
+                  <i class="fas fa-mobile-alt mr-3"></i>
+                  モバイルオーダー管理
+                  <span class="text-md font-bold text-primary-500">(Smart Stock)</span>
+              </span>
+              <div class="col-span-2 text-right">
+                  <button onclick="loadAccessData()" class="text-gray-700 bg-gray-300 rounded-md text-sm px-4 py-2 text-center transition font-bold">
+                      <i class="fas fa-sync-alt mr-2"></i>データ更新
+                  </button>
+              </div>
+              <p class="col-span-4 text-sm font-bold pt-2" style="color:#64748b">取引先および店舗別の発注アプリ接続権限とURLを管理します。</p>
+              <div class="col-span-2 text-right pt-2">
+                  <span id="companyPrefix" class="prefix-badge">Prefix: DEMO</span>
+              </div>
+
+              <!-- Management Table Section -->
+              <div class="col-span-6 mt-4 max-h-[600px] overflow-y-auto border rounded-md relative shadow">
+                  <table class="w-full bg-white border-collapse">
+                      <thead class="bg-slate-200 sticky top-0 z-10">
+                              <tr class="text-xs text-gray-800 font-bold">
+                                  <th class="py-3 px-2 border bg-slate-200" width="8%">取引先番号</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="15%">取引先名</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="8%">店舗番号</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="15%">店舗名</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="18%">接続コード</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="22%">専用URL (コピー)</th>
+                                  <th class="py-3 px-2 border bg-slate-200" width="14%">状態制御</th>
+                              </tr>
+                      </thead>
+                      <tbody id="clientTableBody">
+                          <!-- サンプルデータ行 -->
+                          <tr class="text-center border-b transition" style="transition:background .15s">
+                              <td class="py-2 border-b text-center text-sm" style="color:#94a3b8">V001</td>
+                              <td class="py-2 border-b text-left px-2 text-sm" style="color:#1e293b">サンプル農業株式会社</td>
+                              <td class="py-2 border-b text-center text-sm" style="color:#94a3b8">W001</td>
+                              <td class="py-2 border-b text-left px-2 text-sm" style="color:#475569">柏倉庫</td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <div class="flex items-center justify-center gap-2">
+                                      <code class="code-tag" title="SS-XYZ789">SS-XYZ789</code>
+                                      <button onclick="deleteCode('1')" class="text-red-500 transition btn-hover-red">
+                                          <i class="fas fa-trash-alt"></i>
+                                      </button>
+                                  </div>
+                              </td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <div class="flex items-center gap-1" style="width:100%;padding:0 6px">
+                                      <span class="url-span" style="flex:1;min-width:0;max-width:none;text-align:left">https://smart-stock…?code=SS-XYZ789</span>
+                                      <button onclick="copyToClipboard('#')" class="transition btn-hover-blue" style="color:#94a3b8;flex-shrink:0">
+                                          <i class="far fa-copy text-xs"></i>
+                                      </button>
+                                  </div>
+                              </td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <div class="flex items-center justify-center gap-1">
+                                      <button class="px-2 py-1 rounded text-xs font-bold border transition bg-green-500 text-white border-green-600">
+                                          有効
+                                      </button>
+                                      <button class="px-2 py-1 rounded text-xs font-bold border transition bg-white border-gray-200 btn-hover-gray" style="color:#6b7280">
+                                          無効
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                          <tr class="text-center border-b transition" style="transition:background .15s">
+                              <td class="py-2 border-b text-center text-sm" style="color:#94a3b8">V002</td>
+                              <td class="py-2 border-b text-left px-2 text-sm" style="color:#1e293b">グリーン産地直送</td>
+                              <td class="py-2 border-b text-center text-sm" style="color:#94a3b8">W003</td>
+                              <td class="py-2 border-b text-left px-2 text-sm" style="color:#475569">松戸センター</td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <div class="flex items-center justify-center gap-1">
+                                      <input type="text" class="w-24 px-1 py-1 text-xs border rounded focus:outline-none"
+                                             placeholder="コード入力" id="input-2">
+                                      <button onclick="saveCode('2')" class="bg-blue-400 text-white px-2 py-1 rounded text-xs font-bold transition">
+                                          作成
+                                      </button>
+                                  </div>
+                              </td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <span class="status-text-subtle">未発行</span>
+                              </td>
+                              <td class="px-2 py-2 border-b text-center">
+                                  <span class="status-text-subtle">-</span>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="copyToast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 opacity-0 transition-opacity z-50" style="pointer-events:none">
+      <i class="fas fa-check-circle text-green-400"></i>
+      <span class="font-medium" id="toastMessage">記録がコピーされました。</span>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+  <!-- block script -->
+  <script>
+    var csrfToken = '';
+
+    let companyPrefix = 'DEMO';
+
+    function loadAccessData() {
+        showToast("データ更新（モックアップ）");
+    }
+
+    function saveCode(pk) {
+        const codeInput = document.getElementById('input-' + pk);
+        const code = codeInput ? codeInput.value.trim() : '';
+        if (!code) { alert('コードを入力してください。'); return; }
+        showToast("保存完了（モックアップ）");
+    }
+
+    function deleteCode(pk) {
+        if (!confirm('本当にこの接続コードを削除しますか？該当店舗のアプリ接続が直ちに遮断されます。')) return;
+        showToast("削除完了（モックアップ）");
+    }
+
+    function updateStatus(pk, isActive) {
+        showToast("状態更新完了（モックアップ）");
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('copyToast');
+        document.getElementById('toastMessage').innerText = message;
+        toast.classList.replace('opacity-0', 'opacity-100');
+        setTimeout(() => toast.classList.replace('opacity-100', 'opacity-0'), 2000);
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => showToast("URLがクリップボードにコピーされました。"));
+    }
+
+    function formatAccessUrl(url) {
+        try {
+            const u = new URL(url);
+            const host = u.hostname;
+            const shortHost = host.length > 14 ? host.substring(0, 14) : host;
+            return `${u.protocol}//${shortHost}…${u.search}`;
+        } catch {
+            return url;
+        }
+    }
+  </script>
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>

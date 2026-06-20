@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一括単価変更 — SMART STOCK [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style -->
+  <style>
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+    /* grid-cols-16 は Tailwind 標準外のためカスタム定義 */
+    .grid-cols-16 { grid-template-columns: repeat(16, minmax(0, 1fr)); }
+    /* SS: primary color (blue-green) fallback */
+    .bg-primary-200 { background-color: #a7f3d0; }
+    .bg-primary-300 { background-color: #6ee7b7; }
+    .bg-primary-600 { background-color: #059669; }
+    .hover\:bg-primary-500:hover { background-color: #10b981; }
+    .text-primary-700 { color: #047857; }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- block content -->
+  <div class="p-2 w-full h-screen min-w-screen min-h-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col">
+      <!-- menu section -->
+      <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
+          <div class="grid grid-cols-12 gap-1">
+              <!-- Back Btn-->
+              <div class="grid grid-rows-2 gap-1">
+                <a href="#" role="button">
+                  <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold py-1 text-xl rounded h-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-caret-left mr-2 my-auto"></i>
+                    <span class="my-auto">戻る</span>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Filter Area -->
+              <div class="col-span-7 grid grid-rows-2 gap-1">
+                  <div class="grid grid-cols-5 rounded text-center flex items-center justify-center">
+                    <span class="col-span-2 text-xl font-bold">&#x2F00;括単価変更</span>
+                  </div>
+                  <div class="grid grid-cols-10 gap-2 items-center">
+                      <!-- 取引先フィルタ -->
+                      <div class="col-span-3 grid grid-cols-4 gap-1 items-center">
+                          <div class="col-span-1 text-right font-bold text-sm pr-1">取引先名</div>
+                          <select id="filter_customer" class="col-span-3 bg-white rounded border border-neutral-300 px-2 py-1 text-sm">
+                              <option value="">全て</option>
+                              <option value="1">サンプル農業株式会社</option>
+                          </select>
+                      </div>
+                      <!-- 商品名フィルタ -->
+                      <div class="col-span-3 grid grid-cols-4 gap-1 items-center">
+                          <div class="col-span-1 text-right font-bold text-sm pr-1">商品名</div>
+                          <select id="filter_material" class="col-span-3 bg-white rounded border border-neutral-300 px-2 py-1 text-sm">
+                              <option value="">全て</option>
+                              <option value="1">にんじん</option>
+                          </select>
+                      </div>
+                      <!-- JAN番号検索フィルタ (jan_support=true想定) -->
+                      <div class="col-span-3 grid grid-cols-4 gap-1 items-center">
+                          <div class="col-span-1 text-right font-bold text-sm pr-1">JAN検索</div>
+                          <input id="filter_jan" placeholder="JAN番号を入力"
+                              class="col-span-3 bg-white rounded border border-neutral-300 px-2 py-1 text-sm"/>
+                      </div>
+
+                      <!-- select変数初期化ボタン -->
+                      <div class="col-span-1 flex items-center justify-center">
+                          <button id="filter_reset" type="button" class="w-full bg-[#C7996B] hover:bg-[#d8b897] text-white font-bold py-1 px-2 rounded transition">
+                              リセット
+                          </button>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- CSV Buttons -->
+              <div class="col-span-3 grid grid-cols-2 col-start-10 gap-1">
+                  <div class="grid grid-rows-2">
+                      <a id="btn_download_csv" role="button" target="_blank" onclick="updateCsvDownloadUrl()" class="row-start-2 row-span-1 bg-primary-600 text-white hover:bg-primary-500 rounded h-full flex items-center justify-center transition-all">
+                          <div class="flex items-center gap-1 font-bold">
+                              <i class="fa-solid fa-download mr-1"></i>
+                              CSVダウンロード
+                          </div>
+                      </a>
+                  </div>
+                  <div class="grid grid-rows-2">
+                      <a id="btn_upload_csv" role="button" href="#" onclick="openCsvUploadModal()" class="row-start-2 row-span-1 bg-primary-600 text-white hover:bg-primary-500 rounded h-full flex items-center justify-center transition-all">
+                          <div class="flex items-center gap-1 font-bold">
+                              <i class="fa-solid fa-upload mr-1"></i>
+                              CSVアップロード
+                          </div>
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- content section -->
+      <div class="flex gap-1 h-full max-w-[1920px] overflow-hidden">
+        <div class="flex flex-col rounded border border-neutral-300 bg-[#D9D9D9] w-full h-full">
+          <div class="border rounded-md flex flex-col h-full overflow-hidden">
+            <!-- table head -->
+            <div class="grid grid-cols-16 rounded-t group text-sm bg-primary-200 sticky top-0 z-5">
+              <!-- ID + 取引先名 + 発送元の束 -->
+              <div class="col-span-4 grid grid-cols-16">
+                <div class="col-span-2 grid">
+                  <span class="border-r text-center text-md font-bold py-1">ID</span>
+                </div>
+                <div class="col-span-7 grid">
+                  <span class="border-r text-center text-md font-bold py-1">取引先名</span>
+                </div>
+                <div class="col-span-7 grid">
+                  <span class="border-r text-center text-md font-bold py-1">発送元</span>
+                </div>
+              </div>
+              <div class="col-span-2 grid">
+                <span class="border-r text-center text-md font-bold py-1">商品名</span>
+              </div>
+              <div class="col-span-2 grid">
+                <span class="border-r text-center text-md font-bold py-1">読み/JAN</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="border-r text-center text-md font-bold py-1">形状大きさ等</span>
+              </div>
+              <div class="col-span-1 grid bg-primary-300">
+                <span class="border-r text-center text-md font-bold py-1">入数</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="border-r text-center text-md font-bold py-1">入数単位</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="border-r text-center text-md font-bold py-1">注文容量</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="border-r text-center text-md font-bold py-1">注文単位</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="border-r text-center text-md font-bold py-1">注文数量</span>
+              </div>
+              <!-- jan_support=true 想定: 単品単価 + ケース単価 -->
+              <div class="col-span-1 grid bg-primary-300">
+                <span class="border-r text-center text-md font-bold py-1">単品単価</span>
+              </div>
+              <div class="col-span-1 grid">
+                <span class="text-center text-md font-bold py-1">ｹｰｽ単価</span>
+              </div>
+            </div>
+
+            <!-- table body (サンプルデータ1件) -->
+            <div id="unit_price_table_body" class="overflow-y-auto flex-1 min-h-0 max-h-[600px]">
+              <div class="divrow grid grid-cols-16 border-b-2 hover:bg-amber-50 bg-white">
+                <div class="col-span-4 grid grid-cols-16">
+                  <div class="col-span-2 border-r px-2 py-0.5 text-center">1</div>
+                  <div class="col-span-7 border-r px-2 py-0.5 text-start truncate" title="サンプル農業株式会社">サンプル農業株式会社</div>
+                  <div class="col-span-7 border-r px-2 py-0.5 text-start truncate" title="柏倉庫">柏倉庫</div>
+                </div>
+                <div class="col-span-2 border-r px-2 py-0.5 text-start truncate" title="にんじん">にんじん</div>
+                <div class="col-span-2 border-r px-2 py-0.5 text-start truncate" title="4909999000001">4909999000001</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">M</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">20</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">本</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">1</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">箱</div>
+                <div class="col-span-1 border-r px-2 py-0.5 text-center">10</div>
+                <div class="col-span-1 p-0 text-center bg-red-200 border-r">
+                  <input class="w-full h-full text-center text-end bg-red-200 px-2 py-0.5 border-0 outline-none"
+                         data-pk="1" data-qty-per-pkg="20" data-original-value="80" value="80" data-update-type="pkg"/>
+                </div>
+                <div class="col-span-1 p-0 text-center bg-neutral-200">
+                  <input class="w-full h-full text-center text-end bg-neutral-200 px-2 py-0.5 border-0 outline-none"
+                         data-pk="1" data-qty-per-pkg="20" data-original-value="1600" value="1600" readonly
+                         title="Automatically calculated when unit price is changed." data-update-type="unit"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- pagination -->
+            <div class="flex items-center justify-center px-4 py-2 border-y border-neutral-300 bg-white ">
+              <div class="flex items-center justify-center mx-2">
+                <button id="unit_price_prev_page" type="button" class="flex items-center justify-center w-[50px] rounded-md border hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                  <span class="text-lg font-bold"> &lt; </span>
+                </button>
+
+                <div class="flex items-center gap-2 text-sm text-neutral-700 mx-5">
+                  <span id="unit_price_current_page" class="min-w-[2.5rem] text-center border border-neutral-400 rounded bg-white px-2 py-0.5 font-bold">1</span>
+                  <span>/</span>
+                  <span id="unit_price_total_pages" class="font-semibold">1</span>
+                  <span class="text-xs text-neutral-500 ml-2">(全<span id="unit_price_total_count">1</span>件)</span>
+                </div>
+
+                <button id="unit_price_next_page" type="button" class="flex items-center justify-center w-[50px] rounded-md border hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                 <span class="text-lg font-bold"> &gt; </span>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mx-2">
+                <label for="unit_price_page_size" class="text-xs text-neutral-600">Rows</label>
+                <select id="unit_price_page_size" class="w-14 border border-neutral-300 rounded px-2 py-1 text-xs bg-white">
+                  <option value="50">50</option>
+                  <option value="100" selected>100</option>
+                  <option value="200">200</option>
+                  <option value="all">all</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <!-- CSVアップロードモーダル -->
+  <div id="csv_upload_modal" class="fixed z-30 inset-0 hidden"  aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- グレーオーバーレイ -->
+      <div id="csv_upload_overlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <!-- モーダルコンテンツ -->
+      <div id="csv_upload_modal_content"
+          style="max-width: 1200px;"
+          class="relative inline-block align-bottom bg-neutral-100 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-[520px] max-w-full p-5 border border-neutral-300">
+        <!-- header -->
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-lg">CSV単価一括更新</span>
+          </div>
+          <button id="csv_upload_close" type="button">
+            <i class="fa-solid fa-xmark fa-lg text-neutral-500 hover:text-red-600"></i>
+          </button>
+        </div>
+
+        <!-- body -->
+        <div class="flex flex-col">
+          <div class="text-sm text-neutral-600 my-2">
+            ダウンロードしたCSVの<span class="font-bold text-red-400">「単価」列のみ編集</span>してアップロードしてください。<br>
+          <strong>IDと取引先名・発送元名が一致しない行、単価が数字でない行</strong>は更新されず、結果一覧に表示されます。
+          </div>
+
+          <div class="border border-neutral-300 rounded-md bg-white px-3 py-2 flex items-center justify-between gap-2 mb-2">
+            <div class="flex-1">
+              <input id="unit_price_csv_file" type="file" accept=".csv" class="w-full text-sm" />
+            </div>
+            <button id="btn_upload_csv_execute" type="button" class="px-4 py-1.5 rounded-md bg-primary-600 text-white text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed">
+              アップロード
+            </button>
+          </div>
+
+          <div id="csv_upload_error" class="text-sm text-red-600 font-bold"></div>
+
+          <div class="mt-2">
+            <div class="text-md font-bold text-neutral-700 ml-1 mb-1">
+              処理結果
+            </div>
+            <div id="csv_upload_result" class="p-2 border border-neutral-300 rounded-md bg-white">
+              <div class="text-sm text-neutral-500">アップロード結果はここに表示されます。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+  <!-- block script -->
+  <!-- resolveNumericInput スタブ (モックアップ用) -->
+  <script>
+    function checkJanSupport() { return true; }
+    function resolveNumericInput(input) {
+        const val = parseFloat(input.value);
+        if (isNaN(val)) { alert('数値を入力してください。'); return false; }
+        input.value = val;
+        return true;
+    }
+  </script>
+  <script>
+    const janSupport = checkJanSupport();
+
+    var unitPriceState = {
+        page: 1,
+        pageSize: '100',
+        totalCount: 1
+    };
+
+    $(document).ready(function(){
+        $('#filter_reset').on('click', function(){
+            $('#filter_customer').val('');
+            $('#filter_material').val('');
+            $('#filter_jan').val('');
+        });
+
+        $('#csv_upload_close').on('click', function(){
+            closeCsvUploadModal();
+        });
+        $('#csv_upload_overlay').on('click', function(){
+            closeCsvUploadModal();
+        });
+        $('#csv_upload_modal_content').on('click', function(e){
+            e.stopPropagation();
+        });
+        $('#btn_upload_csv_execute').on('click', function(){
+            alert('CSVアップロード（モックアップ）');
+        });
+        $('#unit_price_prev_page').on('click', function(){});
+        $('#unit_price_next_page').on('click', function(){});
+    });
+
+    function openCsvUploadModal(){
+        $('#unit_price_csv_file').val('');
+        $('#csv_upload_error').text('');
+        $('#csv_upload_result').html('<div class="text-xs text-neutral-500">アップロード結果はここに表示されます。</div>');
+        $('#btn_upload_csv_execute').prop('disabled', false);
+        $('#csv_upload_modal').removeClass('hidden');
+    }
+
+    function closeCsvUploadModal(){
+        $('#csv_upload_modal').addClass('hidden');
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function updateCsvDownloadUrl() {
+        alert('CSVダウンロード（モックアップ）');
+    }
+
+    function applyBorderBlack(rowDiv, i, rows) {
+        rowDiv.classList.remove('border-black');
+        const rowData = rows[i];
+        if (i < rows.length - 1) {
+            let nextRow = rows[i + 1];
+            if (nextRow && rowData.client_id !== nextRow.client_id) {
+                rowDiv.classList.add('border-b-2', 'border-black');
+            }
+        } else {
+            rowDiv.classList.remove('border-b-2', 'border-black');
+        }
+    }
+
+    function handlePriceUpdateEvent(event, type) {
+        const input = event.target;
+        const row = input.closest('.divrow');
+        if (!row) return;
+        if (!resolveNumericInput(input)) {
+            input.value = input.dataset.originalValue ?? '';
+            return;
+        }
+        const qtyPerPkg = parseFloat(input.getAttribute('data-qty-per-pkg')) || 1;
+        const pkgInput = row.querySelector('input[data-update-type="pkg"]');
+        const unitInput = row.querySelector('input[data-update-type="unit"]');
+        if (janSupport && type === 'pkg' && unitInput) {
+            const pkgPrice = parseFloat(input.value) || 0;
+            const newUnitPrice = Math.round(pkgPrice * qtyPerPkg * 10) / 10;
+            unitInput.value = newUnitPrice;
+        }
+        if (pkgInput) { pkgInput.classList.add('bg-green-100'); setTimeout(()=>pkgInput.classList.remove('bg-green-100'),800); }
+        if (unitInput) { unitInput.classList.add('bg-green-100'); setTimeout(()=>unitInput.classList.remove('bg-green-100'),800); }
+    }
+  </script>
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>

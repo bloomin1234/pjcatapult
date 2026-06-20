@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テナント管理 — SMART ORDER [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style -->
+  <style>
+    /* sticky thead z-indexを指定する - tbody要素がヘッダーの上に上がるバグを防ぐ */
+    thead.sticky-header {
+        position: sticky;
+        top: -1px;
+        z-index: 10;
+    }
+    /* tbodyのすべてのtdが新しいスタッキングコンテキストを作成しないことを明示する */
+    tbody td {
+        position: relative;
+        z-index: 0;
+    }
+
+    /* iOSスタイルスイッチカスタムCSS(Tailwind Purgeを防止) */
+    .ios-switch-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 0;
+    }
+    .ios-switch-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+    .ios-switch-slider {
+        width: 2.75rem; /* 44px */
+        height: 1.5rem; /* 24px */
+        background-color: #d1d5db; /* gray-300 */
+        border-radius: 9999px;
+        position: relative;
+        transition: background-color 0.2s;
+    }
+    .ios-switch-slider:after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        background-color: white;
+        border: 1px solid #d1d5db;
+        border-radius: 9999px;
+        height: 1.25rem; /* 20px */
+        width: 1.25rem; /* 20px */
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .ios-switch-input:checked + .ios-switch-slider {
+        background-color: #2563eb; /* blue-600 */
+    }
+    .ios-switch-input:checked + .ios-switch-slider:after {
+        transform: translateX(100%);
+        border-color: white;
+    }
+
+    /* カスタムボタンCSS */
+    .btn-save-custom {
+        background-color: #2563eb !important; /* blue-600 */
+        color: white !important;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-weight: 700;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .btn-save-custom:hover {
+        background-color: #1d4ed8 !important; /* blue-700 */
+    }
+    .btn-save-custom:active {
+        transform: translateY(1px);
+    }
+    .btn-save-custom:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- block content -->
+  <div class="grid w-[1280px] mx-auto mt-10 p-5 border rounded-md shadow-lg bg-slate-50">
+      <div class="mb-5 flex justify-between items-center">
+          <a href="#" role="button">
+              <span class="text-sm text-gray-700 my-2 font-bold bg-gray-300 hover:bg-gray-400 rounded-md px-3 py-2 text-center transition"><i class="fas fa-home mr-2"></i>メインメニュー</span>
+          </a>
+      </div>
+
+      <div class="grid gap-y-5">
+          <!-- Header Section -->
+          <div class="grid grid-cols-6 gap-y-2 rounded border p-4 bg-slate-100 shadow-inner">
+              <span class="col-span-6 text-gray-700 text-2xl font-bold flex items-center">
+                  <i class="fa-solid fa-shield-halved mr-3 text-slate-600"></i>テナント別機能制限管理
+              </span>
+              <p class="col-span-6 text-sm font-bold text-red-400 ">※ 有料アカウントは全ての機能が使用可能、無料アカウントは標準機能のみ使用可能</p>
+          </div>
+
+          <!-- Tenant List Table Section -->
+          <div class="rounded border p-4 bg-slate-100 overflow-hidden">
+              <div class="overflow-x-auto h-[600px] overflow-y-auto">
+                  <table class="min-w-full border rounded-lg bg-white shadow-sm border-separate border-spacing-0">
+                      <thead class="bg-[#8ab8a3] sticky-header">
+                          <tr id="table-header" class="text-sm text-black uppercase tracking-wider">
+                              <th scope="col" class="py-3 px-6 text-left" width="200">会社名</th>
+                              <th scope="col" class="py-3 px-6 text-center" width="200">有料アカウント区分</th>
+                              <!-- 機能ヘッダーはここに動的に追加されます（サーバーで割り当てる必要があります - restriction_features）-->
+                              <th scope="col" class="py-3 px-4 text-center font-bold text-red-400">標準機能</th>
+                              <th scope="col" class="py-3 px-4 text-center font-bold text-red-400">拡張機能A</th>
+                              <th scope="col" class="py-3 px-4 text-center font-bold text-red-400">拡張機能B</th>
+                              <th scope="col" class="py-3 px-6 text-center" width="170">保存</th>
+                          </tr>
+                      </thead>
+                      <tbody id="tenant-list" class="divide-y divide-gray-200">
+                          <!-- サンプル行1（有料アカウント） -->
+                          <tr class="bg-green-100 hover:opacity-90 transition border-b group" data-tenant-row-id="1">
+                              <td class="px-6 py-4 whitespace-nowrap border-gray-100">
+                                  <div class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">株式会社サンプル商事</div>
+                                  <div class="text-xs font-bold text-gray-500 group-hover:text-blue-600 transition">sample_shoji</div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input payed-switch" data-tenant-id="1" checked>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="1" data-key="standard_feature" checked>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="1" data-key="feature_a" checked>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="1" data-key="feature_b">
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-6 py-4 text-center bg-slate-50/50">
+                                  <div class="flex items-center justify-center space-x-2">
+                                       <span id="circle-save-1" class="text-slate-700 hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                                       <span id="success-save-1" class="text-green-500 hidden animate-bounce"><i class="fa-solid fa-circle-check"></i></span>
+                                      <button class="btn-save btn-save-custom" data-id="1" data-schema="sample_shoji">
+                                          <i class="fas fa-save mr-1"></i> 保存
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                          <!-- サンプル行2（無料アカウント） -->
+                          <tr class="bg-gray-100 hover:opacity-90 transition border-b group" data-tenant-row-id="2">
+                              <td class="px-6 py-4 whitespace-nowrap border-gray-100">
+                                  <div class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">テスト農産株式会社</div>
+                                  <div class="text-xs font-bold text-gray-500 group-hover:text-blue-600 transition">test_noisan</div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input payed-switch" data-tenant-id="2">
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="2" data-key="standard_feature" checked>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container opacity-50 cursor-not-allowed">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="2" data-key="feature_a" disabled>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-4 py-4 text-center">
+                                  <div class="flex justify-center">
+                                      <label class="ios-switch-container opacity-50 cursor-not-allowed">
+                                          <input type="checkbox" class="ios-switch-input feature-switch" data-tenant-id="2" data-key="feature_b" disabled>
+                                          <div class="ios-switch-slider"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="px-6 py-4 text-center bg-slate-50/50">
+                                  <div class="flex items-center justify-center space-x-2">
+                                       <span id="circle-save-2" class="text-slate-700 hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                                       <span id="success-save-2" class="text-green-500 hidden animate-bounce"><i class="fa-solid fa-circle-check"></i></span>
+                                      <button class="btn-save btn-save-custom" data-id="2" data-schema="test_noisan">
+                                          <i class="fas fa-save mr-1"></i> 保存
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+      <!-- Tailwind CSS Scan Helper (Ensure classes in JS are compiled) -->
+      <div class="hidden bg-blue-600 hover:bg-blue-700 bg-slate-700 hover:bg-slate-900 text-white rounded-md text-xs px-4 py-2 font-bold transition shadow-sm active:translate-y-0.5"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+
+  <!-- block script -->
+  <script>
+  $(document).ready(function() {
+      // モックアップ: loadTenants() はAJAX不要でHTMLにサンプルデータ埋め込み済み
+
+      // [イベントバインディング]有料アカウントスイッチ変更時のリアルタイムUI制御
+      $('.payed-switch').off('change').on('change', function() {
+          const tenantId = $(this).data('tenant-id');
+          const isChecked = $(this).is(':checked');
+          const row = $(this).closest('tr');
+
+          // 行の背景色の変更
+          if (isChecked) {
+              row.removeClass('bg-gray-100').addClass('bg-green-100');
+          } else {
+              row.removeClass('bg-green-100').addClass('bg-gray-100');
+          }
+
+          // standard_feature以外のすべての機能スイッチの処理
+          row.find('.feature-switch').each(function() {
+              const key = $(this).data('key');
+              if (key !== 'standard_feature') {
+                  if (!isChecked) {
+                      $(this).prop('checked', false);
+                      $(this).prop('disabled', true);
+                      $(this).closest('label').addClass('opacity-50 cursor-not-allowed');
+                  } else {
+                      $(this).prop('disabled', false);
+                      $(this).closest('label').removeClass('opacity-50 cursor-not-allowed');
+                  }
+              }
+          });
+      });
+
+      // イベントバインディング
+      $('.btn-save').off('click').on('click', function() {
+          const id = $(this).data('id');
+          const $circle = $(`#circle-save-${id}`);
+          const $success = $(`#success-save-${id}`);
+          const $btn = $(this);
+
+          $btn.prop('disabled', true);
+          $circle.removeClass('hidden');
+          $success.addClass('hidden');
+
+          // モックアップ: AJAX保存の代わりに擬似フィードバック
+          setTimeout(() => {
+              $circle.addClass('hidden');
+              $success.removeClass('hidden');
+              setTimeout(() => {
+                  $success.addClass('hidden');
+                  $btn.prop('disabled', false);
+              }, 1500);
+          }, 800);
+      });
+  });
+  </script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>

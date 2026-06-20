@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>受注入力 — SMART ORDER [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; }
+
+    .block-overlay {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.0);
+      cursor: not-allowed;
+    }
+    .textfont { writing-mode: vertical-lr; }
+    a.disabled { pointer-events: none; cursor: default; }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .old-color { background-color: rgb(255,255,255); }
+    .new-color { background-color: rgb(247,181,128); }
+    .new-color-des { background-color: rgb(247,181,128); }
+    .material-color { background-color: #fecaca; }
+
+    ::-webkit-scrollbar { width: 0px; }
+    ::-webkit-scrollbar-track { background-color: white; }
+    ::-webkit-scrollbar-thumb { background-color: #d6dee1; border-radius: 10px; border: 6px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb:hover { background-color: #a8bbbf; }
+
+    /* 材料区分ツールチップ */
+    .material-classification { position: relative; }
+    .material-classification .tooltip {
+      visibility: hidden; position: absolute; z-index: 1;
+      border: 1px solid #ccc; border-radius: 4px; padding: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap;
+      top: 100%; left: 0%; transform: translateX(-8%); margin-top: 5px;
+    }
+    .material-classification:hover .tooltip { visibility: visible; }
+
+    /* 帳票出力ツールチップ */
+    .specific-table-delivery-print { position: relative; }
+    .specific-table-delivery-print .tooltip {
+      visibility: hidden; position: absolute; background-color: white; z-index: 1080;
+      border: 1px solid #ccc; border-radius: 4px; padding: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap;
+      top: 100%; left: 0%; margin-top: 5px;
+    }
+    .specific-table-delivery-print:hover .tooltip { visibility: visible; }
+    .specific-table-delivery-print .tooltip div { font-size: 12px; }
+
+    /* SOカラーテーマ: グリーン系 */
+    .so-header { background-color: #3C8865; }
+    .so-light { background-color: #a9d18e; }
+    .so-mid { background-color: #77ac93; }
+    .so-panel { background-color: #8ab8a3; }
+
+    /* サンプルリスト行 */
+    .client-row { display: grid; grid-template-columns: 1fr 4fr; font-size: 12px; border-bottom: 1px solid #e5e7eb; }
+    .client-row:hover { background-color: #d1fae5; cursor: pointer; }
+    .client-row.active { background-color: #86efac; }
+
+    .dest-row { display: grid; grid-template-columns: 3fr 9fr 2fr 2fr 2fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; }
+    .dest-row:hover { background-color: #d1fae5; cursor: pointer; }
+
+    .material-row { display: grid; grid-template-columns: 2fr 6fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; }
+    .material-row:hover { background-color: #fef9c3; cursor: pointer; }
+
+    .order-summary-row { display: grid; grid-template-columns: 1fr 4fr 1fr 1fr 1fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; height: 28px; }
+    .order-summary-row:hover { background-color: #d1fae5; cursor: pointer; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- MOCKUP バッジ -->
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+
+  <div id="block-overlay" class="block-overlay"></div>
+
+  <div class="flex flex-col w-screen h-screen max-w-screen max-h-screen mx-auto bg-[#E9E5DB] p-2 gap-1">
+
+    <!-- ===== TOP CONTENT (ヘッダーバー) ===== -->
+    <div class="w-full max-w-[1920px] shrink h-fit flex">
+      <div class="flex gap-1 p-1 rounded border border-neutral-300 bg-[#D9D9D9] w-full drop-shadow h-[80px]">
+
+        <!-- 戻るボタン -->
+        <a href="#" role="button">
+          <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition w-[150px]">
+            <i class="fa-solid fa-caret-left mr-2 my-auto"></i>
+            <span class="my-auto">戻る</span>
+          </div>
+        </a>
+
+        <!-- 画面タイトル -->
+        <div class="font-bold flex items-center justify-center w-[150px]">受注入力</div>
+
+        <!-- スタッフ名 -->
+        <div class="grid grid-cols-5 w-[260px] rounded bg-white overflow-hidden drop-shadow text-sm font-bold">
+          <div class="col-span-1 text-base flex items-center justify-center text-green-500"><i class="fa-solid fa-user"></i></div>
+          <input id="staff_name" class="col-span-4 bg-white text-sm text-center font-bold" value="山田 太郎" disabled>
+        </div>
+
+        <div class="flex rounded overflow-hidden text-sm font-bold gap-1 justify-start w-full">
+
+          <!-- 納品日 + 前日/翌日/暦管理 -->
+          <div class="grid grid-cols-12 w-[320px] rounded overflow-hidden drop-shadow">
+            <div class="col-span-2 so-light h-full flex items-center justify-center font-bold w-full"><span>納品日</span></div>
+            <input id="calendar_current" class="col-span-3 my-auto bg-white text-lg font-bold h-full text-center border-r" value="6/21(土)" readonly>
+            <input id="day" class="col-span-1 my-auto bg-white text-lg h-full text-center" maxlength="3" placeholder="##" disabled>
+            <div class="col-span-6 grid grid-cols-6">
+              <button class="col-span-2 text-sm bg-gradient-to-b from-green-500 to-green-600 hover:to-green-500 font-bold transition border-l border-y border-green-400 text-white">暦管理</button>
+              <button class="col-span-2 text-sm bg-gradient-to-b from-green-500 to-green-600 hover:to-green-500 font-bold transition border border-green-400 text-white"><i class="fa-solid fa-caret-left"></i>前日</button>
+              <button class="col-span-2 text-sm bg-gradient-to-b from-green-500 to-green-600 hover:to-green-500 font-bold transition border-r border-y border-green-400 text-white">翌日<i class="fa-solid fa-caret-right"></i></button>
+            </div>
+          </div>
+
+          <!-- 納品合計表示 (西/南/北/中央/他) -->
+          <div class="grid grid-cols-6 w-[290px] h-full rounded overflow-hidden drop-shadow">
+            <div class="col-span-1 so-light text-sm w-full h-full flex items-center justify-center">納品<br>合計</div>
+            <div class="grid grid-rows-2">
+              <div class="so-light text-base h-full flex items-center justify-center">西</div>
+              <input class="bg-white text-base w-full h-full text-center p-0" value="12" disabled>
+            </div>
+            <div class="grid grid-rows-2">
+              <div class="bg-[#f4b183] text-base h-full flex items-center justify-center">南</div>
+              <input class="bg-[#ffe699] text-base w-full h-full text-center p-0" value="8" disabled>
+            </div>
+            <div class="grid grid-rows-2">
+              <div class="so-light text-base h-full flex items-center justify-center">北</div>
+              <input class="bg-white text-base w-full h-full text-center p-0" value="6" disabled>
+            </div>
+            <div class="grid grid-rows-2">
+              <div class="bg-[#f4b183] text-base h-full flex items-center justify-center">中央</div>
+              <input class="bg-[#ffe699] text-base w-full h-full text-center p-0" value="4" disabled>
+            </div>
+            <div class="grid grid-rows-2">
+              <div class="so-light text-base h-full flex items-center justify-center">他</div>
+              <input class="bg-white text-base w-full h-full text-center p-0" value="2" disabled>
+            </div>
+          </div>
+
+          <!-- 入力確認 (最後の注文情報) -->
+          <div class="grid grid-cols-9 w-[320px] h-full rounded overflow-hidden drop-shadow">
+            <div class="col-span-1 so-light text-sm w-full h-full flex items-center justify-center rounded-l">入力<br>確認</div>
+            <div class="col-span-2 grid grid-rows-2 border-r">
+              <div class="so-light text-sm h-full flex items-center justify-center">納品日</div>
+              <input class="bg-white text-sm w-full h-full text-center p-0" value="6/21" disabled>
+            </div>
+            <div class="col-span-2 grid grid-rows-2 border-r">
+              <div class="so-light text-sm h-full flex items-center justify-center">伝票番号</div>
+              <input class="bg-white text-sm w-full h-full text-center p-0" value="1234" disabled>
+            </div>
+            <div class="col-span-2 grid grid-rows-2 border-r">
+              <div class="so-light text-sm h-full flex items-center justify-center">商品名</div>
+              <input class="bg-white text-sm w-full h-full text-center p-0" value="キャベツ" disabled>
+            </div>
+            <div class="col-span-2 grid grid-rows-2">
+              <div class="so-light text-sm h-full flex items-center justify-center">注文数量</div>
+              <input class="bg-white text-sm w-full h-full text-center p-0" value="5" disabled>
+            </div>
+          </div>
+
+          <!-- 日付2 + 前日/翌日 -->
+          <div class="grid grid-rows-2 w-[140px] h-full rounded overflow-hidden drop-shadow">
+            <input class="w-full font-bold text-base text-center bg-white rounded-l p-0" value="2026/06/21(土)" readonly>
+            <div class="flex rounded-r drop-shadow overflow-hidden h-full">
+              <button class="w-full text-sm bg-gradient-to-b from-green-500 to-green-600 hover:to-green-500 font-bold transition px-2 border border-green-400 text-white"><i class="fa-solid fa-caret-left"></i>前日</button>
+              <button class="w-full text-sm bg-gradient-to-b from-green-500 to-green-600 hover:to-green-500 font-bold transition px-2 border-r border-y border-green-400 text-white">翌日<i class="fa-solid fa-caret-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ダブルクリック説明 -->
+          <div class="relative flex overflow-hidden drop-shadow h-[35px] my-auto">
+            <div class="m-auto flex rounded-md bg-neutral-400/60 h-[35px]">
+              <span class="my-auto px-3 py-2 text-sm">ダブルクリックで詳細</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ===== END TOP CONTENT ===== -->
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="flex gap-1 h-full max-w-[1920px] overflow-hidden">
+
+      <!-- ===== 1. 取引先リスト ===== -->
+      <div class="flex flex-col rounded overflow-hidden border border-neutral-300 bg-[#D9D9D9] w-full max-w-[240px]">
+        <div class="so-header p-1 flex justify-between">
+          <span class="font-bold text-white text-md">取引先</span>
+          <button class="bg-[#C7996B] hover:bg-[#d8b897] h-[25px] text-sm font-bold transition px-2 rounded-full drop-shadow">新規追加</button>
+        </div>
+
+        <!-- 番号フィルタ (100〜1000) -->
+        <div class="grid grid-rows-3 rounded py-1">
+          <div class="grid grid-cols-5 so-header text-white font-bold h-[30px] text-center border-t border-x border-green-800 rounded-t">
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">100</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">200</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">300</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">400</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">500</a>
+          </div>
+          <div class="grid grid-cols-5 so-header text-white font-bold h-[30px] text-center border border-green-800">
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">600</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">700</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">800</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">900</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition">1000</a>
+          </div>
+          <!-- 読みがなフィルタ -->
+          <div class="grid grid-cols-10 so-header text-white font-bold h-[30px] border-b border-x border-green-800">
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">あ</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">か</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">さ</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">た</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">な</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">は</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">ま</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">や</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">ら</a>
+            <a role="button" class="hover:bg-[#77ac93] h-full flex items-center justify-center transition text-xs">わ</a>
+          </div>
+          <button class="text-white border-b border-x rounded-b w-full so-header border-green-800 hover:bg-[#77ac93]"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+
+        <!-- 取引先リスト本体 -->
+        <div class="grid overflow-hidden">
+          <div class="grid grid-cols-6 rounded-t text-sm so-light font-bold">
+            <div class="col-span-1 border-r text-center text-md font-bold">番号</div>
+            <div class="col-span-4 text-center text-md font-bold">取引先名</div>
+          </div>
+          <div class="overflow-y-auto" style="height: calc(100vh - 320px);">
+            <!-- サンプルデータ -->
+            <div class="client-row active"><span class="text-center border-r px-1">101</span><span class="px-1">株式会社 山田商店</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">102</span><span class="px-1">田中青果</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">201</span><span class="px-1">スーパーABC</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">302</span><span class="px-1">レストランXYZ</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">401</span><span class="px-1">食堂まるまる</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">503</span><span class="px-1">ホテル緑</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">601</span><span class="px-1">学校給食センター</span></div>
+            <div class="client-row"><span class="text-center border-r px-1">702</span><span class="px-1">病院厨房</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== END 取引先リスト ===== -->
+
+      <!-- ===== 2. 納品先リスト ===== -->
+      <div class="flex flex-col rounded overflow-hidden border border-neutral-300 bg-[#D9D9D9] w-full max-w-[280px]">
+        <div class="so-header p-1 flex justify-between">
+          <span class="font-bold text-white text-md">納品先</span>
+          <button class="bg-[#C7996B] hover:bg-[#d8b897] h-[25px] text-sm font-bold transition px-2 rounded-full drop-shadow" disabled>新規追加</button>
+        </div>
+
+        <!-- 発送コース設定 -->
+        <div class="flex w-full so-panel py-1">
+          <span class="font-bold m-auto">発送コース設定</span>
+        </div>
+        <div class="grid grid-cols-7 py-1 rounded text-white drop-shadow">
+          <div class="grid py-1 so-mid rounded-l"><span class="text-xs mx-auto my-auto font-bold">西</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="西"></div>
+          <div class="grid py-1 so-mid"><span class="text-xs mx-auto my-auto font-bold">南</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="南"></div>
+          <div class="grid py-1 so-mid"><span class="text-xs mx-auto my-auto font-bold">北</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="北"></div>
+          <div class="grid py-1 so-mid"><span class="text-xs mx-auto my-auto font-bold">中央</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="中央"></div>
+          <div class="grid py-1 so-mid"><span class="text-xs mx-auto my-auto font-bold">ヤマト</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="ヤマト"></div>
+          <div class="grid py-1 so-mid"><span class="text-xs mx-auto my-auto font-bold">佐川</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="佐川"></div>
+          <div class="grid py-1 so-mid rounded-r"><span class="text-xs mx-auto my-auto font-bold">他</span><input class="mx-auto my-auto" type="radio" name="shippingCompanyRadio" value="その他"></div>
+        </div>
+        <div class="flex w-full bg-neutral-300 py-1">
+          <span class="m-auto text-xs text-neutral-600">下表の便情報をクリックしてから上記のボタンで変更</span>
+        </div>
+
+        <!-- 配送先テーブルヘッダー -->
+        <div class="grid overflow-hidden">
+          <div class="grid so-light font-bold text-xs" style="grid-template-columns: 3fr 9fr 2fr 2fr 2fr;">
+            <div class="border-r text-center flex items-center justify-center py-1">店舗<br>番号</div>
+            <div class="border-r text-center flex items-center justify-center py-1 cursor-pointer">配送先店舗</div>
+            <div class="border-r text-center flex items-center justify-center py-1">4<br>便</div>
+            <div class="border-r text-center flex items-center justify-center py-1">3<br>便</div>
+            <div class="text-center flex items-center justify-center py-1">金額<br>表示</div>
+          </div>
+          <!-- サンプルデータ -->
+          <div class="overflow-y-auto" style="height: calc(100vh - 320px);">
+            <div class="dest-row py-1"><span class="border-r text-center">S001</span><span class="px-1">山田商店 本店</span><span class="border-r text-center">西</span><span class="border-r text-center">南</span><span class="text-center">〇</span></div>
+            <div class="dest-row py-1"><span class="border-r text-center">S002</span><span class="px-1">山田商店 支店</span><span class="border-r text-center">西</span><span class="border-r text-center"></span><span class="text-center">〇</span></div>
+            <div class="dest-row py-1 new-color-des"><span class="border-r text-center">S003</span><span class="px-1">田中青果 柏店</span><span class="border-r text-center">北</span><span class="border-r text-center">中央</span><span class="text-center"></span></div>
+            <div class="dest-row py-1"><span class="border-r text-center">S004</span><span class="px-1">スーパーABC 東店</span><span class="border-r text-center">南</span><span class="border-r text-center"></span><span class="text-center">〇</span></div>
+            <div class="dest-row py-1"><span class="border-r text-center">S005</span><span class="px-1">スーパーABC 西店</span><span class="border-r text-center">南</span><span class="border-r text-center">南</span><span class="text-center">〇</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== END 納品先リスト ===== -->
+
+      <!-- ===== 3. 商品台帳 ===== -->
+      <div class="flex flex-col rounded overflow-hidden border border-neutral-300 bg-[#D9D9D9] w-full max-w-[240px]">
+        <div class="so-header p-1 flex justify-between">
+          <span class="font-bold text-white text-md">商品</span>
+          <button class="bg-[#C7996B] hover:bg-[#d8b897] h-[25px] text-sm font-bold transition px-2 rounded-full drop-shadow">新規追加</button>
+        </div>
+        <div class="grid overflow-hidden gap-y-1">
+          <button class="bg-yellow-300 hover:bg-yellow-400 transition flex items-center justify-center px-4 drop-shadow py-1">
+            <i class="fa-solid fa-search mr-2"></i>
+            <span class="font-bold">全商品表示</span>
+          </button>
+
+          <div class="grid grid-cols-[auto_1fr] rounded border border-green-600 overflow-hidden mx-1">
+            <div class="so-light text-base flex items-center justify-center font-bold px-2">商品名</div>
+            <input class="text-md bg-neutral-100 text-center h-[45px] font-bold" value="キャベツ" disabled>
+          </div>
+
+          <!-- メーカー検索 + 商品名検索 -->
+          <div class="mx-1 flex flex-col gap-1 bg-white border border-gray-300 p-1">
+            <div class="text-center text-xs font-bold py-1 bg-blue-100 text-blue-800 rounded shadow-inner">
+              全商品台帳 (全件検索中)
+            </div>
+            <select class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none">
+              <option value="">メーカー名を選択</option>
+              <option value="1">株式会社ベジトレード</option>
+              <option value="2">山田農場</option>
+            </select>
+            <input type="text" placeholder="商品名検索" class="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none">
+          </div>
+
+          <!-- 商品台帳ヘッダー -->
+          <div class="grid" style="grid-template-columns: 2fr 6fr;">
+            <div class="so-light text-center font-bold text-sm">番号</div>
+            <div class="so-light border-l text-center font-bold text-sm">商品名</div>
+          </div>
+          <!-- サンプルデータ -->
+          <div class="overflow-y-auto" style="height: calc(100vh - 420px);">
+            <div class="material-row active bg-yellow-100"><span class="border-r text-center px-1">001</span><span class="px-1">キャベツ</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">002</span><span class="px-1">レタス</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">003</span><span class="px-1">ほうれん草</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">004</span><span class="px-1">にんじん</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">005</span><span class="px-1">大根</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">006</span><span class="px-1">トマト</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">007</span><span class="px-1">きゅうり</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">008</span><span class="px-1">なす</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">009</span><span class="px-1">ピーマン</span></div>
+            <div class="material-row"><span class="border-r text-center px-1">010</span><span class="px-1">ねぎ</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== END 商品台帳 ===== -->
+
+      <!-- ===== 4. 発注入力パネル ===== -->
+      <div class="flex flex-col rounded overflow-hidden border border-neutral-300 bg-[#D9D9D9] w-full max-w-[700px]">
+        <div class="so-header p-1 flex justify-between">
+          <span class="font-bold text-white text-md">発注入力</span>
+        </div>
+        <div class="relative flex w-full so-panel py-1">
+          <span class="font-bold m-auto">商品台帳設定<span class="text-xs px-2 py-1 bg-red-300 text-red-800 rounded mx-1">必須</span></span>
+          <button class="absolute right-[10px] bg-[#C7996B] hover:bg-[#d8b897] h-[25px] text-sm font-bold transition px-2 rounded-full drop-shadow">新規追加</button>
+        </div>
+
+        <!-- 入力パネル 1行目 -->
+        <div class="grid grid-cols-8 gap-[1px] py-1 drop-shadow">
+          <!-- 区分 (通常納品/無償品) -->
+          <div class="col-span-1 grid border grid-rows-3">
+            <div class="so-light font-bold text-sm w-full flex items-center justify-center">区分</div>
+            <div class="grid grid-cols-4">
+              <input class="mx-auto my-auto" type="radio" value="0" name="radioShipping" checked>
+              <label class="col-span-3 text-xs w-full h-full flex items-center font-bold justify-center">通常納品</label>
+            </div>
+            <div class="grid grid-cols-4">
+              <input class="mx-auto my-auto" type="radio" value="9" name="radioShipping">
+              <label class="col-span-3 text-xs w-full h-full flex items-center font-bold justify-center">無償品</label>
+            </div>
+          </div>
+
+          <!-- ラベル -->
+          <div class="col-span-1 grid grid-rows-3 border">
+            <div class="so-light font-bold text-sm w-full flex items-center justify-center">ラベル</div>
+            <input class="row-span-2 bg-white text-sm w-full h-full text-center" value="千葉県産">
+          </div>
+
+          <!-- 形状・大きさ -->
+          <div class="col-span-2 grid grid-rows-3 border">
+            <div class="so-light font-bold text-sm w-full h-full flex items-center justify-center">形状・大きさ</div>
+            <input class="row-span-2 bg-red-200 text-base font-bold w-full h-full text-center" value="Mサイズ 約500g">
+          </div>
+
+          <!-- 注文 (容量/単位) -->
+          <div class="col-span-1 grid grid-rows-3 border">
+            <div class="so-light font-bold text-sm w-full flex items-center justify-center">注文</div>
+            <div class="grid grid-cols-2 row-span-2">
+              <div class="grid grid-rows-2">
+                <div class="so-light font-bold text-sm w-full flex items-center justify-center border-r">容量</div>
+                <input type="number" class="bg-red-200 w-full px-1 py-0 border-0 text-center" value="10">
+              </div>
+              <div class="grid grid-rows-2">
+                <div class="so-light font-bold text-sm w-full flex items-center justify-center">単位</div>
+                <select class="w-full bg-white border-0 text-sm px-1 py-0 leading-tight focus:outline-none">
+                  <option>kg</option><option>ｹｰｽ</option><option>ｾｯﾄ</option>
+                  <option>ﾊﾟｯｸ</option><option>個</option><option>切</option>
+                  <option>束</option><option>袋</option><option>本</option>
+                  <option>枚</option><option>粒</option><option>基</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 入数 (数量/単位) -->
+          <div class="col-span-1 grid grid-rows-3 border">
+            <div class="so-light font-bold text-sm w-full flex items-center justify-center">入数</div>
+            <div class="grid grid-cols-2 row-span-2">
+              <div class="grid grid-rows-2">
+                <div class="so-light font-bold text-sm w-full flex items-center justify-center border-r">数量</div>
+                <input type="number" class="bg-white w-full px-1 py-0 border-0 text-center" value="5">
+              </div>
+              <div class="grid grid-rows-2">
+                <div class="so-light font-bold text-sm w-full flex items-center justify-center">単位</div>
+                <select class="w-full bg-white border-0 text-sm px-1 py-0 leading-tight focus:outline-none">
+                  <option>kg</option><option>ｹｰｽ</option><option>ｾｯﾄ</option>
+                  <option>ﾊﾟｯｸ</option><option>個</option><option>切</option>
+                  <option>束</option><option>袋</option><option>本</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 単位重量 + 形態/外装区分 -->
+          <div class="col-span-2 p-0 m-0 grid grid-cols-3">
+            <div class="col-span-1 grid-rows-3 grid border">
+              <div class="row-span-2 so-light font-bold text-sm flex items-center justify-center w-full">単位<br>重量</div>
+              <input class="w-full bg-neutral-200 text-center" value="0.5" disabled>
+            </div>
+            <div class="col-span-2 grid grid-rows-4 border">
+              <div class="row-span-2 grid grid-cols-5 h-full">
+                <div class="col-span-5 so-light text-sm font-bold w-full h-full flex items-center justify-center">形態区分</div>
+                <input class="col-span-1 bg-white h-full text-center" value="01" disabled>
+                <input class="col-span-3 border-l bg-white h-full text-center text-xs font-bold p-0" value="袋詰め" disabled>
+                <button class="col-span-1 bg-blue-200 hover:bg-blue-400 transition"><span class="text-white font-bold">E</span></button>
+              </div>
+              <div class="row-span-2 grid grid-cols-5 h-full">
+                <div class="col-span-5 so-light text-sm font-bold w-full h-full flex items-center justify-center">外装区分</div>
+                <input class="col-span-1 bg-white h-full text-center" value="02" disabled>
+                <input class="col-span-3 border-l bg-white h-full text-center text-xs font-bold p-0" value="段ボール" disabled>
+                <button class="col-span-1 bg-blue-200 hover:bg-blue-400 transition"><span class="text-white font-bold">E</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 入力パネル 2行目 -->
+        <div class="grid grid-cols-8 gap-[1px] py-1 drop-shadow">
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">注文数量</div>
+            <input class="border-0 bg-red-200 w-full p-0 text-center font-bold" value="50">
+          </div>
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">単価</div>
+            <input class="w-full bg-neutral-200 border-0 text-center" value="¥120" disabled>
+          </div>
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">消費税率</div>
+            <select class="text-center block w-full py-0 border-0">
+              <option value="8">8%</option>
+              <option value="10" selected>10%</option>
+            </select>
+          </div>
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">消費税額</div>
+            <input class="w-full bg-neutral-200 border-0 text-center" value="¥600" disabled>
+          </div>
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">税込金額</div>
+            <input class="w-full bg-neutral-200 border-0 text-center" value="¥6,600" disabled>
+          </div>
+          <div class="grid border">
+            <div class="w-full so-light text-sm font-bold text-center">作業外直送</div>
+            <div class="bg-red-200 flex justify-center h-full">
+              <input type="checkbox" class="m-auto cursor-pointer">
+            </div>
+          </div>
+          <div class="col-span-1 p-0 m-0 grid">
+            <button class="h-full w-full rounded bg-yellow-300 hover:bg-yellow-400 text-center">
+              <span class="font-bold text-xl">登録</span>
+            </button>
+          </div>
+          <div class="col-span-1 p-0 m-0 grid">
+            <button class="col-span-1 grid text-sm h-full w-full rounded-xl so-header text-white text-center drop-shadow p-1">
+              <span>全表示</span>
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 商品台帳テーブル -->
+        <div class="w-full">
+          <table class="w-full text-center overflow-hidden table-fixed">
+            <thead class="block w-full">
+              <tr class="flex w-full">
+                <th class="so-light text-xs" style="width:4%;"></th>
+                <th class="bg-[#ffd966] border-l text-xs" style="width:6%;">材料<br>区分</th>
+                <th class="so-light border-l text-xs" style="width:10%;"><br>ラベル</th>
+                <th class="so-light border-l text-xs" style="width:24%;">形状<br>大きさ等</th>
+                <th class="so-light border-l text-xs" style="width:7%;">入数<br>数量</th>
+                <th class="so-light border-l text-xs" style="width:7%;">入数<br>単位</th>
+                <th class="so-light border-l text-xs" style="width:7%;">注文<br>容量</th>
+                <th class="so-light border-l text-xs" style="width:7%;">注文<br>単位</th>
+                <th class="so-light border-l text-xs" style="width:7%;">単位<br>重量</th>
+                <th class="so-light border-l text-xs" style="width:15%;"><br>単価</th>
+                <th class="so-light border-l text-xs" style="width:3%;">形態</th>
+                <th class="so-light border-l text-xs" style="width:3%;">外装</th>
+              </tr>
+            </thead>
+            <tbody class="overflow-auto block font-extrabold" style="height: 220px;">
+              <!-- サンプルデータ: 商品台帳行 -->
+              <tr class="flex w-full text-xs border-b hover:bg-yellow-50 cursor-pointer new-color">
+                <td style="width:4%;" class="py-1 border-r"><button class="text-red-500 font-bold text-xs w-full">✕</button></td>
+                <td style="width:6%;" class="py-1 border-r">0</td>
+                <td style="width:10%;" class="py-1 border-r">千葉</td>
+                <td style="width:24%;" class="py-1 border-r text-left px-1">Mサイズ 約500g</td>
+                <td style="width:7%;" class="py-1 border-r">5</td>
+                <td style="width:7%;" class="py-1 border-r">kg</td>
+                <td style="width:7%;" class="py-1 border-r">10</td>
+                <td style="width:7%;" class="py-1 border-r">kg</td>
+                <td style="width:7%;" class="py-1 border-r">0.5</td>
+                <td style="width:15%;" class="py-1 border-r">¥120</td>
+                <td style="width:3%;" class="py-1 border-r">01</td>
+                <td style="width:3%;" class="py-1">02</td>
+              </tr>
+              <tr class="flex w-full text-xs border-b hover:bg-yellow-50 cursor-pointer">
+                <td style="width:4%;" class="py-1 border-r"><button class="text-red-500 font-bold text-xs w-full">✕</button></td>
+                <td style="width:6%;" class="py-1 border-r">0</td>
+                <td style="width:10%;" class="py-1 border-r">茨城</td>
+                <td style="width:24%;" class="py-1 border-r text-left px-1">大きめ 4kg入り</td>
+                <td style="width:7%;" class="py-1 border-r">3</td>
+                <td style="width:7%;" class="py-1 border-r">ｹｰｽ</td>
+                <td style="width:7%;" class="py-1 border-r">1</td>
+                <td style="width:7%;" class="py-1 border-r">ｹｰｽ</td>
+                <td style="width:7%;" class="py-1 border-r">4.0</td>
+                <td style="width:15%;" class="py-1 border-r">¥480</td>
+                <td style="width:3%;" class="py-1 border-r">01</td>
+                <td style="width:3%;" class="py-1">01</td>
+              </tr>
+              <tr class="flex w-full text-xs border-b hover:bg-yellow-50 cursor-pointer material-color">
+                <td style="width:4%;" class="py-1 border-r"><button class="text-red-500 font-bold text-xs w-full">✕</button></td>
+                <td style="width:6%;" class="py-1 border-r">9</td>
+                <td style="width:10%;" class="py-1 border-r">群馬</td>
+                <td style="width:24%;" class="py-1 border-r text-left px-1">ミックスサラダ用</td>
+                <td style="width:7%;" class="py-1 border-r">10</td>
+                <td style="width:7%;" class="py-1 border-r">袋</td>
+                <td style="width:7%;" class="py-1 border-r">2</td>
+                <td style="width:7%;" class="py-1 border-r">kg</td>
+                <td style="width:7%;" class="py-1 border-r">0.2</td>
+                <td style="width:15%;" class="py-1 border-r">¥200</td>
+                <td style="width:3%;" class="py-1 border-r">03</td>
+                <td style="width:3%;" class="py-1">02</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- ミックス品入力エリア (通常非表示) -->
+          <div class="h-[200px] mt-1">
+            <div class="grid grid-cols-12 bg-orange-50 border rounded p-1">
+              <span class="col-span-12 text-xs text-center text-orange-600 font-bold">ミックス品配分エリア (材料区分=9 の場合に表示)</span>
+              <div class="col-span-1 so-light text-center text-xs border-r flex items-center justify-center">No</div>
+              <div class="col-span-1 so-light text-center text-xs border-r">商品<br>番号</div>
+              <div class="col-span-2 so-light text-center text-xs border-r flex items-center justify-center">商品名</div>
+              <div class="col-span-1 so-light text-xs border-r"><span class="block">配分(kg)</span><span class="block bg-[#f4b183]">入数</span></div>
+              <div class="col-span-3 so-light text-center text-xs border-r flex items-center justify-center">加工方法</div>
+              <div class="col-span-3 so-light text-center text-xs flex items-center justify-center">セット方法</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== END 発注入力パネル ===== -->
+
+      <!-- ===== 5. 帳票出力パネル ===== -->
+      <div class="flex flex-col rounded overflow-hidden border border-neutral-300 bg-[#D9D9D9] w-fit h-full min-w-[180px]">
+        <div class="so-header p-1 flex justify-between">
+          <span class="font-bold text-white text-md">帳票出力</span>
+        </div>
+        <div class="block flex flex-col overflow-hidden h-full">
+          <div class="flex-none flex flex-col">
+            <!-- 方向フィルタ + 日付 -->
+            <div class="grid grid-cols-8">
+              <input class="col-span-3 bg-white text-base text-center" value="06/21" disabled>
+              <button class="so-mid hover:bg-[#9ec4b2] font-bold text-center border-r transition text-sm">西</button>
+              <button class="so-mid hover:bg-[#9ec4b2] font-bold text-center border-r transition text-sm">南</button>
+              <button class="so-mid hover:bg-[#9ec4b2] font-bold text-center border-r transition text-sm">北</button>
+              <button class="col-span-2 so-mid hover:bg-[#9ec4b2] font-bold text-center transition text-xs">中央</button>
+            </div>
+            <!-- 伝票更新/一括印刷 -->
+            <div class="grid grid-cols-3">
+              <button class="bg-[#ffe16a] hover:bg-yellow-400 font-bold h-full transition text-center flex items-center justify-center">
+                <div class="text-xs">伝票更新</div>
+              </button>
+              <button class="bg-green-600 hover:bg-green-500 font-bold w-full h-full text-white text-center flex items-center justify-center transition" disabled>
+                <div class="text-xs">一括で印刷</div>
+              </button>
+              <div class="grid bg-neutral-200 p-1 gap-1">
+                <span class="text-xs">作業指示書は伝票</span>
+                <span class="text-xs">納品書は点数</span>
+              </div>
+            </div>
+            <!-- テーブルヘッダー -->
+            <div class="grid grid-cols-8 border so-light">
+              <div class="border-r text-center font-bold text-xs specific-table-delivery-print py-1">伝票
+                <div class="tooltip"><div>伝票番号</div><div>ダブルクリック</div><div>作業指示書印刷</div></div>
+              </div>
+              <div class="col-span-4 border-r text-center font-bold text-xs specific-table-delivery-print py-1">配送先店舗
+                <div class="tooltip text-start"><div>・作業指示書印刷済み：<span class="bg-[#dfdbe7] px-1 rounded">グレー</span></div><div>・納品書未印刷：<span class="bg-[#fff200] px-1 rounded">黄色</span></div></div>
+              </div>
+              <div class="border-r text-center font-bold text-xs specific-table-delivery-print py-1">点数
+                <div class="tooltip"><div>点数</div><div>ダブルクリック</div><div>納品書印刷</div></div>
+              </div>
+              <div class="border-r text-center font-bold text-xs py-1">方向</div>
+              <div class="text-center font-bold text-xs py-1">都度</div>
+            </div>
+          </div>
+
+          <!-- 帳票リスト -->
+          <div class="grid overflow-hidden h-fit">
+            <div class="overflow-y-auto" style="max-height: calc(100vh - 280px);">
+              <!-- サンプルデータ: 受注サマリー行 -->
+              <div class="order-summary-row border-b hover:bg-green-50 cursor-pointer">
+                <span class="border-r text-center text-xs flex items-center justify-center">1001</span>
+                <span class="border-r text-xs flex items-center px-1">山田商店 本店</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">5</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">西</span>
+                <span class="text-center text-xs flex items-center justify-center bg-[#fff200]">都度</span>
+              </div>
+              <div class="order-summary-row border-b hover:bg-green-50 cursor-pointer bg-[#dfdbe7]">
+                <span class="border-r text-center text-xs flex items-center justify-center">1002</span>
+                <span class="border-r text-xs flex items-center px-1">山田商店 支店</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">3</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">西</span>
+                <span class="text-center text-xs flex items-center justify-center">9</span>
+              </div>
+              <div class="order-summary-row border-b hover:bg-green-50 cursor-pointer">
+                <span class="border-r text-center text-xs flex items-center justify-center">1003</span>
+                <span class="border-r text-xs flex items-center px-1">田中青果 柏店</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">8</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">北</span>
+                <span class="text-center text-xs flex items-center justify-center bg-[#fff200]">都度</span>
+              </div>
+              <div class="order-summary-row border-b hover:bg-green-50 cursor-pointer">
+                <span class="border-r text-center text-xs flex items-center justify-center">1004</span>
+                <span class="border-r text-xs flex items-center px-1">スーパーABC 東店</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">12</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">南</span>
+                <span class="text-center text-xs flex items-center justify-center bg-[#fff200]">都度</span>
+              </div>
+              <div class="order-summary-row border-b hover:bg-green-50 cursor-pointer bg-[#dfdbe7]">
+                <span class="border-r text-center text-xs flex items-center justify-center">1005</span>
+                <span class="border-r text-xs flex items-center px-1">レストランXYZ</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">2</span>
+                <span class="border-r text-center text-xs flex items-center justify-center">中央</span>
+                <span class="text-center text-xs flex items-center justify-center">9</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== END 帳票出力パネル ===== -->
+
+    </div>
+    <!-- ===== END MAIN CONTENT ===== -->
+  </div>
+
+  <!-- モーダル例: 取引先追加 (非表示) -->
+  <div id="modal-create-client" class="hidden fixed z-50 inset-0 overflow-y-auto" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+      <div class="relative bg-neutral-100 rounded-lg p-5 w-[450px] h-[400px] z-10">
+        <div class="flex gap-2 mb-4">
+          <div class="grid rounded-full bg-green-100 w-[50px] h-[50px] my-auto border border-green-300">
+            <i class="fa-regular fa-address-book fa-lg text-green-500 m-auto"></i>
+          </div>
+          <span class="my-auto font-bold text-xl">取引先追加</span>
+        </div>
+        <div class="grid gap-y-2 mx-5">
+          <div class="grid grid-cols-5 border border-neutral-400 rounded overflow-hidden">
+            <div class="col-span-2 so-light flex items-center justify-center font-bold">取引先番号</div>
+            <input class="col-span-3 text-neutral-600 bg-neutral-200 text-center w-full" value="(自動採番)" disabled>
+          </div>
+          <span class="font-bold text-center text-sm text-red-500">※変更できません</span>
+          <div class="grid grid-cols-5 border border-neutral-400 rounded overflow-hidden">
+            <div class="col-span-2 so-light flex items-center justify-center font-bold">取引先名</div>
+            <input class="col-span-3 bg-white text-center w-full" placeholder="取引先名を入力">
+          </div>
+          <div class="grid grid-cols-5 border border-neutral-400 rounded overflow-hidden">
+            <div class="col-span-2 so-light flex items-center justify-center font-bold">読み/JAN</div>
+            <input class="col-span-3 bg-white text-center w-full" placeholder="全角ひらがなで入力">
+          </div>
+          <span class="font-bold text-center text-sm text-red-500">※読み/JANは全角ひらがなで修正して下さい</span>
+        </div>
+        <div class="absolute bottom-[10px] right-[10px] flex gap-2">
+          <button onclick="document.getElementById('modal-create-client').classList.add('hidden')" class="px-4 py-2 rounded border border-gray-400 bg-white text-sm">キャンセル</button>
+          <button class="px-4 py-2 rounded border border-green-600 bg-green-200 text-sm font-bold">追加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery + スタブJS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // グローバル変数 (スタブ)
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+
+    // モックアップ: AJAX関数はすべてスタブ化
+    function getCustomerList(id, kana) { console.log('[STUB] getCustomerList', id, kana); }
+    function resetCustomerList() { console.log('[STUB] resetCustomerList'); }
+    function getDestinationId() { console.log('[STUB] getDestinationId'); }
+    function selectShipping() { console.log('[STUB] selectShipping'); }
+    function materialListAll() { console.log('[STUB] materialListAll'); }
+    function filterMaterialList() { console.log('[STUB] filterMaterialList'); }
+    function radioCheckShipping(v) { console.log('[STUB] radioCheckShipping', v); }
+    function setQuantityPerUnitSelected() { console.log('[STUB] setQuantityPerUnitSelected'); }
+    function setQuantitySelected() { console.log('[STUB] setQuantitySelected'); }
+    function editIndividualModal() { console.log('[STUB] editIndividualModal'); }
+    function editExteriorModal() { console.log('[STUB] editExteriorModal'); }
+    function createNewOrder() { console.log('[STUB] createNewOrder'); }
+    function toggleButton() { console.log('[STUB] toggleButton'); }
+    function orderSummaryList(dir) { console.log('[STUB] orderSummaryList', dir); }
+    function showTotalPrintModal() { console.log('[STUB] showTotalPrintModal'); }
+    function highlightOrder(v) { console.log('[STUB] highlightOrder', v); }
+    function cilentCheckId() { console.log('[STUB] cilentCheckId'); }
+    function toggleDestinationData(el) { console.log('[STUB] toggleDestinationData'); }
+    function createMaterial() { console.log('[STUB] createMaterial'); }
+    function showProductManagerModal() { console.log('[STUB] showProductManagerModal'); }
+    function openMaterialCopyModal() { console.log('[STUB] openMaterialCopyModal'); }
+    function addRowMix() { console.log('[STUB] addRowMix'); }
+    function saveOrderMix() { console.log('[STUB] saveOrderMix'); }
+    function destinationValue(id, name) { console.log('[STUB] destinationValue', id, name); }
+  </script>
+</body>
+</html>

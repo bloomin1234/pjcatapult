@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>納品書・請求書印刷 — SMART ORDER [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- pickadate CSS (scriptブロックから移動) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.date.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.time.css" />
+  <!-- block style の内容 -->
+  <style>
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+    [x-cloak] { display: none }
+    /* Works for Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- block content の内容 -->
+<div class="p-2 w-full h-screen min-w-screen min-h-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col"
+    x-data="{
+        editFormalModal: false, fixClientNoteModal:false,
+    }"
+    x-cloak>
+    <!-- menu section -->
+    <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
+        <div class="grid grid-cols-12 gap-1">
+
+            <div class="col-span-1 grid grid-rows-2 gap-1">
+                <!-- Back Btn-->
+                <a href="#" role="button">
+                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i><span class="my-auto">戻る</span></div>
+                </a>
+                <!-- Refresh Btn -->
+                <a href="#" role="button">
+                    <!-- SMO-IMP-009 Start -->
+                    <div class="bg-[#C7996B] hover:bg-[#d8b897] text-white  font-bold rounded h-full flex items-center justify-center transition" onclick="customerList(year_id.value, month_id.value), setDateRange(year_id.value, month_id.value), resetPrintBtnState();"><i class="fa-solid fa-arrows-rotate mr-2"></i><span>取引先更新</span></div>
+                    <!-- SMO-IMP-009 End -->
+                </a>
+            </div>
+
+            <div class="col-span-2 grid grid-cols-4 grid-rows-3 gap-1">
+                <div class="col-span-4 flex items-center justify-center">
+                    <span class="font-bold">納品書 · 請求書印刷</span>
+                </div>
+                <!-- Month Select -->
+                <div class="col-span-4 row-start-2 rounded border">
+                    <div class="grid grid-cols-4 h-full">
+                        <input id="year_id" class="bg-white text-center rounded-l" data-value=" " disabled>
+                        <div class="bg-[#a9d18e] flex items-center justify-center font-bold">年</div>
+                        <input id="month_id" class="bg-white text-center" data-value=" " disabled>
+                        <div class="bg-[#a9d18e] flex items-center justify-center rounded-r font-bold">月</div>
+                    </div>
+                </div>
+                <div class="col-span-4 row-start-3">
+                    <div class="grid grid-cols-2 gap-1 h-full">
+                        <a id="prev_date" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" data-diff="-1" href="#" role="button"><i class="fa-solid fa-angle-left mr-2"></i>前月</a>
+                        <a id="next_date" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" data-diff="1" href="#" role="button">翌月<i class="fa-solid fa-angle-right ml-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- SMO-IMP-009 Start -->
+             <!-- Period Select -->
+            <div class="col-span-2 grid grid-rows-3 gap-1">
+                <div class="row-start-1 rounded flex items-center justify-center bg-[#E5DAAC] font-bold">期間内検索</div>
+                <div class="row-start-2 grid grid-cols-5 gap-1">
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(10)">⁓10日</button>
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(15)">⁓15日</button>
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(20)">⁓20日</button>
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(25)">⁓25日</button>
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(0)">全件</button>
+                </div>
+                <div class="row-start-3 grid grid-cols-5 gap-1">
+                    <div class="col-span-4 flex">
+                        <input type="text" name="start-date" id="date_picker_start" class="w-full h-full rounded-md border-1 text-[#363636]">
+                        <span class="grow-0 mx-1 flex items-center justify-center">⁓</span>
+                        <input type="text" name="end-date" id="date_picker_end" class="w-full h-full rounded-md border-1 text-[#363636]">
+                    </div>
+                    <button class="bg-[#3C8865] hover:bg-[#77ac93] font-bold text-white rounded h-full flex items-center justify-center" onclick="filterList()">検索</button>
+                </div>
+            </div>
+            <!-- SMO-IMP-009 End -->
+            <div class="col-span-2 grid grid-rows-3 gap-1">
+                <div class="row-start-1 flex items-center overflow-hidden">
+                    <div class="flex flex-col items-start justify-start">
+                        <div class="px-2 flex text-sm font-bold">
+                            消費税算定方式 : <div id="tax_cal_id" class="px-1 text-red-400"></div>
+                        </div>
+                        <div class="px-2 flex text-sm font-bold">
+                            消費税計算単位 : <div id="tax_method_id" class="px-1 text-red-400"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-start-2 grid grid-cols-4 border rounded-l overflow-hidden">
+                    <div class="bg-[#a9d18e] flex items-center justify-center font-bold">取引先</div>
+                    <input id="client_id" class="bg-white text-center text-base" disabled>
+                    <input id="client_name" class="grid col-span-2 bg-white text-center text-base rounded-r" disabled>
+                </div>
+                <div class="row-start-3 grid grid-cols-4 border rounded-l overflow-hidden">
+                    <div class="bg-[#a9d18e] flex items-center justify-center font-bold">持込先</div>
+                    <input id="destination_id" class="bg-white text-center text-base" onchange="inputtingPrint()">
+                    <input id="destination_name" class="grid col-span-2 bg-white text-center text-base rounded-r" disabled>
+                </div>
+            </div>
+
+            <div class="col-span-5 grid grid-rows-3 gap-1">
+                <!-- 行1：請求書発行ユニット -->
+                <div class="row-span-1">
+                    <!-- jan_support=true ブランチ -->
+                    <div class="grid grid-cols-6 h-full items-center">
+                        <span class="col-span-2 text-sm font-bold">
+                            請求書発行単位<span class="text-red-400">（重要）</span>
+                        </span>
+
+                        <div class="col-span-4 grid grid-cols-3">
+                            <label class="inline-flex items-center mx-3 cursor-pointer">
+                                <input type="radio" class="form-radio" name="invoice_pdf_option" value="unit" checked onclick="">
+                                <span class="ml-2 text-sm">注文単位計算</span>
+                            </label>
+                            <label class="inline-flex items-center mx-3 cursor-pointer">
+                                <input type="radio" class="form-radio" name="invoice_pdf_option" value="package" onclick="">
+                                <span class="ml-2 text-sm">入数単位計算</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2～3行束 -->
+                <div class="row-span-2 grid grid-cols-5 gap-1">
+                    <!-- 左2マス -->
+                    <div class="col-span-2 grid grid-rows-2 gap-1">
+                        <!-- 合算番号 -->
+                        <div class="grid grid-cols-6 border rounded-l overflow-hidden h-full">
+                            <div class="col-span-2 bg-[#a9d18e] flex items-center justify-center font-bold">合算番号</div>
+                            <input id="set_zero_id" class="col-span-4 bg-white text-center text-base rounded-r" disabled>
+                        </div>
+                        <!-- 代表請求先 -->
+                        <div class="grid grid-cols-6 border rounded-l overflow-hidden h-full">
+                            <div class="col-span-2 bg-[#a9d18e] flex items-center justify-center text-sm font-bold">代表請求先</div>
+                            <input id="destination_name_no" class="col-span-4 bg-white text-center text-base rounded-r">
+                        </div>
+                    </div>
+
+                    <!-- 右3マス（ボタンエリア） -->
+                    <div class="col-span-3 grid grid-cols-3 gap-1">
+                        <a id="print_print_zero" target="_blank">
+                            <div class="bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center text-center">
+                                単価未設定<br>抽出
+                            </div>
+                        </a>
+                        <button id="print_btn_1"
+                            class=" bg-[#C7996B] hover:bg-[#d8b897] text-white rounded h-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 transition-all" type="button" disabled>
+                            <div id="prnt_btn_normal" class="transition-all font-bold">請求書発行</div>
+                            <div id="prnt_btn_process" class="flex flex-col hidden transition-all font-bold"><i class="fa-solid fa-spinner animate-spin"></i><span>発行中</span></div>
+                            <div id="prnt_btn_done" class="flex flex-col hidden transition-all font-bold"><span>ダウンロード完了</span></div>
+                            <div id="prnt_btn_failed" class="flex flex-col hidden transition-all font-bold text-red-700"><i class="fa-solid fa-triangle-exclamation"></i><span>エラー</span></div>
+                        </button>
+                        <a id="print_btn_2" target="_blank"
+                            class="bg-[#C7996B] hover:bg-[#d8b897] rounded h-full flex items-center justify-center text-white">
+                            <span class="text-center font-bold">店舗別<br>売上表</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!-- content section -->
+    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] rounded-md drop-shadow flex-1 h-full overflow-hidden">
+        <div class="grid grid-cols-18 h-full gap-1">
+            <!-- 左：取引先一覧＋請求先番号 -->
+            <div class="col-span-6 grid grid-cols-12 gap-1">
+                <!-- 取引先一覧 -->
+                <div class="col-span-8">
+                    <div class="grid grid-rows-3 gap-1 h-[95px]">
+                        <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">取引先一覧</div>
+                        <div class="row-start-2 border row-span-2 grid grid-cols-22 bg-[#a9d18e]">
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">番号</div>
+                            <div class="col-span-6 border-r text-sm flex items-center justify-center">取引先名</div>
+                            <div class="col-span-3 border-r text-sm flex items-center justify-center text-center">振込<br>手数料</div>
+                            <div class="col-span-4 border-r text-sm flex items-center justify-center text-center">振込⼝座</div>
+                            <div class="col-span-3 border-r text-sm flex items-center justify-center">税込金額</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">請求<br>管理</div>
+                            <div class="col-span-2 text-sm flex items-center justify-center">備考</div>
+                        </div>
+                    </div>
+
+                    <div class="h-[660px] overflow-y-auto overflow-hidden">
+                        <div id="client_list">
+                            <!-- javascript section -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 請求先番号 -->
+                <div class="col-span-4">
+                    <div class="grid grid-rows-3 gap-1 h-[95px]">
+                        <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold text-nowrap">請求先番号</div>
+                        <div class="row-start-2 border row-span-2 grid grid-cols-12 bg-[#a9d18e]">
+                            <div class="col-span-3 border-r text-sm flex items-center justify-center">請求順</div>
+                            <div class="col-span-7 border-r text-sm flex items-center justify-center">店舗名</div>
+                            <div class="col-span-2 text-sm flex items-center justify-center">合No</div>
+                        </div>
+                    </div>
+
+                    <div class="h-[660px] overflow-y-auto">
+                        <div id="destination_list" class="grid grid-cols-12">
+                            <!-- javascript section -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右：取引先別売上一覧 -->
+            <div class="col-span-12">
+                <div class="grid grid-rows-3 gap-1 h-[95px]">
+                    <div class="grid grid-cols-9 gap-1">
+                        <div class="col-span-2 py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">取引先別売上一覧</div>
+                        <div class="col-span-3 grid grid-cols-12">
+                            <!---- text -->
+                            <div class="col-span-3 bg-[#a9d18e] text-center text-xs flex items-center justify-center rounded-l">取引先番号</div>
+                            <input id="client_id_sum" class="col-span-2 bg-white text-center" disabled>
+                            <div class="col-span-3 bg-[#a9d18e] text-center text-xs flex items-center justify-center">取引先名</div>
+                            <input id="client_name_sum" class="col-span-4 bg-white text-center rounded-r" disabled>
+                        </div>
+                        <!-- OHM edit -->
+                        <div class="col-span-4 grid grid-cols-8 gap-1">
+                            <!-- SMO-IMP-011 -->
+                            <button id="download_full_csv" onclick="downloadCSV(null)" class="col-span-3">
+                                <div class="bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center">
+                                    <i class="fa-solid fa-download mr-1"></i>
+                                    CSV全ダウンロード
+                                </div>
+                            </button>
+                            <!-- OHM edit: button download csv -->
+                            <button id="btn_download_csv_01" target="_blank" class="bg-[#C7996B] hover:bg-[#d8b897] text-white rounded h-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 col-span-3" disabled>
+                                <div class="h-full flex items-center justify-center font-bold ">
+                                    <i class="fa-solid fa-download mr-1"></i>
+                                    CSVダウンロード
+                                </div>
+                            </button>
+                            <input id="sum_total_id" class="col-span-2 bg-white text-center rounded" disabled>
+                        </div>
+                    </div>
+                    <div class="row-start-2 row-span-2 grid border bg-[#a9d18e] overflow-auto">
+                        <div class="grid grid-cols-25">
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">出荷日</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">店舗名</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">商品名</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">ラベル</div>
+                            <!-- jan_support=true ブランチ: col-span-2 -->
+                            <div class="border-r text-sm flex items-center justify-center col-span-2
+                            ">形状<br>大きさ等</div>
+                            <!-- jan_support=true ブランチ: bg-[#8ab8a3] -->
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#8ab8a3]
+                            ">入数</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">入数<br>単位</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>容量</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>単位</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>数量</div>
+                            <!-- jan_support=true ブランチ -->
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#8ab8a3]">単品<br>単価</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">ｹｰｽ<br>単価</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">税前<br>金額</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center">消費<br>税率</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">消費<br>税額</div>
+                            <div class="col-span-2 border-r text-sm flex items-center justify-center">金額</div>
+                            <div class="col-span-1 text-sm flex items-center justify-center">納品<br>区分</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-6 grid h-[600px] overflow-y-auto">
+                    <div id="detail_order_date" class="grid grid-cols-25 h-[22px]">
+                        <!-- javascript section -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- start edit formal name modal -->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="editFormalModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="editFormalModal"
+            @click.away="editFormalModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <!-- Header -->
+                <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
+                    <div class="col-span-2 text-center w-full my-auto">
+                        <h3 class="text-lg leading-6 font-medium text-left" id="modal-title">
+                            取引先台帳_正式名称
+                        </h3>
+                    </div>
+                    <div class="col-span-1 text-right w-full my-auto pr-2">
+                        <i class="fa-solid fa-xmark fa-xl text-gray-700 hover:text-red-600 cursor-pointer" @click="editFormalModal = false"></i>
+                    </div>
+                </div>
+                <!-- content -->
+                <div class="bg-[#203864] px-4 pb-2">
+                    <div class="sm:flex sm:items-start w-full">
+                        <div class="mt-2 text-center sm:mt-0 sm:text-left w-full">
+                            <div class="mt-2">
+                            <form id="edit_formal_form" method="POST">
+                                <div class="grid text-sm">
+                                    <div class="col-span-1 text-left mt-2 mx-5">
+                                        <div class="grid grid-cols-5">
+                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">取引先番号</div>
+                                            <input id="pk_id" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" hidden>
+                                            <input id="customer_number" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" value="" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-1 text-left mt-1 mx-5">
+                                        <div class="grid grid-cols-5">
+                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">取引先名</div>
+                                            <input id="customer_name" class="col-start-3 col-span-2 bg-[#f8cbad] text-sm text-center w-full mr-2" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-1 text-left mt-1 mx-5">
+                                        <div class="grid grid-cols-5">
+                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">正式名称</div>
+                                            <input id="formal_name" class="col-start-3 col-span-2 bg-white text-sm text-center w-full mr-2">
+                                        </div>
+                                    </div>
+                                    <div class="col-span-1 text-left mt-1 mx-5">
+                                        <div class="grid grid-cols-5">
+                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">読み</div>
+                                            <input id="reading_id" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" value="" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- footer -->
+                <div class="grid grid-cols-6 bg-[#203864] px-4 py-3">
+                    <div class="col-start-4 col-span-2">
+                        <button onclick="editFormalName()" @click="editFormalModal = false"  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-4 bg-zinc-200 hover:bg-zinc-300 text-base font-medium text-gray-700">
+                            追加
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End edit formal name modal -->
+
+    <!-- 請求書取引先別注編集モーダル-->
+    <div class="fixed z-10 inset-0 overflow-y-auto"
+    x-show="fixClientNoteModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform"
+    x-transition:enter-end="opacity-100 transform"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform"
+    x-transition:leave-end="opacity-0 transform"
+    x-cloak
+    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- This element is to trick the browser into centering the modal contents. -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+            x-show="fixClientNoteModal"
+            @click.away="fixClientNoteModal = true"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 transform scale-200"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            x-cloak
+            class="relative inline-block align-bottom bg-neutral-100 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle p-5 w-[450px] h-fit"
+            >
+                <!-- Header -->
+                <div class="flex gap-2">
+                    <div class="grid rounded-full bg-green-200 w-[50px] h-[50px] my-auto border-1 border border-green-300">
+                        <i class="fa-regular fas fa-print fa-lg text-green-500 m-auto"></i>
+                    </div>
+                    <span class="my-auto font-bold text-xl">請求書にコメントを追記</span>
+                </div>
+                <!-- Content -->
+                <div class="w-full h-fit grid content-center p-2 top-0 left-0">
+                    <!-- 備考 -->
+                    <div>
+                        <div class="bg-[#a9d18e] w-full h-10 flex items-center justify-center font-bold">備考</div>
+                        <textarea id="remark_note" class="form-control block w-full max-h-[180px] min-h-[120px]  px-3 py-1.5 text-base text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 focus:text-gray-700 focus:bg-white focus:border-gray-100 focus:outline-none"
+                            maxlength="200"
+                            oninput="updateCharCount()" rows="5"></textarea>
+                        <div class="text-center text-sm text-gray-500 mt-1">
+                            <span id="charCount">0</span>/200字
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="bottom-[10px] right-[10px] flex justify-end gap-4 w-full">
+                    <button id="client_note_btn" class="w-[120px] py-2 rounded-md border border-green-600 bg-green-400 text-base text-white hover:bg-green-500 transition"
+                    onclick="updateClientNote()" @click="fixClientNoteModal = false">
+                        確定
+                    </button>
+                </div>
+                <button @click="fixClientNoteModal = false" class="absolute top-[10px] right-[14px]">
+                    <i class="fa-solid fa-xmark fa-lg text-neutral-500"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 請求書取引先別比較編集モーダル -->
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.date.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.time.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+    // checkJanSupport スタブ関数
+    function checkJanSupport() { return true; }
+  </script>
+
+  <!-- block script の内容 -->
+<script>
+    // グローバルで使用するjanSupport定数の設定
+    const janSupport = checkJanSupport();
+
+    // 口座情報グローバル変数
+    let global_BankAccounts = [];
+    let global_Default_BankAccounts = [];
+
+    $(document).ready(function(){
+        getPrintOptions();
+        companyInfo(); // ページの読み込み時にアカウント情報を取得するように設定
+        customerList(year_id.value, month_id.value);
+    });
+
+
+    function companyInfo(){
+        $.ajax({
+            url: "#",
+            type: 'GET',
+            success: function(data) {
+                console.log('会社情報:',data.company_info_list);
+                console.log('口座配列:',data.company_info_list[0].bank_account);
+                console.log('デフォルト口座インデックス:',data.company_info_list[0].default_bank_account);
+
+                if (data.company_info_list[0].bank_account) {
+                    let accounts = data.company_info_list[0].bank_account;
+                    // 配列でない場合は配列に変換
+                    if (!Array.isArray(accounts)) {
+                        accounts = [accounts];
+                    }
+                    // グローバル変数にアカウント情報を保存する
+                    global_BankAccounts = accounts;
+                    console.log('保存された銀行口座情報:', global_BankAccounts);
+                    global_Default_BankAccounts = data.company_info_list[0].default_bank_account
+                } else {
+                    // アカウント情報がない場合は空の配列で初期化
+                    global_BankAccounts = [];
+                }
+            }
+        });
+    }
+</script>
+<script>
+//Start function set month and year
+var setToYear = document.getElementById('year_id');
+var setMonth = document.getElementById('month_id');
+
+var pickerMonth = $('#month_id').pickadate({
+        format: 'mm'
+    }).pickadate('picker');
+var pickerYear = $('#year_id').pickadate({
+        format: 'yyyy'
+    }).pickadate('picker');
+
+    $('#prev_date, #next_date').click(function(e) {
+        e.preventDefault();
+        setDate($(this).data('diff'));
+    })
+
+    function setDate(diff) {
+        // var year = new Date(pickerYear.get('select').pick);
+        let month = new Date(pickerMonth.get('select').pick);
+        let newMonth = month.setMonth(month.getMonth() + diff);
+        let newYear = month.setFullYear(month.getFullYear());
+
+        pickerYear.set('select', newYear)
+        pickerMonth.set('select', newMonth)
+    }
+//End function set month and year
+</script>
+
+<script>
+    // function call ajax by month and year to show client id and client name
+    var ClientListObj=[];
+    var divClientId;
+    var docYear = '';
+    var docMonth = '';
+    var docClient = '';
+    var docTotalNumber = '';
+    var docEndDestination = '';
+    var setZero = document.getElementById('set_zero_id');
+    var setClientId = document.getElementById('client_id');
+    var setDestination = document.getElementById('destination_id');
+    var setDestinationName = document.getElementById('destination_name');
+    var setClientName = document.getElementById('client_name');
+    var setValueClientId = document.getElementById('client_id_sum');
+    var setValueClientName = document.getElementById('client_name_sum');
+    var desNameNo = document.getElementById('destination_name_no');
+    var sumTotalPrice = document.getElementById('sum_total_id');
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    function customerList(currentYear, currentMonth){
+        printDoc1(currentYear, currentMonth);
+        setClientId.value = "";
+        setClientName.value = "";
+        setZero.value = "";
+        setDestination.value = "";
+        setDestinationName.value = "";
+        desNameNo.value = "";
+        setValueClientId.value = "";
+        setValueClientName.value = "";
+        sumTotalPrice.value = "";
+        disableButton();
+
+        $.ajax({
+          url: '#',
+          data:{
+            'year': currentYear,
+            'month': currentMonth,
+          },
+          dataType: 'json',
+          success: function (data) {
+            docYear = currentYear;
+            docMonth = currentMonth;
+
+            let divClientList = document.getElementById('client_list');
+            divClientList.innerHTML = '';
+            ClientListObj = data.ret;
+
+            for (let id in ClientListObj) {
+                let divMain = document.createElement('div');
+                divMain.classList.add('grid', 'grid-cols-22', 'group', 'text-base', 'bg-white', 'h-full', 'border');
+
+                // 番号
+                divClientId = document.createElement('div');
+                divClientId.classList.add('col-span-2', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'border-r', 'text-center', 'text-sm');
+                divClientId.innerHTML = ClientListObj[id].client_id;
+                divClientId.setAttribute('ondblclick', 'setAccountLedger(' + currentYear + ',' + currentMonth + ',' + ClientListObj[id]['pk'] + ', ' + ClientListObj[id].client_id + ', "' + ClientListObj[id].client_name + '", "' + ClientListObj[id].formal_name + '", "' + ClientListObj[id].pronunciation + '")');
+
+                // 取引先名
+                let divClientName = document.createElement('div');
+                divClientName.classList.add('col-span-6', 'grid', 'div-client-name', 'border-l','overflow-show');
+
+                let spanClientName = document.createElement('span');
+                spanClientName.classList.add('col-span-4', 'group-hover:text-zinc-800', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'pl-1' , 'whitespace-nowrap', 'truncate', 'hover:z-10', 'hover:bg-white', 'text-sm');
+                spanClientName.innerHTML = ClientListObj[id].client_name;
+                spanClientName.title = ClientListObj[id].client_name;
+                spanClientName.setAttribute('onclick', 'billingDestinationList(' + currentYear + ',' + currentMonth + ',' + ClientListObj[id].client_id + '), setBillingDestination(' + ClientListObj[id].client_id + ', "' + ClientListObj[id].client_name + '", ' + ClientListObj[id].billing_destination_id+ ')');
+
+                // 振込手数料 select フォーム設定
+                const currentValue = ClientListObj[id].bank_transfer_fee;
+                const currentId = ClientListObj[id].pk;
+
+                let bankTransferFee = document.createElement('select');
+                bankTransferFee.classList.add('col-span-3', 'appearance-none', 'w-full', 'bg-white', 'text-sm', 'px-1', 'py-0', 'border-gray-400', 'focus:outline-none', 'focus:border-gray-500');
+
+                let blankOption = document.createElement('option');
+                blankOption.value = '';
+                blankOption.textContent = '';
+                bankTransferFee.appendChild(blankOption);
+
+                const options = [
+                    { value: '先方', label: '先方' },
+                    { value: '自社', label: '自社' },
+                    { value: '空欄', label: '空欄' },
+                ];
+
+                options.forEach(option => {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.label;
+
+                    // Pre-select the option if it matches the current value from the database
+                    if (option.value === currentValue) {
+                        optionElement.selected = true;
+                    }
+
+                    bankTransferFee.appendChild(optionElement);
+                });
+                if (!currentValue) {
+                    blankOption.selected = true;
+                }
+                bankTransferFee.addEventListener('change', (event) => {
+                    const selectedValue = event.target.value || null;
+                    updateBankTransferFee(currentId, selectedValue);
+                });
+
+
+                // 振込⼝座 select フォーム設定
+                let bankAccountSelectFormat = document.createElement('select');
+                bankAccountSelectFormat.classList.add('col-span-4', 'border-r', 'text-sm', 'text-left', 'appearance-none', 'w-full', 'bg-white', 'px-1', 'py-0', 'border-gray-400', 'focus:outline-none', 'focus:border-gray-500');
+
+                let accountBlankOption = document.createElement('option');
+                accountBlankOption.value = '';
+                accountBlankOption.textContent = '';
+                bankAccountSelectFormat.appendChild(accountBlankOption);
+
+                // 口座情報 グローバル変数をオプションに代入
+                global_BankAccounts.forEach((account, index) => {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = index; // インデックス値を value に設定
+                    // Format: "0. test account 123"
+                    let displayText = `${index}. ${account.substring(0, 5)}`;
+                    optionElement.textContent = displayText;
+
+                    // console.log('ClientListObj[id].bank_account_index:', ClientListObj[id].bank_account_index)
+                    // 選択されたidに対応するオブジェクトがbank_account_indexがnullでない場合
+                    // 対応するインデックス値で事前に選択フォームを設定する
+                    if(ClientListObj[id].bank_account_index !== null &&
+                       ClientListObj[id].bank_account_index === index) {
+                        optionElement.selected = true;
+                    }
+
+                    bankAccountSelectFormat.appendChild(optionElement);
+                });
+
+                if (ClientListObj[id].bank_account_index === null) {
+                    accountBlankOption.selected = true;
+                }
+
+                bankAccountSelectFormat.addEventListener('change', (event) => {
+                    const selectedValue = event.target.value || null;
+                    updateBankAccountIndex(currentId, selectedValue, 'bank');
+                });
+
+                // 税込金額
+                let grossValDiv = document.createElement('div');
+                grossValDiv.classList.add('col-span-3', 'grid', 'div-client-name', 'border-l', 'pr-1', 'text-center', 'text-sm', 'overflow-hidden');
+                grossValDiv.innerHTML = ClientListObj[id].total_val.toLocaleString('en-US');
+                grossValDiv.title = ClientListObj[id].total_val.toLocaleString('en-US');
+
+                // 請求管理選択フォーム設定
+                managementSelectDiv = createManagementSelect(ClientListObj[id], id, currentId)
+
+                // 備考
+                let client_note = document.createElement('button');
+                client_note.addEventListener('click', function(e) {
+                    client_note.setAttribute('x-show','fixClientNoteModal = true');
+                });
+                client_note.classList.add('col-span-2', 'grid', 'border-l', 'pr-1', 'text-center', 'text-sm', 'cursor-pointer');
+                client_note.setAttribute('onclick', 'fixClientNote(' + ClientListObj[id].pk + ', ' + JSON.stringify(ClientListObj[id].client_note) + ')');
+                client_note.innerHTML = '編集';
+
+
+                divClientList.append(divMain);
+                divMain.append(divClientId, divClientName, bankTransferFee, bankAccountSelectFormat, grossValDiv, managementSelectDiv, client_note);
+                divClientName.append(spanClientName);
+
+            }
+            billingDestinationList('', '', '');
+            }
+        });
+    }
+
+    function createManagementSelect(ClientListObj, id, currentId) {
+        const currentManagementIndex = ClientListObj.management_index;
+
+        const currentManagementIndexArray = [
+            { value: 1, label: '◯' },
+            { value: 2, label: '△' },
+            { value: 3, label: '！' },
+            { value: 4, label: '空欄' },
+        ];
+
+        let managementSelectFormat = document.createElement('select');
+        managementSelectFormat.id = `management-select-${id}`; // ユニークID付与
+
+        managementSelectFormat.classList.add(
+            'col-span-2', 'border-r', 'text-sm', 'text-left',
+            'appearance-none', 'w-full', 'px-1', 'py-0',
+            'border-gray-400', 'focus:outline-none', 'focus:border-gray-500'
+        );
+
+        // 初期背景色
+        if (currentManagementIndex == 3) {
+            managementSelectFormat.classList.add('bg-red-300');
+        } else {
+            managementSelectFormat.classList.add('bg-white');
+        }
+
+        // 空白 option
+        let managementBlankOption = document.createElement('option');
+        managementBlankOption.classList.add('bg-white');
+        managementBlankOption.value = '';
+        managementBlankOption.textContent = '';
+        managementSelectFormat.appendChild(managementBlankOption);
+
+        // オプションの追加
+        currentManagementIndexArray.forEach(account => {
+            let optionElement = document.createElement('option');
+            optionElement.classList.add('bg-white');
+            optionElement.value = account.value;
+            optionElement.textContent = account.label;
+
+            if (ClientListObj.management_index !== null &&
+                ClientListObj.management_index === account.value) {
+                optionElement.selected = true;
+            }
+
+            managementSelectFormat.appendChild(optionElement);
+        });
+
+        if (ClientListObj.management_index === null) {
+            managementBlankOption.selected = true;
+        }
+
+        // change イベント
+        managementSelectFormat.addEventListener('change', (event) => {
+            const selectedValue = event.target.value || null;
+            updateBankAccountIndex(currentId, selectedValue, 'management', id)
+        });
+
+        return managementSelectFormat;
+    }
+</script>
+
+<script>
+    // function set color when click at client name
+    function setTagColorClient(){
+        let previousDiv = null;
+        $('#client_list').on('click', '.div-client-name', function() {
+            $(this).addClass('bg-[#f7b580]');
+            if (previousDiv !== null) {
+                previousDiv.removeClass('bg-[#f7b580]').addClass('bg-white');
+            }
+            previousDiv = $(this);
+        });
+    }
+
+    var printOptions = [];
+    var getTaxMethod = document.getElementById('tax_method_id');
+    var getTaxcal = document.getElementById('tax_cal_id');
+    function getPrintOptions() {
+        $.ajax({
+            url: "#",
+            type: 'GET',
+            success: function(data) {
+                printOptions = Array.isArray(data.ret) ? data.ret[0] : data.ret;
+                console.log('Print Options:', printOptions);
+
+                 const taxCalMap = {
+                    ceil: '切り上げ',
+                    floor: '切り捨て',
+                    round: '四捨五入'
+                };
+                const taxMethodMap = {
+                    total: '総額計算',
+                    individual: '個別計算'
+                };
+
+                getTaxcal.textContent = taxCalMap[printOptions.tax_cal] ?? printOptions.tax_cal;
+                getTaxMethod.textContent = taxMethodMap[printOptions.tax_calculation_method] ?? printOptions.tax_calculation_method;
+            },
+            error: function(error) {
+                console.error('Error fetching print options:', error);
+            }
+        });
+    }
+</script>
+
+<script>
+    // function set value top section
+    var setYear = '';
+    var setMoth = '';
+    var setTicket = '';
+    function setAccountLedger(year, month, pkId, clientId, clientName, formalName, pronunciation){
+        setYear = year;
+        setMoth = month;
+
+        divClientId.setAttribute('x-show', 'editFormalModal = true');
+
+        let pk = document.getElementById('pk_id');
+        pk.value = pkId;
+
+        let customerId = document.getElementById('customer_number');
+        customerId.value = clientId;
+
+        let customerName = document.getElementById('customer_name');
+        customerName.value = clientName
+
+        let customerFormal = document.getElementById('formal_name');
+        if(formalName === '' || formalName === 'null'){
+            customerFormal.value = '';
+        }else{
+            customerFormal.value = formalName;
+        }
+
+        let customerPronunciation = document.getElementById('reading_id');
+        customerPronunciation.value = pronunciation;
+    }
+
+    // function call ajax of edit formal name
+    function editFormalName(){
+        let pkClient = document.getElementById('pk_id').value;
+        let editFormal = document.getElementById('formal_name').value;
+        $.ajax({
+          url: '#',
+          data:{
+            'pk': pkClient,
+            'formal_name': editFormal,
+          },
+          type:'POST',
+          headers: { 'X-CSRFToken': csrfToken },
+          dataType: 'json',
+          success: function (data) {
+            let forEditFormal = document.getElementById('edit_formal_form');
+            forEditFormal.reset();
+            customerList(setYear, setMoth);
+            }
+        });
+    }
+</script>
+
+<script>
+    var detailSaleOrderListObj = []; // 取引先別売上一覧 グローバル変数
+    // function show detail order by client id
+    function setBillingDestination(customerId, customerName, billingId){
+        setClientId.value = customerId;
+        setClientName.value = customerName;
+        setZero.value = "0";
+        setDestination.value = "";
+        setValueClientId.classList.add('text-base', 'flex', 'items-center', 'justify-center');
+        setValueClientId.value = billingId;
+        setValueClientName.classList.add('text-base', 'flex', 'items-center', 'justify-center');
+        setValueClientName.value = customerName;
+        docEndDestination = 'null';
+        docTotalNumber = 0;
+        enableButton();
+        resetPrintBtnState();
+    }
+
+    // 取引先別売上一覧データ照会
+    function billingDestinationList(year, month, clientId){
+        // SMO-IMP-009 Start
+        const initialYear = document.getElementById('year_id').value;
+        const initialMonth = document.getElementById('month_id').value;
+        setDateRange(initialYear, initialMonth);
+        // SMO-IMP-009 End
+        docClient = clientId;
+        setDestinationName.value = '';
+        desNameNo.value = '';
+        setTagColorClient();
+        $.ajax({
+          url: '#',
+          data:{
+            'client_id': clientId,
+            'year':year,
+            'month':month,
+          },
+          dataType: 'json',
+            success: function (data) {
+                sumTotalPrice.classList.add('text-base');
+                // 合計金額を表示
+                let totalPrice = data.total_price;
+                // console.log（ 'フィルタリング合計金額：'、totalPrice）;
+                if(totalPrice == undefined){
+                    sumTotalPrice.value = '';
+                }else if(totalPrice == null){
+                    sumTotalPrice.value = totalPrice;
+                }else{
+                    sumTotalPrice.value = totalPrice.toLocaleString('en-US');
+                }
+
+                console.log('billing_details:', data.billing_details);
+                let divDestinationList = document.getElementById('destination_list');
+                divDestinationList.innerHTML = '';
+                destinationListObj = data.billing_details;
+                for (let id in destinationListObj) {
+                    let divBilling = document.createElement('input');
+                    divBilling.classList.add('border-slate-200', 'col-span-3', 'bg-white', 'text-base', 'text-center', 'p-0', 'focus:ring-0', 'focus:border-slate-200');
+                    divBilling.setAttribute('min', 0);
+                    divBilling.setAttribute('type', 'number');
+                    divBilling.setAttribute('oninput', "validity.valid||(value='');");
+                    divBilling.setAttribute('id', 'destintion_order_' + destinationListObj[id]['pk']);
+
+                    if(destinationListObj[id].billing_destintion_order == null){
+                        divBilling.setAttribute('value', '');
+                        divBilling.setAttribute('onchange', 'setCurrent(this, '+ destinationListObj[id].pk + ', ' + destinationListObj[id].billing_destintion_order + ', ' + destinationListObj[id].totaling_billing_id + ')');
+                    }else{
+                        divBilling.setAttribute('value', destinationListObj[id].billing_destintion_order);
+                        divBilling.setAttribute('onchange', 'setCurrent(this, ' + destinationListObj[id].pk  + ', ' + destinationListObj[id].billing_destintion_order + ', ' + destinationListObj[id].totaling_billing_id + ')');
+                    }
+
+                    let divDesName = document.createElement('div');
+                    divDesName.classList.add('border', 'col-span-7', 'bg-white', 'text-base', 'h-full', 'pl-1');
+                    divDesName.innerHTML = destinationListObj[id].end_destination_name;
+                    divDesName.title = destinationListObj[id].end_destination_name;
+
+                    let divGoNo = document.createElement('input');
+                    divGoNo.classList.add('col-span-2', 'border-slate-200', 'bg-white', 'text-base', 'h-full', 'text-center', 'p-0', 'focus:ring-0', 'focus:border-slate-200');
+                    divGoNo.setAttribute('min', 0);
+                    divGoNo.setAttribute('type', 'number');
+                    divGoNo.setAttribute('oninput', "validity.valid||(value='');");
+                    divGoNo.setAttribute('id', 'totaling_id_' + destinationListObj[id]['pk']);
+                    divGoNo.setAttribute('ondblclick', 'setValueTotalNumber(' + destinationListObj[id].totaling_billing_id + ', "' + destinationListObj[id].end_destination_id + '", "' + destinationListObj[id].end_destination_name + '")');
+
+                    if(destinationListObj[id].totaling_billing_id == null){
+                        divGoNo.setAttribute('value', '');
+                        divGoNo.setAttribute('onchange', 'setCurrent(this, ' + destinationListObj[id].pk  + ', ' + destinationListObj[id].billing_destintion_order + ', ' + destinationListObj[id].totaling_billing_id + ')');
+                    }else{
+                        divGoNo.setAttribute('value', destinationListObj[id].totaling_billing_id);
+                        divGoNo.setAttribute('onchange', 'setCurrent(this, ' + destinationListObj[id].pk  + ', ' + destinationListObj[id].billing_destintion_order + ', ' + destinationListObj[id].totaling_billing_id + ')');
+                    }
+
+                    divDestinationList.append(divBilling, divDesName, divGoNo);
+                }
+
+                console.log('sale_details:', data.sale_details);
+                detailSaleOrderListObj = data.sale_details;
+
+                // 取引先別売上一覧レンダリング
+                renderingFilterList();
+            }
+        });
+    }
+</script>
+
+<script>
+    // 備考編集
+    function fixClientNote(pk, client_note){
+        console.log('備考モーダルの内容確認', pk, client_note)
+
+        let client_note_btn = document.getElementById('client_note_btn')
+        client_note_btn.value = pk;
+
+        let note_content = document.getElementById('remark_note');
+        note_content.value = client_note;
+        updateCharCount();
+    }
+
+    function updateCharCount(){
+        let current_charCount = document.getElementById('charCount')
+        let current_remark_note = document.getElementById('remark_note')
+        let length = current_remark_note.value.length;
+
+        if(length >= 201){
+            return
+        }
+
+        // 文字数表示の更新
+        current_charCount.textContent = length;
+    }
+
+    function updateClientNote(){
+        let client_note_btn = document.getElementById('client_note_btn');
+        let note_content = document.getElementById('remark_note');
+
+        $.ajax({
+            url: '#',
+            data:{
+                'pk':client_note_btn.value,
+                'client_note':note_content.value
+            },
+            success: function (data) {
+                console.log('更新結果',data.ret);
+                if(data.success){
+                    fixClientNoteModal = false
+                    get_year = document.getElementById('year_id');
+                    get_month = document.getElementById('month_id');
+                    customerList(get_year.value, get_month.value);
+                } else{
+                    alert('エラー。変更を失敗しました。');
+                }
+
+            }
+        })
+    }
+
+</script>
+
+<script>
+    // function set value top section
+    var endDestinationIdPrint = 'all';
+    var endDestinationNamePrint = 'all';
+
+    function setValueMaterial(destinationId, destinationName, ticketId){
+        docEndDestination = destinationId;
+        setTicket = ticketId;
+        setZero.value = 0;
+        docTotalNumber = 0;
+        desNameNo.value = '';
+
+        setDestination.value = destinationId;
+
+        endDestinationIdPrint = destinationId;
+        endDestinationNamePrint = destinationName;
+
+        if(destinationName === 'null'){
+            setDestinationName.value = '';
+        }else if(destinationName === null){
+            setDestinationName.value = '';
+        }else{
+            setDestinationName.value = destinationName;
+        }
+    }
+
+    // function current remember channel at click
+    var currentPointer;
+    var pointerData = [];
+    var destintionOrder = '';
+    var totalingId = '';
+    function setCurrent(obj, pk, billingDes, totalBilling){
+        currentPointer = obj;
+        pointerData[0] = pk;
+        pointerData[1] = billingDes;
+        pointerData[2] = totalBilling;
+
+        updateBilling(pointerData[0], pointerData[1], pointerData[2]);
+    }
+
+    // function call ajax update number billing destination
+    function updateBilling(pkId, BillingDestination, totalBilling){
+        destintionOrder = document.getElementById('destintion_order_' + pkId).value;
+        totalingId = document.getElementById('totaling_id_' + pkId).value;
+        $.ajax({
+            url: '#',
+            data:{
+                'pk': pkId,
+                'billing_destintion_order': destintionOrder,
+                'totaling_billing_id': totalingId,
+            },
+            type:'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            dataType: 'json',
+            success: function (data) {
+                billingDestinationList(year_id.value, month_id.value, client_id.value);
+            }
+        });
+    }
+</script>
+
+<script>
+    // function set value input top section
+    function setValueTotalNumber(totalNumber, endDestinationId, endDestinationName){
+        endDestinationIdPrint = endDestinationId;
+        endDestinationNamePrint = endDestinationName;
+
+        if(totalNumber == null){
+            docTotalNumber = 0;
+        }else if(totalNumber == 'null'){
+            docTotalNumber = 0;
+        }else{
+            docTotalNumber = totalNumber;
+        }
+        setZero.value = '';
+        setZero.value = docTotalNumber;
+
+        desNameNo.value = endDestinationName;
+    }
+</script>
+
+<script>
+    // 請求書発行ユニット
+    var invoice_pdf_option = document.getElementsByName('invoice_pdf_option');
+    // 初期値の設定（選択したラジオボタンの値を確認しない場合は「unit」）
+    var invoice_pdf_optionValue = document.querySelector('input[name="invoice_pdf_option"]:checked') ? document.querySelector('input[name="invoice_pdf_option"]:checked').value : 'unit';
+    // 請求書発行単位変更時
+    invoice_pdf_option.forEach(option => {
+        option.addEventListener('change', function () {
+            console.log('請求書発行単位オプション変更', this.value);
+            invoice_pdf_optionValue = this.value;
+            renderingFilterList();
+        });
+    });
+</script>
+
+<script>
+    // 取引先別売上一覧データ照会 - フィルタリング日時基準
+    function filterList(){
+        let clientName = setClientId.value;
+        let converntClient = clientName.substring(0, 3);
+        // SMO-IMP-009 Start
+        let selectedStartDate = document.getElementById('date_picker_start').value
+        let selectedEndDate = document.getElementById('date_picker_end').value
+        $.ajax({
+          url: "#",
+          data:{
+            'start_date': selectedStartDate,
+            'end_date': selectedEndDate,
+            'client_id': converntClient,
+          },
+          // SMO-IMP-009 End
+          dataType: 'json',
+          success: function (data) {
+                console.log( data.sale_details)
+                let sumTotalFilter = document.getElementById('sum_total_id');
+                // 合計金額を表示
+                let totalPrice = data.total_price;
+                // console.log（ 'フィルタリング合計金額：'、totalPrice）;
+                if(totalPrice == null){
+                    sumTotalFilter.value = sumTotalPrice.value;
+                }else{
+                    sumTotalFilter.value = totalPrice.toLocaleString('en-US');
+                }
+                console.log('フィルタリング sale_details:', data.sale_details);
+                // グローバル変数にデータを割り当てる
+                detailSaleOrderListObj = data.sale_details;  // フィルタリングされた日付のデータとしてレンダリング
+                // レンダリング
+                renderingFilterList();
+            }
+        });
+    }
+
+    // 取引先別売上一覧レンダリング
+    function renderingFilterList() {
+        // detailOFilterListObjが空の場合、関数の終了（undefinedエラー防止）
+        console.log('detailSaleOrderListObj:', detailSaleOrderListObj);
+        if (!detailSaleOrderListObj) return;
+
+        let divDetailOrderList = document.getElementById('detail_order_date');
+        divDetailOrderList.innerHTML = '';
+        divDetailOrderList.setAttribute('innerHTML', '');
+
+        // 請求書発行単位チェック(最新値更新)
+        invoice_pdf_optionValue = document.querySelector('input[name="invoice_pdf_option"]:checked') ? document.querySelector('input[name="invoice_pdf_option"]:checked').value : 'unit';
+        console.log('請求書発行単位:', invoice_pdf_optionValue)
+        // 請求書発行単位 : unit なら既存単価領域のみ append
+        // 請求書発行単位：packageなら単品単価/ケース単価append
+
+        setTimeout(() => {
+            renderingOrderList();
+        }, 200);
+
+        function renderingOrderList() {
+            for (let id in detailSaleOrderListObj) {
+                let divShipDate = document.createElement('div');
+                divShipDate.classList.add('border', 'bg-white', 'text-base', 'h-full', 'text-center');
+                divShipDate.innerHTML = detailSaleOrderListObj[id].shipping_date;
+
+                let divSlipNumber = document.createElement('div');
+                divSlipNumber.classList.add('border', 'bg-white', 'text-base', 'h-full', 'text-center');
+                divSlipNumber.setAttribute('id', 'ticket_id_' + detailSaleOrderListObj[id].ticket_id);
+                divSlipNumber.innerHTML = detailSaleOrderListObj[id].ticket_id;
+
+                let divTerminalName = document.createElement('div');
+                divTerminalName.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'cursor-pointer', 'truncate', 'pl-1');
+                divTerminalName.innerHTML = detailSaleOrderListObj[id].end_destination_name;
+                divTerminalName.setAttribute('ondblclick', 'setValueMaterial(' + detailSaleOrderListObj[id].end_destination_id + ', "' + detailSaleOrderListObj[id].end_destination_name + '", '+ detailSaleOrderListObj[id].ticket_id +')');
+
+                let divOriginalName = document.createElement('div');
+                divOriginalName.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'truncate', 'pl-1');
+                divOriginalName.innerHTML = detailSaleOrderListObj[id].material_name;
+
+                let divProducingArea = document.createElement('div');
+                divProducingArea.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'pl-1');
+                divProducingArea.innerHTML = detailSaleOrderListObj[id].producing_area;
+
+                let divShapeSizeEtc = document.createElement('div');
+                if (janSupport) {
+                    // janSupportがtrueの場合、col-span-2
+                    divShapeSizeEtc.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'truncate', 'pl-1');
+                } else {
+                    // janSupportがfalseの場合、col-span-3
+                    divShapeSizeEtc.classList.add('border', 'col-span-3', 'bg-white', 'text-base', 'h-full', 'truncate', 'pl-1');
+                }
+                divShapeSizeEtc.innerHTML = detailSaleOrderListObj[id].shape_size_etc;
+
+                let divQuantityPerPackage = document.createElement('div');
+                divQuantityPerPackage.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divQuantityPerPackage.innerHTML = detailSaleOrderListObj[id].quantity_per_package;
+
+                let divUnitQuantityPerPackage = document.createElement('div');
+                divUnitQuantityPerPackage.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divUnitQuantityPerPackage.innerHTML = detailSaleOrderListObj[id].unit_of_quantity_per_package;
+
+                let divQuantity = document.createElement('div');
+                divQuantity.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divQuantity.innerHTML = detailSaleOrderListObj[id].quantity_per_unit;
+
+                let divUnit = document.createElement('div');
+                divUnit.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divUnit.innerHTML = detailSaleOrderListObj[id].unit;
+
+                let divQuantityPerUnit = document.createElement('div');
+                divQuantityPerUnit.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divQuantityPerUnit.innerHTML = detailSaleOrderListObj[id].quantity;
+
+                // 単品単価
+                let divPackageUnitPrice = document.createElement('div');
+                divPackageUnitPrice.classList.add('border', 'col-span-1', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divPackageUnitPrice.innerHTML = detailSaleOrderListObj[id].price_per_package;
+
+                let divNetUnitPrice = document.createElement('div');
+                divNetUnitPrice.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center', 'text-right', 'pr-1');
+                let netUnitPrice = detailSaleOrderListObj[id].net_unit_price;
+                if(netUnitPrice == null){
+                    divNetUnitPrice.innerHTML = netUnitPrice;
+                }else{
+                    divNetUnitPrice.innerHTML = netUnitPrice.toLocaleString('en-US');
+                }
+
+                let divTaxAmount = document.createElement('div');
+                divTaxAmount.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center', 'text-right', 'pr-1');
+                let taxAmount = detailSaleOrderListObj[id].net_total_price;
+                if(taxAmount == null){
+                    divTaxAmount.innerHTML = taxAmount;
+                }else{
+                    divTaxAmount.innerHTML = taxAmount.toLocaleString('en-US');
+                }
+
+                let divTaxRate = document.createElement('div');
+                divTaxRate.classList.add('border', 'bg-white', 'text-base', 'h-full', 'truncate', 'text-center');
+                divTaxRate.innerHTML = String(detailSaleOrderListObj[id].tax_rate * 100).concat("%");
+
+                let divTax = document.createElement('div');
+                divTax.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'text-right', 'pr-1');
+                let tax = detailSaleOrderListObj[id].tax;
+                if(tax == null){
+                    divTax.innerHTML = tax;
+                }else{
+                    divTax.innerHTML = tax.toLocaleString('en-US');
+                }
+
+                let divGrossTotalPrice = document.createElement('div');
+                divGrossTotalPrice.classList.add('border', 'col-span-2', 'bg-white', 'text-base', 'h-full', 'text-right', 'pr-1');
+                let grossTotalPrice = detailSaleOrderListObj[id].gross_total_price;
+                if(grossTotalPrice == null){
+                    divGrossTotalPrice.innerHTML = divGrossTotalPrice;
+                }else{
+                    divGrossTotalPrice.innerHTML = grossTotalPrice.toLocaleString('en-US');
+                }
+
+                let divDeliveryCategory = document.createElement('div');
+                divDeliveryCategory.classList.add('border', 'bg-white', 'text-base', 'h-full', 'text-center');
+                if(detailSaleOrderListObj[id].delivery_division == 0){
+                    divDeliveryCategory.innerHTML = '';
+                }else if(detailSaleOrderListObj[id].delivery_division == null){
+                    divDeliveryCategory.innerHTML = '';
+                }else{
+                    divDeliveryCategory.innerHTML = '*';
+                    divDeliveryCategory.classList.add('bg-red-200');
+                }
+
+                divDetailOrderList.append(divShipDate, divSlipNumber, divTerminalName, divOriginalName, divProducingArea, divShapeSizeEtc,
+                divQuantityPerPackage, divUnitQuantityPerPackage, divQuantity, divUnit, divQuantityPerUnit)
+
+                if(janSupport) {
+                    divDetailOrderList.append(divPackageUnitPrice);
+                }
+                divDetailOrderList.append(divNetUnitPrice, divTaxAmount, divTaxRate, divTax, divGrossTotalPrice, divDeliveryCategory);
+            }
+        }
+    }
+
+</script>
+
+<script>
+    var flag1 = false;
+    // ボタン要素を取得する（jQueryオブジェクトとして）
+    var printBtn01 = $('#print_btn_1');
+    var printBtn02 = $('#print_btn_2');
+    var csvDownloadButton01 = $('#btn_download_csv_01');
+
+    // function enable button
+    function enableButton() {
+        // 既存のリスナーを削除した後の新しいリスナーの登録
+        printBtn01.off('click').on('click', handlePrintButtonClick);
+        printBtn01.prop('disabled', false);
+
+        // printDoc3関数直接呼び出し（jQueryを無効にする）
+        printBtn02.attr('onclick', 'printDoc3()');
+        printBtn02.prop('disabled', false);
+
+        // OHM Edit - CSVボタンを有効にする
+        csvDownloadButton01.prop('disabled', false);
+        var csvClientID = $('#client_id').val(); // client_idのインポート
+        // onclick属性の代わりにjQueryイベントを使用することを検討できます
+        csvDownloadButton01.attr('onclick', 'downloadCSV("' + csvClientID + '")');
+    }
+</script>
+
+<script>
+    // function disable button
+    function disableButton() {
+        // jQueryを使用したイベントリスナーの削除と無効化
+        printBtn01.off('click');
+        printBtn01.prop('disabled', true);
+
+        printBtn02.removeAttr('onclick');
+        printBtn02.prop('disabled', true);
+
+        // OHM Edit - CSVボタンを無効にする
+        csvDownloadButton01.removeAttr('onclick');
+        csvDownloadButton01.prop('disabled', true);
+    }
+</script>
+
+<script>
+    // function inputting value ticket number and set variable assignment docEndDestination
+    function inputtingPrint(){
+        let inputDestination = document.getElementById('destination_id').value;
+        docEndDestination =  parseInt(inputDestination);
+    }
+</script>
+
+<script>
+    // function of 単価未設定抽出 button
+    function printDoc1(yearCurrent, MonthCurrent){
+        let btnPrintDoc1 = document.getElementById('print_print_zero');
+        btnPrintDoc1.setAttribute('href', '/generate_unset_unit_price_report/?year=' + parseInt(yearCurrent) + '&month=' + parseInt(MonthCurrent));
+    }
+
+    // 「請求書発行」ボタンをクリックしたときに実行される関数
+    function handlePrintButtonClick() {
+        setPrintBtn1Text('processing'); // ボタン状態の変更
+        console.log('請求書発行要求開始');
+        printInvoice() // 即時PDF作成リクエスト
+    }
+
+    // function of 取引先売上明細表 button
+    var invoiceUrl = ''; // PDF URLを保存するための変数
+    function printInvoice(){
+        let selectedStartDate = document.getElementById('date_picker_start').value
+        let selectedEndDate = document.getElementById('date_picker_end').value
+        endDestinationIdPrint = 'all';
+        endDestinationNamePrint = 'all';
+
+        if (!docClient) {
+            console.error("Client ID (docClient) is not set.");
+            setPrintBtn1Text('failed');
+            return;
+        }
+
+        console.log('請求書発行要求データ:', {
+            start_date: selectedStartDate,
+            end_date: selectedEndDate,
+            client_id: docClient,
+            total_number: docTotalNumber,
+            end_destination_id: endDestinationIdPrint,
+            end_destination_name: endDestinationNamePrint,
+            invoice_pdf_option: invoice_pdf_optionValue
+        });
+
+        $.ajax({
+            /* 請求書発行 */
+            url: "#",
+            data:{
+                'start_date': selectedStartDate,
+                'end_date': selectedEndDate,
+                'client_id': docClient,
+                'total_number': docTotalNumber,
+                'end_destination_id': endDestinationIdPrint,
+                'end_destination_name': endDestinationNamePrint,
+                'invoice_pdf_option': invoice_pdf_optionValue
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response['url'] && response['url'] !== 'failed') {
+                    setPrintBtn1Text('done');
+                    invoiceUrl = response['url'];
+                    window.open(invoiceUrl, 'blank');
+                } else {
+                    console.error("PDF generation failed on server:", response.error);
+                    setPrintBtn1Text('failed');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", status, error);
+                setPrintBtn1Text('failed');
+            }
+        });
+    }
+    // Function to set Print Btn Text based on status
+    function setPrintBtn1Text(stat = 'normal') {
+        let normalState = document.getElementById('prnt_btn_normal');
+        let processState = document.getElementById('prnt_btn_process');
+        let doneState = document.getElementById('prnt_btn_done');
+        let failedState = document.getElementById('prnt_btn_failed');
+        if (stat == 'normal'){
+            normalState.classList.remove('hidden')
+            processState.classList.add('hidden')
+            doneState.classList.add('hidden')
+            failedState.classList.add('hidden')
+            printBtn01.prop('disabled', false);
+        }else if(stat == 'processing'){
+            normalState.classList.add('hidden')
+            processState.classList.remove('hidden')
+            doneState.classList.add('hidden')
+            failedState.classList.add('hidden')
+            printBtn01.prop('disabled', true);
+        }else if(stat == 'done'){
+            normalState.classList.add('hidden')
+            processState.classList.add('hidden')
+            doneState.classList.remove('hidden')
+            failedState.classList.add('hidden')
+            printBtn01.prop('disabled', false);
+             setTimeout(resetPrintBtnState, 3000);
+        }else if(stat == 'failed'){
+            normalState.classList.add('hidden')
+            processState.classList.add('hidden')
+            doneState.classList.add('hidden')
+            failedState.classList.remove('hidden')
+            printBtn01.prop('disabled', false);
+             setTimeout(resetPrintBtnState, 5000);
+        }
+    }
+
+    // Function to clear all variable
+    function resetPrintBtnState() {
+        invoiceUrl = '';
+        setPrintBtn1Text('normal');
+    }
+
+     // function print pdf of 店舗別売上表 button
+    function printDoc3(){
+        let btnPrintDoc3 = document.getElementById('print_btn_2');
+        if (!docClient) {
+             console.error("Client ID (docClient) for printDoc3 is not set.");
+             return;
+        }
+        btnPrintDoc3.setAttribute('href', '/generate_sales_by_store_report/?year=' + parseInt(docYear) + '&month=' + parseInt(docMonth) + '&client_id=' + docClient);
+    }
+</script>
+
+<!-- OHM Edit: AJAX support csv download function -->
+<script>
+    function downloadCSV(csvClientID){
+        var convertClient;
+        var clientName;
+        // SMO-IMP-011
+        if (csvClientID === null){
+            convertClient = '';
+            clientName = 'full';
+        }else{
+            convertClient = csvClientID;
+            clientName = setClientName.value;
+        }
+        // Get current date
+        let currentDate = new Date();
+        let year = currentDate.getFullYear();
+        let month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+        let day = ('0' + currentDate.getDate()).slice(-2);
+        let formattedDate = `${year}${month}${day}`;
+        // SMO-IMP-009 Start
+        let selectedStartDate = document.getElementById('date_picker_start').value
+        let selectedEndDate = document.getElementById('date_picker_end').value
+        $.ajax({
+            url: "#",
+            data:{
+                'start_date': selectedStartDate,
+                'end_date': selectedEndDate,
+                'client_id': convertClient,
+            },
+            // SMO-IMP-009 End
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (data, status, xhr) {
+                let blob = new Blob([data], { type: 'text/csv;charset=utf-8-sig' });
+                let link = document.createElement('a');
+                let url = window.URL.createObjectURL(blob);
+                let fileName = `${setToYear.value}${setMonth.value}_${clientName}_invoice_${formattedDate}.csv`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+</script>
+<!-- OHM Edit -->
+
+<!-- SMO-IMP-009 Start -->
+<!-- include: vendor/datetimepicker/jquery.datetimepicker.full.js -->
+<script>
+    jQuery(function(){
+        jQuery.datetimepicker.setLocale('ja');
+
+        jQuery('#date_picker_start').datetimepicker({
+            format:'Y/m/d',
+            onShow:function( ct ){
+                this.setOptions({
+                    maxDate:jQuery('#date_picker_end').val()?jQuery('#date_picker_end').val():false
+                })
+            },
+            timepicker:false
+        });
+
+        jQuery('#date_picker_end').datetimepicker({
+            format:'Y/m/d',
+            onShow:function( ct ){
+                this.setOptions({
+                    minDate:jQuery('#date_picker_start').val()?jQuery('#date_picker_start').val():false
+                })
+            },
+            timepicker:false
+        });
+
+        const initialYear = document.getElementById('year_id').value;
+        const initialMonth = document.getElementById('month_id').value;
+        setDateRange(initialYear, initialMonth);
+    });
+
+    function setDateRange(year, month) {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0);
+
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        };
+
+        const startFormatted = formatDate(startDate);
+        const endFormatted = formatDate(endDate);
+
+        jQuery('#date_picker_start').datetimepicker('setOptions', {
+            minDate: startFormatted,
+        });
+        jQuery('#date_picker_end').datetimepicker('setOptions', {
+            minDate: startFormatted,
+        });
+
+        jQuery('#date_picker_start').val(startFormatted);
+        jQuery('#date_picker_end').val(endFormatted);
+    }
+
+    function setStaticDate(day) {
+        resetPrintBtnState();
+        const initialYear = document.getElementById('year_id').value;
+        const initialMonth = document.getElementById('month_id').value;
+
+        const formathMonth = (day, month) => {
+            if (day === 0) {
+                return `${month}`;
+            } else {
+                return `${month - 1}`;
+            }
+        }
+
+        const startDate = new Date(initialYear, initialMonth - 1, 1);
+        const endDate = new Date(initialYear, formathMonth(day, initialMonth), day);
+
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        };
+
+        const startFormatted = formatDate(startDate);
+        const endFormatted = formatDate(endDate);
+
+        jQuery('#date_picker_start').val(startFormatted);
+        jQuery('#date_picker_end').val(endFormatted);
+        filterList();
+    }
+</script>
+<!-- SMO-IMP-009 End -->
+
+<!-- SMOR-NEW-0008 -->
+<script>
+    function updateBankTransferFee(selectedId, selectedValue) {
+        console.log('updateBankTransferFee:',selectedId, selectedValue)
+        $.ajax({
+            url: "#",
+            type: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            data:{
+                'bank_transfer_fee_id': selectedId,
+                'materiabank_transfer_fee_value': selectedValue
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('Selection saved successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error saving selection:', xhr.responseText);
+            }
+        });
+    }
+</script>
+<!-- SMOR-NEW-0008 -->
+
+<!-- bank account インデックス値の更新 -->
+<script>
+    function updateBankAccountIndex(selectedId, index_val, type, rowId) {
+        console.log('updateBankAccountIndex:',selectedId, index_val, type, rowId)
+        $.ajax({
+            url: "#",
+            type: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            data:{
+                'selected_id': selectedId,
+                'index_val': index_val,
+                'index_type':type
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('Selection saved successfully:', response);
+                 // DOM反映管理の（背景色のみ変更）
+                if (rowId && type === 'management') {
+                    const selectEl = document.getElementById(`management-select-${rowId}`);
+                    if (selectEl) {
+                        selectEl.classList.remove('bg-red-300', 'bg-white');
+
+                        if (index_val === '3' || index_val === 3) {
+                            console.log('index_val1:', index_val)
+                            selectEl.classList.add('bg-red-300');
+                        } else {
+                            console.log('index_val2:', index_val)
+                            selectEl.classList.add('bg-white');
+                        }
+                    }
+                }
+
+                // 必要であれば ClientListObj も更新
+                if (rowId && ClientListObj[rowId]) {
+                    ClientListObj[rowId].management_index = selectedValue;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error saving selection:', xhr.responseText);
+            }
+        });
+    }
+</script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP · SO</div>
+</body>
+</html>

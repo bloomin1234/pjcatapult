@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仕入指示書 — SMART STOCK [モックアップ]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    /* SS版はprimary色をカスタム設定（元テンプレートのbg-primary-XXXに対応） */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">
+  <style>body { font-family: 'Noto Sans JP', sans-serif; }</style>
+  <!-- block style -->
+  <style>
+    [x-cloak] {
+        display: none
+    }
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+  </style>
+  <!-- pickadate CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.date.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/themes/default.time.css" />
+</head>
+<body>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- block content -->
+  <!-- 工場加工指示書 工場加工指示書 packaging_printing -->
+  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col">
+      <!-- menu section -->
+      <div class="p-2 mb-1 bg-neutral-100 rounded-md">
+          <div class="grid grid-cols-12 gap-1">
+              <div class="grid grid-rows-4">
+                  <a href="#" role="button" class="row-span-4">
+                      <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i><span class="my-auto">戻る</span></div>
+                  </a>
+              </div>
+              <div class="col-span-2 grid grid-cols-2 gap-1">
+                  <div class="col-span-2 row-start-2 text-md font-bold text-center rounded">
+                      仕⼊指⽰書
+                  </div>
+              </div>
+
+              <div class="col-start-9 grid col-span-4">
+                  <span class="text-base">ダブルクリックで切り替え</span>
+                  <div class="grid grid-cols-2 gap-2">
+                      <div class="bg-[#4a4949] text-base text-white px-2 grid grid-cols-3 gap-3">
+                          <span>0:業務</span>
+                          <span>1:クリーン</span>
+                          <span>9:商品</span>
+                      </div>
+                      <div class="bg-[#4a4949] text-base text-white px-2 grid grid-cols-2 gap-3">
+                          <span>10:スライサー</span>
+                          <span>11:手切り</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- content section -->
+      <div class="p-2 border border-neutral-300 bg-[#4a4949] rounded-md drop-shadow flex-1 h-full overflow-hidden">
+          <div class="grid grid-cols-9 text-center">
+              <div class="col-span-2 grid grid-cols-8">
+                  <div class="col-span-6 h-[500px] ml-5">
+                      <div class="grid grid-rows-2 mt-5 ml-10 mr-10">
+                          <div class="row-span-1 grid grid-cols-4 mb-1">
+                              <div class="bg-primary-200 text-center rounded-l flex items-center justify-center">納品日</div>
+                              <input id="date_id" class="col-span-2 bg-white text-center border" data-value=" ">
+                              <input id="day_id" class="col-span-1 bg-white text-center rounded-r" data-value=" " disabled>
+                          </div>
+                          <div class="row-span-1 grid grid-cols-7">
+                              <a href="#" id="previous_day" type="button" class="col-start-2 col-span-2 text-center mt-1" data-diff="-1">
+                                  <div class="bg-[#feb888] hover:bg-orange-400 hover:font-bold rounded border-4 border-x-[#866441] border-y-[#ffc28f] h-full flex items-center justify-center">前日</div>
+                              </a>
+                              <a href="#" id="next_day" type="button" class="col-start-5 col-span-2 text-center mt-1" data-diff="1">
+                                  <div class="bg-[#9dc3e6] hover:bg-blue-400 hover:font-bold rounded border-4 border-x-[#5c7286] border-y-[#aed7fc] h-full flex items-center justify-center">翌日</div>
+                              </a>
+                          </div>
+                      </div>
+                      <div class="grid-rows-5 mt-10 border rounded p-4">
+                          <div class="row-span-1">
+                              <!-- 印刷区分印刷分類 - 選択項目 - > documents_4のpdfに表示 -->
+                              <div class="bg-primary-300 text-center rounded flex items-center justify-center">印刷区分</div>
+                          </div>
+                          <div for="radioReport_1" class="row-span-1 grid grid-cols-5 mt-3">
+                              <input class="col-span-1 mt-1 ml-5 cursor-pointer" type="radio" id="radioReport_1" value="1" name="radioReport" onchange="selectReport()">
+                              <label for="radioReport_1" class="col-span-4 bg-primary-200 text-center rounded flex items-center justify-center mr-3">原料別集計表</label>
+                          </div>
+                          <div for="radioReport_2" class="row-span-1 grid grid-cols-5 mt-3">
+                              <input class="col-span-1 mt-1 ml-5 cursor-pointer" type="radio" id="radioReport_2" value="2" name="radioReport" onchange="selectReport()">
+                              <label for="radioReport_2" class="col-span-4 bg-primary-200 text-center rounded flex items-center justify-center mr-3">ピッキング表</label>
+                          </div>
+                          <div for="radioReport_3" class="row-span-1 grid grid-cols-5 mt-3">
+                              <input class="col-span-1 mt-1 ml-5 cursor-pointer" type="radio" id="radioReport_3" value="3" name="radioReport" onchange="selectReport()">
+                              <label for="radioReport_3" class="col-span-4 bg-primary-200 text-center rounded flex items-center justify-center mr-3">原料投入重量</label>
+                          </div>
+                          <div for="radioReport_4" class="row-span-1 grid grid-cols-5 mt-3">
+                              <input class="col-span-1 mt-1 ml-5 cursor-pointer" type="radio" id="radioReport_4" value="4" name="radioReport" onchange="selectReport()">
+                              <label for="radioReport_4" class="col-span-4 bg-primary-200 text-center rounded flex items-center justify-center mr-3">検品票欠番一覧</label>
+                          </div>
+                      </div>
+                      <div class="grid grid-cols-4 mt-10 h-16 gap-1">
+                          <button type="button" class="col-start-1 col-span-2 bg-[#feb888] hover:bg-orange-400 hover:font-bold rounded border-4 border-x-[#866441] border-y-[#ffc28f]" onclick="mountingData()">
+                              <div class="text-center">デ－タ抽出</div>
+                          </button>
+
+                          <a id="btn_report" type="button" class="col-start-3 col-span-2 rounded border-4 bg-yellow-200 border-x-yellow-300 border-y-yellow-400 h-full flex items-center justify-center disabled">
+                              印刷
+                          </a>
+                      </div>
+                  </div>
+                  <div class="col-span-2">
+                  </div>
+              </div>
+              <div class="col-span-7">
+                  <div class="grid grid-rows-1 mr-2">
+                      <div class="row-start-1 grid grid-cols-15 rounded-tl rounded-tr bg-primary-100">
+                          <div class="col-span-1 border-r text-base flex items-center justify-center">伝票番号</div>
+                          <div class="col-span-1 border-r text-base flex items-center justify-center">方向</div>
+                          <div class="col-span-2 border-r text-base flex items-center justify-center">発送元</div>
+                          <div class="col-span-2 border-r text-base flex items-center justify-center">商品名</div>
+                          <div class="col-span-2 border-r text-base flex items-center justify-center">形状大きさ等</div>
+                          <div class="col-span-1 border-r text-base flex items-center justify-center">作業外直送</div>
+                          <div class="col-span-1 border-r text-base flex items-center justify-center bg-[#f4b183]">作業<br>区分</div>
+                          <!-- <div class="col-span-1 border-r text-base flex items-center justify-center bg-[#ffe699]">M<br>区分</div> -->
+                          <div class="col-span-2 border-r text-base flex items-center justify-center">作業場所</div>
+                          <div class="col-span-1 border-r text-base flex items-center justify-center bg-[#f4b183]">加工<br>区分</div>
+                          <!-- <div class="col-span-1 border-r text-base flex items-center justify-center bg-[#ffe699]">M<br>区分</div> -->
+                          <div class="col-span-2 text-base flex items-center justify-center">加工方法</div>
+                      </div>
+                  </div>
+                  <div class="row-start-2 mr-2 h-[655px] overflow-y-auto">
+                      <div id="detail_packaging_printing" class="h-[22px]">
+
+                          <div id="detail_packaging">
+                              <!-- javascript section -->
+                          </div>
+                          <div class="grid grid-cols-15">
+                              <input id="slip_number" class="col-span-1 border-r text-base text-center" onchange="addRow('')">
+                              <input id="direction" class="col-span-1 border-r text-base text-center" onchange="addRow('')">
+                              <input id="terminal_name" class="col-span-2 border-r text-base pl-1" onchange="addRow('')">
+                              <input id="material_name" class="col-span-2 border-r text-base pl-1" onchange="addRow('')">
+                              <input id="shape_size_etc" class="col-span-2 border-r text-base pl-1" onchange="addRow('')">
+                              <input id="is_ignore" class="col-span-1 border-r text-base pl-1" onchange="addRow('')">
+                              <input id="work_division" class="col-span-1 border-r text-base text-center text-red-500" value="0" ondblclick="addRow('work_division')">
+                              <!-- <input id="m_division_one" class="col-span-1 border-r text-base text-center text-red-500" value="0" onchange="addRow('')"> -->
+                              <input id="work_place" class="col-span-2 border-r text-base pl-1" onchange="addRow('')">
+                              <input id="processing_division" class="col-span-1 border-r text-base text-center text-red-500" value="0" ondblclick="addRow('processing_division')">
+                              <!-- <input id="m_division_two" class="col-span-1 border-r text-base text-center text-red-500" value="0" onchange="addRow('')"> -->
+                              <input id="processing_method" class="col-span-2 text-base pl-1" onchange="addRow('')">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    window.term_product = "商品";
+    window.term_label = "ラベル";
+  </script>
+
+  <!-- block script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.date.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.6/compressed/picker.time.js"></script>
+
+  <script>
+    $( document ).ready(function() {
+        calendar();
+        mountingData();
+    });
+
+    // function show date to click next and previous day
+    var days = ['日', '月', '火', '水', '木', '金', '土'];
+    var setCurrentDate = document.getElementById('date_id');
+    var setDay = document.getElementById('day_id');
+    var currentTime;
+
+    let today = new Date();
+    let fullYear = today.getFullYear();
+    let month = today.getMonth() + 1;
+    let date = today.getDate();
+    let currentDay = days[today.getDay()];
+    let subStrYear = fullYear.toString().substr(2);
+
+    let displayCurrentMonth;
+    let displayCurrentDay;
+
+    if(month <= 9){
+        displayCurrentMonth = '0' + month;
+    }else{
+        displayCurrentMonth = month;
+    }
+
+    if(date <= 9){
+        displayCurrentDay = '0' + date;
+    }else{
+        displayCurrentDay = date;
+    }
+
+    let setStartDate = subStrYear + '-' + displayCurrentMonth + '-' + displayCurrentDay;
+    currentTime = fullYear + '-' + displayCurrentMonth + '-' + displayCurrentDay;
+    setCurrentDate.value = setStartDate;
+    setDay.value = currentDay;
+
+    $('#previous_day, #next_day').click(function(e) {
+        e.preventDefault();
+        setDate($(this).data('diff'));
+    })
+
+    function setDate(diff) {
+        let date = new Date(currentTime);
+        let newDate = date.setDate(date.getDate() + diff);
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let newDay = days[date.getDay()];
+        let subStrYear = year.toString().substr(2);
+
+        let displayMonth;
+        let displayDay;
+
+        if(month <= 9){
+            displayMonth = '0' + month;
+        }else{
+            displayMonth = month;
+        }
+
+        if(day <= 9){
+            displayDay = '0' + day;
+        }else{
+            displayDay = day;
+        }
+
+        let setPreviousAndNextDate = subStrYear + '-' + displayMonth + '-' + displayDay;
+        currentTime = year + '-' + displayMonth + '-' + displayDay;
+
+        setCurrentDate.value = setPreviousAndNextDate;
+        setDay.value = newDay;
+    }
+
+    $("#date_id").change(function() {
+        let setDateSelect = document.getElementById('date_id');
+        let selectDate = new Date(setDateSelect.value);
+
+        let selectYear = selectDate.getFullYear();
+        let selectMonth = selectDate.getMonth() + 1;
+        let selectDay = selectDate.getDate();
+        let weekDay = days[selectDate.getDay()];
+        let subStrYear = selectYear.toString().substr(2);
+
+        let displaySelectMonth;
+        let displaySelectDay;
+
+        if(selectMonth <= 9){
+            displaySelectMonth = '0' + selectMonth;
+        }else{
+            displaySelectMonth = selectMonth;
+        }
+
+        if(selectDay <= 9){
+            displaySelectDay = '0' + selectDay;
+        }else{
+            displaySelectDay = selectDay;
+        }
+
+        let setSelectDate = subStrYear + '-' + displaySelectMonth + '-' + displaySelectDay;
+        currentTime = selectYear + '-' + selectMonth + '-' + selectDay;
+        setCurrentDate.value = setSelectDate;
+        setDay.value = weekDay;
+    })
+
+    function calendar(){
+        // jQuery.datetimepicker は外部ライブラリ依存のためモックアップでは無効化
+        // jQuery.datetimepicker.setLocale('ja');
+        // jQuery('#date_id').datetimepicker({maxDate: today, timepicker: false, format: 'Y-m-d',});
+    }
+    // function add row data
+    var rowCount = 1;
+    function addRow(typeInput){
+        let slipNumberId = document.getElementById('slip_number').value;
+        let directionId = document.getElementById('direction').value;
+        let terminalNameId = document.getElementById('terminal_name').value;
+        let materialNameId = document.getElementById('material_name').value;
+        let shapeSizeEtcId = document.getElementById('shape_size_etc').value;
+        let is_ignoreID = document.getElementById('is_ignore').value;
+        let workDivisionId = document.getElementById('work_division').value;
+        let workPlaceId = document.getElementById('work_place').value;
+        let processingDivisionId = document.getElementById('processing_division').value;
+        let processingMethodId = document.getElementById('processing_method').value;
+
+        let divDetail = document.getElementById('detail_packaging_printing');
+        let newRow = document.createElement('div');
+        newRow.classList.add('grid', 'grid-cols-15');
+        newRow.setAttribute('id', 'div_row_' + rowCount);
+
+        let slipNumberInput = document.createElement('input');
+        slipNumberInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+        slipNumberInput.value = slipNumberId;
+        newRow.appendChild(slipNumberInput);
+
+        let directionInput = document.createElement('input');
+        directionInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+        directionInput.value = directionId;
+        newRow.appendChild(directionInput);
+
+        let terminalNameInput = document.createElement('input');
+        terminalNameInput.classList.add('col-span-2', 'border-r', 'border-b', 'text-base', 'pl-1');
+        terminalNameInput.value = terminalNameId;
+        newRow.appendChild(terminalNameInput);
+
+        let materialNameInput = document.createElement('input');
+        materialNameInput.classList.add('col-span-2', 'border-r', 'border-b', 'text-base', 'pl-1');
+        materialNameInput.value = materialNameId;
+        newRow.appendChild(materialNameInput);
+
+        let shapeSizeEtcInput = document.createElement('input');
+        shapeSizeEtcInput.classList.add('col-span-2', 'border-r', 'border-b', 'text-base', 'pl-1');
+        shapeSizeEtcInput.value = shapeSizeEtcId;
+        newRow.appendChild(shapeSizeEtcInput);
+
+        let is_ignore_Input = document.createElement('div');
+        is_ignore_Input.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'pl-1');
+        is_ignore_Input.textContent = is_ignoreID;
+        newRow.appendChild(is_ignore_Input);
+
+        let workDivisionInput = document.createElement('input');
+        workDivisionInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+        workDivisionInput.setAttribute('ondblclick', 'changeNumberWorkDivision("0", ' + rowCount + ')');
+        workDivisionInput.setAttribute('id', 'work_division_' + rowCount);
+        workDivisionInput.setAttribute('value', '0');
+
+        let workPlaceInput = document.createElement('input');
+        workPlaceInput.classList.add('col-span-2', 'border-r', 'border-b', 'text-base', 'pl-1');
+        workPlaceInput.setAttribute('id', 'work_place_' + rowCount);
+
+        if(typeInput === 'work_division'){
+            workDivisionInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+            workDivisionInput.setAttribute('ondblclick', 'changeNumberWorkDivision("0", ' + rowCount + ')');
+            workDivisionInput.setAttribute('id', 'work_division_' + rowCount);
+            workDivisionInput.setAttribute('value', '0');
+            workPlaceInput.setAttribute('id', 'work_place_' + rowCount);
+        }
+
+        newRow.appendChild(workDivisionInput);
+        newRow.appendChild(workPlaceInput);
+
+        let processingDivisionInput = document.createElement('input');
+        processingDivisionInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+        processingDivisionInput.setAttribute('ondblclick', 'changeNumberProcessingDivision("0",' + rowCount + ')');
+        processingDivisionInput.setAttribute('id', 'processing_division_' + rowCount);
+        processingDivisionInput.setAttribute('value', '0');
+
+        let processingMethodInput = document.createElement('input');
+        processingMethodInput.classList.add('col-span-2', 'border-r', 'border-b', 'text-base', 'pl-1');
+        processingMethodInput.setAttribute('id', 'processing_method_' + rowCount);
+
+        if(typeInput === 'processing_division'){
+            processingDivisionInput.classList.add('col-span-1', 'border-r', 'border-b', 'text-base', 'text-center');
+            processingDivisionInput.setAttribute('ondblclick', 'changeNumberProcessingDivision("0",' + rowCount + ')');
+            processingDivisionInput.setAttribute('id', 'processing_division_' + rowCount);
+            processingDivisionInput.setAttribute('value', '0');
+            processingMethodInput.setAttribute('id', 'processing_method_' + rowCount);
+        }
+
+        newRow.appendChild(processingDivisionInput);
+        newRow.appendChild(processingMethodInput);
+
+        rowCount++;
+
+        let lastRow = divDetail.lastChild;
+        divDetail.insertBefore(newRow, lastRow.previousSibling);
+
+        slip_number.value = '';
+        direction.value = '';
+        terminal_name.value = '';
+        material_name.value = '';
+        shape_size_etc.value = '';
+    }
+
+    // function change number operating division and color by number operating division of add new row
+    function changeNumberWorkDivision(numberChange, workDivisionNumber){
+        let divRow = document.getElementById('div_row_' + workDivisionNumber);
+        let workDivisionChange = document.getElementById('work_division_' + workDivisionNumber);
+        let workPlaceChange = document.getElementById('work_place_'+ workDivisionNumber);
+        let processingDivisionChange = document.getElementById('processing_division_' + workDivisionNumber);
+
+        if(numberChange === '1'){
+            workDivisionChange.setAttribute('value', '9');
+            workDivisionChange.classList.remove('bg-white');
+            workDivisionChange.classList.add('bg-yellow-500');
+            workPlaceChange.setAttribute('value', term_product);
+            workPlaceChange.classList.add('text-yellow-700');
+            processingDivisionChange.classList.remove('bg-white');
+            processingDivisionChange.classList.add('bg-yellow-500');
+            workDivisionChange.setAttribute('ondblclick', 'changeNumberWorkDivision("9",' + workDivisionNumber + ')');
+        }else if(numberChange === '9'){
+            workDivisionChange.setAttribute('value', '');
+            workDivisionChange.classList.remove('bg-yellow-500');
+            workDivisionChange.classList.add('bg-[#f8cbad]');
+            workPlaceChange.setAttribute('value', '');
+            processingDivisionChange.classList.remove('bg-yellow-500');
+            processingDivisionChange.classList.add('bg-[#f8cbad]');
+            workDivisionChange.setAttribute('ondblclick', 'changeNumberWorkDivision("blank",' + workDivisionNumber + ')');
+        }else if(numberChange === 'blank'){
+            workDivisionChange.setAttribute('value', '0');
+            workDivisionChange.classList.remove('bg-[#f8cbad]');
+            workDivisionChange.classList.add('bg-white');
+            workPlaceChange.setAttribute('value', '業務');
+            workPlaceChange.classList.remove('text-yellow-700');
+            divRow.classList.add('text-red-500');
+            processingDivisionChange.classList.remove('bg-[#f8cbad]');
+            workDivisionChange.setAttribute('ondblclick', 'changeNumberWorkDivision("0",' + workDivisionNumber + ')');
+        }else if(numberChange === '0'){
+            workDivisionChange.setAttribute('value', '1');
+            workDivisionChange.classList.remove('bg-white');
+            workDivisionChange.classList.add('bg-[#f8cbad]');
+            workPlaceChange.setAttribute('value', 'クリーン');
+            processingDivisionChange.classList.remove('bg-white');
+            processingDivisionChange.classList.add('bg-[#f8cbad]');
+            divRow.classList.remove('text-red-500');
+            workDivisionChange.setAttribute('ondblclick', 'changeNumberWorkDivision("1",' + workDivisionNumber + ')');
+        }
+    }
+    // function change number processing division and color by number processing division of add new row
+    function changeNumberProcessingDivision(numberChange, processingDivisionNumber){
+        let processingDivisionChange = document.getElementById('processing_division_' + processingDivisionNumber);
+        let processingMethodChange = document.getElementById('processing_method_' + processingDivisionNumber);
+
+        if(numberChange === '0'){
+            processingDivisionChange.setAttribute('value', '10');
+            processingMethodChange.setAttribute('value', 'スライサー');
+            processingDivisionChange.setAttribute('ondblclick', 'changeNumberProcessingDivision("10",' + processingDivisionNumber + ')');
+        }else if(numberChange === '10'){
+            processingDivisionChange.setAttribute('value', '11');
+            processingMethodChange.setAttribute('value', '手切り');
+            processingDivisionChange.setAttribute('ondblclick', 'changeNumberProcessingDivision("11",' + processingDivisionNumber + ')');
+        }else if(numberChange === '11'){
+            processingDivisionChange.setAttribute('value', '');
+            processingMethodChange.setAttribute('value', '');
+            processingDivisionChange.setAttribute('ondblclick', 'changeNumberProcessingDivision("blank",' + processingDivisionNumber + ')');
+        }else if(numberChange === 'blank'){
+            processingDivisionChange.setAttribute('value', '10');
+            processingMethodChange.setAttribute('value', 'スライサー');
+            processingDivisionChange.setAttribute('ondblclick', 'changeNumberProcessingDivision("10",' + processingDivisionNumber + ')');
+        }
+    }
+
+    // Function to display information of all orders for each day
+    // モックアップではAJAX呼び出しを無効化（サーバー接続なし）
+    function mountingData(){
+        console.log('[MOCKUP] mountingData() called — AJAX disabled');
+    }
+
+    // Operation division number update function
+    function updateOperatingDivision(year, savingNumber, operatingNumber, endDestinationNumber, materialNumber, standardNumber, clientId){
+        console.log('Double click - change operation classification value')
+        let operatingDivisionId = document.getElementById('operating_division_id_' + savingNumber);
+        let operatingDivisionName = document.getElementById('operating_division_name_'+ savingNumber);
+
+        if(operatingNumber === '1'){
+            operatingDivisionId.value = '9';
+            operatingDivisionName.value = term_product;
+        }else if(operatingNumber === '9'){
+            operatingDivisionId.value = '';
+            operatingDivisionName.value = '';
+        }else if(operatingNumber === 'null' || operatingNumber === '' || operatingNumber === null || operatingNumber === undefined || operatingNumber === 'undefined'){
+            operatingDivisionId.value = '0';
+            operatingDivisionName.value = '業務';
+        }else if(operatingNumber === '0'){
+            operatingDivisionId.value = '1';
+            operatingDivisionName.value = 'クリーン';
+        }
+        // モックアップではAJAX保存を無効化
+    }
+
+     // processing division number update function
+    function updateProcessingDivision(year, savingNumber, processingDivisionNumber, endDestinationNumber, materialNumber, standardNumber, clientId){
+        let processingDivisionId = document.getElementById('processing_division_id_' + savingNumber);
+        let processingDivisionName = document.getElementById('processing_division_name_'+ savingNumber);
+
+        if(processingDivisionNumber === '0'){
+            processingDivisionId.value = '10';
+            processingDivisionName.value = 'スライサー';
+        }else if(processingDivisionNumber === '10'){
+            processingDivisionId.value = '11';
+            processingDivisionName.value = '手切り';
+        }else if(processingDivisionNumber === '11'){
+            processingDivisionId.value = '';
+            processingDivisionName.value = '';
+        }else if(processingDivisionNumber === 'null' || processingDivisionNumber === '' || processingDivisionNumber === null || processingDivisionNumber === undefined || processingDivisionNumber === 'undefined'){
+            processingDivisionId.value = '10';
+            processingDivisionName.value = 'スライサー';
+        }
+        // モックアップではAJAX保存を無効化
+    }
+
+    // Radio button check function, if it is true, enable print button.
+    var radioValue = '';
+    function selectReport(){
+        let radioReportBtn = document.getElementsByName('radioReport');
+        for (i = 0; i < radioReportBtn.length; i++){
+            if (radioReportBtn[i].checked){
+                radioValue = radioReportBtn[i].value;
+                enableButton();
+            };
+        };
+    }
+
+    var btnReportId = document.getElementById('btn_report');
+    function enableButton(){
+        btnReportId.classList.remove('disabled');
+        btnReportId.classList.remove('bg-yellow-200', 'border-x-yellow-300', 'border-y-yellow-400');
+        btnReportId.classList.add('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+        btnReportId.setAttribute('onclick', 'btnReport()');
+    }
+
+    // function to retrieve reports of each type
+    function btnReport(){
+        if(radioValue === '1'){
+            btnReportId.setAttribute('target', '_blank');
+            btnReportId.setAttribute('href', '/generate_raw_material_summary_table/?shipping_date=' + currentTime);
+        }else if(radioValue === '2'){
+            btnReportId.setAttribute('target', '_blank');
+            btnReportId.setAttribute('href', '/generate_customer_delivery_summary_table/?shipping_date=' + currentTime);
+        }else if(radioValue === '3'){
+            btnReportId.setAttribute('target', '_blank');
+            btnReportId.setAttribute('href', '/generate_raw_material_input_weight/?shipping_date=' + currentTime);
+        }else if(radioValue === '4'){
+            btnReportId.setAttribute('target', '_blank');
+            btnReportId.setAttribute('href', '/generate_specific_table_missing_numbers/?shipping_date=' + currentTime);
+        }
+    }
+  </script>
+
+  <div style="position:fixed;top:8px;right:8px;background:#E60012;color:white;font-size:10px;padding:2px 8px;border-radius:2px;z-index:9999;font-weight:bold;letter-spacing:.05em;">MOCKUP</div>
+</body>
+</html>
