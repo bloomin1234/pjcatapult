@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Z CHAIN ― LOGO PLAY ／ 中村勇吾</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0F5132; --green-d:#0A3D26; --green-t:#E9F1EC;
+    --navy:#1A3A63; --navy-d:#0E2746;
+    --ink:#0A0A0A; --text:#1A1A1A; --sub:#6B6B6B; --faint:#8A8A8A;
+    --line:#E6E6E6; --line2:#D9D9D9; --paper:#FFFFFF; --panel:#FAFAFA;
+    --gap:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--text);
+    font-family:"Noto Sans JP",sans-serif;font-weight:400;line-height:1.8;
+    -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"lnum" 1;}
+
+  .top{display:flex;align-items:center;gap:14px;padding:13px 26px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .top .mk{width:28px;height:28px;flex:none}
+  .top .nm{font-weight:900;font-size:15px;letter-spacing:.04em}
+  .top .rt{font-size:10.5px;color:var(--faint);font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+  .top .lead2{margin-left:auto;font-size:13px;color:var(--sub)}
+  .top .lead2 b{color:var(--text);font-weight:700}
+
+  .hero{position:relative;width:100%;min-height:460px;background:var(--paper);overflow:hidden;border-bottom:1px solid var(--line)}
+  #grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,16),1fr);
+    grid-auto-rows:1fr;gap:var(--gap);padding:var(--gap)}
+  .cell{position:relative;background:var(--sq,#fff);border-radius:2px;
+    display:flex;align-items:center;justify-content:center;
+    aspect-ratio:1/1;will-change:transform;backface-visibility:hidden}
+  .cell svg{width:56%;height:auto;display:block}
+  .cell .zmark{fill:var(--z,#0F5132)}
+  .cell.rest{--sq:#FFFFFF;--z:#0F5132;box-shadow:inset 0 0 0 1px #EDEDED}
+  .cell.sell{--sq:#0F5132;--z:#FFFFFF;box-shadow:none}
+  .cell.buy{--sq:#1A3A63;--z:#FFFFFF;box-shadow:none}
+  .cell.flip{animation:flip .46s cubic-bezier(.4,0,.2,1)}
+  @keyframes flip{0%{transform:perspective(620px) rotateY(0)}
+                  50%{transform:perspective(620px) rotateY(87deg)}
+                  100%{transform:perspective(620px) rotateY(0)}}
+  .legend{position:absolute;left:14px;bottom:13px;display:flex;gap:13px;align-items:center;
+    background:rgba(255,255,255,.9);backdrop-filter:blur(2px);padding:7px 13px;border:1px solid var(--line);border-radius:2px}
+  .legend .it{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text)}
+  .legend .sw{width:12px;height:12px;border-radius:2px;flex:none}
+  .legend .sw.o{background:#0F5132} .legend .sw.s{background:#1A3A63}
+  .stcap{position:absolute;right:14px;bottom:13px;font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.16em;text-transform:uppercase}
+
+  main{max-width:1180px;margin:0 auto;padding:0 28px}
+  .sec{padding:62px 0;border-bottom:1px solid var(--line)}
+  .sec:last-of-type{border-bottom:none}
+  .sec .k{font-size:11px;color:var(--green-d);font-weight:900;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+  .sec h2{font-size:clamp(20px,3vw,30px);font-weight:900;line-height:1.4;letter-spacing:.01em;color:var(--ink);max-width:880px}
+  .sec p{margin-top:18px;font-size:15.5px;line-height:1.95;color:#222;max-width:820px}
+  .sec p b{font-weight:700;color:var(--ink)}
+  .sec p .g{color:var(--green);font-weight:700} .sec p .n{color:var(--navy);font-weight:700}
+  .ref{margin-top:20px;font-size:12px;color:var(--faint);max-width:820px;line-height:1.7}
+  .twin{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px;max-width:880px}
+  @media(max-width:680px){.twin{grid-template-columns:1fr}}
+  .tw{border:1px solid var(--line);border-top:3px solid var(--ink);border-radius:2px;padding:20px 22px}
+  .tw .nm{font-weight:900;font-size:15px}
+  .tw .nm small{display:block;font-size:10px;color:var(--faint);font-weight:700;letter-spacing:.12em;margin-top:2px;text-transform:uppercase}
+  .tw .d{margin-top:12px;font-size:13px;color:var(--sub);line-height:1.85}
+  .tw .d b{color:var(--text);font-weight:700}
+
+  footer{max-width:1180px;margin:0 auto;padding:34px 28px 60px;border-top:1px solid var(--line)}
+  footer .c{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12px;color:var(--sub)}
+  footer .c b{color:var(--text);font-weight:700}
+  footer .note{margin-top:14px;font-size:11px;color:var(--faint);line-height:1.7;max-width:880px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <svg class="mk" viewBox="0 0 100 100" aria-label="Z CHAIN"><rect width="100" height="100" rx="3" fill="#0F5132"/><g fill="#fff"><rect x="22" y="22" width="56" height="15"/><polygon points="54,37 78,37 46,63 22,63"/><rect x="22" y="63" width="56" height="15"/></g></svg>
+  <span class="nm">Z CHAIN</span>
+  <span class="rt">Logo Play ／ 中村勇吾</span>
+  <span class="lead2"><b>決まったロゴが、規則で動きつづける。</b>　形は変えず、配置・時間・色だけを。</span>
+</header>
+
+<section class="hero">
+  <div id="grid" aria-hidden="true"></div>
+  <div class="legend">
+    <span class="it"><span class="sw o"></span>売る ／ Order</span>
+    <span class="it"><span class="sw s"></span>買う ／ Stock</span>
+  </div>
+  <div class="stcap">Logo Play</div>
+</section>
+
+<main>
+  <section class="sec">
+    <div class="k">01 ― 中村勇吾の、作法</div>
+    <h2>形は描き変えない。<b>規則を組み、走らせる。</b></h2>
+    <p>中村勇吾の出発点は<b>橋梁の設計＝構造</b>。装飾を足すのではなく、構造そのものを表現にする（tha の標語 <b>“composition of logics”</b>）。ユニクロでも佐藤可士和のロゴはそのまま、<b>固定ロゴを単位として配置・時間・色だけを動かしつづけた</b>（UNIQLO LOGO PLAY、誰もが同じ盤面でロゴを生成・着色して遊べた UNIQLO_GRID、銀座旗艦店の動くロゴサイン）。形は不変、仕組みが動く。</p>
+    <div class="ref">参考：UNIQLO LOGO PLAY SERIES 2021–2025（Direction: Yugo Nakamura ／ Creative Direction: Kashiwa Sato, tha ltd.）、銀座／東京旗艦店の動くロゴサイン、UNIQLO_GRID（2007）、NHK Eテレ「デザインあ」映像監修。出自は東京大学工学部・橋梁設計。</div>
+  </section>
+
+  <section class="sec">
+    <div class="k">02 ― だから、Zチェーンも</div>
+    <h2>シンプルなロゴが、盤面の上で<b>静かに動く。</b></h2>
+    <p>Zマークは変えない。白い地のグリッド＝<b>企業のネットワーク</b>の上で、ロゴがパタパタとめくれ、色だけが移ろう。<span class="g">緑の波（売る）</span>が渡り、<span class="n">紺の波（買う）</span>が渡る——それが、企業から企業へ流れる<b>二つの取引</b>。にぎやかな演出ではなく、<b>規則的で、静かな反復</b>。当社の地＝<b>白</b>の上で、画面いっぱいに。</p>
+  </section>
+
+  <section class="sec">
+    <div class="k">03 ― 二人は、対等</div>
+    <h2>静と動、二つの頂点が、<b>同じ一点で出会う。</b></h2>
+    <p>これは上下関係ではない。<b>佐藤可士和は〈引き算〉</b>で本質に至り、形をこれ以上動かせない一点に定める。<b>中村勇吾は〈ロジックの構築〉</b>で構造を動かし、その構造自体を美しさにする。行き着く先は同じ——<b>「むき出しの構造＝美しさ」</b>。</p>
+    <div class="twin">
+      <div class="tw"><div class="nm">佐藤可士和<small>Form ／ 引き算</small></div><div class="d">原点まで削り、<b>形を一つに定める</b>。マークは不可侵。</div></div>
+      <div class="tw"><div class="nm">中村勇吾<small>Motion ／ 構造</small></div><div class="d">形は描き変えず、<b>仕組みを組んで走らせる</b>。固定ロゴを配置・時間・色で動かす。</div></div>
+    </div>
+    <p>ユニクロが、佐藤の固定ロゴと中村の LOGO PLAY で一つの世界になったように。Zチェーンも、<b>形は佐藤、仕組みは中村</b>——対等な二つの頂点で、一つになる。</p>
+  </section>
+</main>
+
+<footer>
+  <div class="c"><span>Z CHAIN ／ <b>LOGO PLAY</b></span><span>形：<b>佐藤可士和</b></span><span>動き：<b>中村勇吾</b></span><span>地：<b>白</b>／緑・紺</span></div>
+  <div class="note">※ 本ページは、両氏が公に発表した仕事と思想（UNIQLO LOGO PLAY ／ UNIQLO_GRID ／「構造から発想する」エンジニアリング思考、および佐藤可士和の「引き算」「原点回帰」のブランド論）に着想を得た、Zチェーンのための<b>コンセプト提案</b>です。両氏が実際に当社のために制作したものではありません。</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var grid = document.getElementById('grid');
+  var hero = document.querySelector('.hero');
+  var header = document.querySelector('.top');
+  var ZSVG = '<svg viewBox="0 0 100 100" aria-hidden="true"><g class="zmark"><rect x="22" y="22" width="56" height="15"/><polygon points="54,37 78,37 46,63 22,63"/><rect x="22" y="63" width="56" height="15"/></g></svg>';
+  var cols=16, rows=10, g2d=[], timer=null, beat=0;
+
+  function setVar(d,v){ d.className='cell '+v; d._v=v; }
+  function flipTo(d,v){
+    if(!d||d._busy||d._v===v) return;
+    d._busy=true; d.classList.add('flip');
+    setTimeout(function(){ setVar(d,v); d.classList.add('flip'); },205);
+    setTimeout(function(){ d.classList.remove('flip'); d._busy=false; },470);
+  }
+  function build(){
+    var hh = header? header.offsetHeight : 60;
+    hero.style.height = Math.max(460, window.innerHeight - hh) + 'px';
+    var w=grid.clientWidth, h=grid.clientHeight;
+    var tile=Math.max(54, Math.min(96, Math.round(h/10)));
+    cols=Math.max(7, Math.floor(w/tile));
+    rows=Math.max(6, Math.round(h/tile));
+    grid.style.setProperty('--cols', cols);
+    grid.innerHTML=''; g2d=[];
+    for(var r=0;r<rows;r++){ g2d[r]=[];
+      for(var c=0;c<cols;c++){
+        var d=document.createElement('div'); d.className='cell rest'; d._v='rest';
+        d.innerHTML=ZSVG; grid.appendChild(d); g2d[r][c]=d;
+        (function(el){ el.addEventListener('click',function(){ flipTo(el, Math.random()<0.5?'sell':'buy'); }); })(d);
+      }
+    }
+  }
+  function diagWave(v, reverse){
+    var maxK=rows+cols-2;
+    for(var k=0;k<=maxK;k++){
+      (function(k){ setTimeout(function(){ var kk=reverse?(maxK-k):k;
+        for(var r=0;r<rows;r++){ var c=kk-r; if(c>=0&&c<cols) flipTo(g2d[r][c], v); } }, k*58); })(k);
+    }
+  }
+  function tick(){
+    var m=beat%4;
+    if(m===0) diagWave('sell', false);
+    else if(m===1) diagWave('rest', false);
+    else if(m===2) diagWave('buy', true);
+    else diagWave('rest', true);
+    beat++;
+  }
+  function staticCompose(){
+    for(var r=0;r<rows;r++)for(var c=0;c<cols;c++){
+      if((r+c)%6===0) setVar(g2d[r][c],'sell');
+      else if((r-c+cols)%8===0) setVar(g2d[r][c],'buy');
+      else setVar(g2d[r][c],'rest');
+    }
+  }
+  function start(){
+    if(timer){clearInterval(timer);timer=null;}
+    build();
+    if(reduce){ staticCompose(); return; }
+    var period=(rows+cols-2)*58 + 760;
+    setTimeout(tick, 500);
+    timer=setInterval(tick, Math.max(2000, period));
+  }
+  var rt=null;
+  window.addEventListener('resize', function(){ clearTimeout(rt); rt=setTimeout(start,200); });
+  start();
+})();
+</script>
+</body>
+</html>
