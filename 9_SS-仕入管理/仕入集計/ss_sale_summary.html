@@ -81,7 +81,7 @@
             </div>
 
             <div class="col-start-4 grid grid-rows-3">
-                <a role="button" class="row-start-2 row-span-2 bg-[#1A3A63] hover:bg-[#0E2746] font-bold text-white rounded h-full flex items-center justify-center transition-all"
+                <a role="button" class="row-start-2 row-span-2 bg-[#0F5132] hover:bg-[#0A3D26] font-bold text-white rounded h-full flex items-center justify-center transition-all"
                     onclick="yearList(current_year_id.value)">
                     <div class="rounded h-full flex items-center justify-center text-center">抽出</div>
                 </a>
@@ -89,7 +89,7 @@
 
             <div class="col-start-5 col-span-2 grid grid-rows-3">
                 <div class="row-start-2 row-span-2 grid grid-rows-2">
-                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-primary-200">
+                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-primary-600 text-white">
                         <div class="col-span-2 font-bold">集計単位</div>
                         <div class="font-bold">区分</div>
                     </div>
@@ -113,7 +113,7 @@
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
                     <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">年月仕入集計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-primary-200">
+                    <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-primary-600 text-white">
                         <div class="border-r text-sm flex items-center justify-center">年</div>
                         <div class="border-r text-sm flex items-center justify-center">月</div>
                         <div class="col-span-3 text-sm flex items-center justify-center">合計税抜</div>
@@ -130,7 +130,7 @@
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
                     <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">月日仕入合計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-primary-200">
+                    <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-primary-600 text-white">
                         <div class="border-r text-sm flex items-center justify-center">月</div>
                         <div class="border-r text-sm flex items-center justify-center">日</div>
                         <div class="border-r text-sm flex items-center justify-center">曜</div>
@@ -148,7 +148,7 @@
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
                     <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">年月取引先別仕入集計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-primary-200">
+                    <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-primary-600 text-white">
                         <div class="border-r text-sm flex items-center justify-center">取引先名</div>
                         <div class="border-r text-sm flex items-center justify-center">合計税抜</div>
                     </div>
@@ -164,7 +164,7 @@
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
                     <div class="py-1 bg-primary-600 rounded text-md text-white flex items-center justify-center font-bold">取引先別仕入台帳</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-primary-200">
+                    <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-primary-600 text-white">
                         <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
                         <div class="col-span-2 border-r text-sm flex items-center justify-center">納品日</div>
                         <div class="col-span-2 border-r text-sm flex items-center justify-center">発送元</div>
@@ -363,7 +363,7 @@
         let confirmButton1 = document.getElementById('btn_print_pdf');
         confirmButton1.classList.remove('disabled');
         confirmButton1.classList.remove('bg-gray-300', 'text-gray-500');
-        confirmButton1.classList.add('bg-[#1A3A63]', 'hover:bg-[#0E2746]', 'text-white', 'cursor-pointer');
+        confirmButton1.classList.add('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'cursor-pointer');
         confirmButton1.setAttribute('onclick', 'btnPrintPDF()');
     }
 
@@ -371,7 +371,7 @@
         let disableBtn = document.getElementById('btn_print_pdf');
         disableBtn.classList.add('disabled');
         disableBtn.classList.add('bg-gray-300', 'text-gray-500');
-        disableBtn.classList.remove('bg-[#1A3A63]', 'hover:bg-[#0E2746]', 'text-white', 'cursor-pointer');
+        disableBtn.classList.remove('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'cursor-pointer');
         disableBtn.removeAttribute('onclick', '');
         disableBtn.removeAttribute('href', '');
     }
