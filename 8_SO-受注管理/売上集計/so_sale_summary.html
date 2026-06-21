@@ -50,65 +50,65 @@
   <!-- block content -->
   <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#F5F5F4] flex flex-col">
     <!-- menu section -->
-    <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
+    <div class="p-2 mb-2 border border-neutral-300 bg-neutral-100">
         <div class="grid grid-cols-12 gap-1 h-[130px]">
             <div class="grid grid-rows-2 gap-1">
                 <a href="#" role="button">
-                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i>戻る</div>
+                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i>戻る</div>
                 </a>
             </div>
 
             <div class="col-span-2 grid grid-cols-3 grid-rows-3 gap-1">
-                <div class="col-span-3 rounded text-center flex items-center justify-center">
+                <div class="col-span-3 text-center flex items-center justify-center">
                     <span class="text-lg font-bold">売上集計</span>
                 </div>
-                <div class="col-span-3 row-start-2 rounded border">
+                <div class="col-span-3 row-start-2 border">
                     <div class="grid grid-cols-4 h-full">
-                        <input id="current_year_id" class="col-span-3 text-center bg-white text-center rounded-l">
-                        <div class="bg-[#E9F1EC] flex items-center justify-center rounded-r font-bold">年</div>
+                        <input id="current_year_id" class="col-span-3 text-center bg-white text-center">
+                        <div class="bg-[#E9F1EC] flex items-center justify-center font-bold">年</div>
                     </div>
                 </div>
                 <div class="col-span-3 row-start-3">
                     <div class="grid grid-cols-2 gap-1 h-full">
-                        <a id="previous_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="-1"><i class="fa-solid fa-angle-left mr-2"></i>前年</a>
-                        <a id="next_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="1">翌年<i class="fa-solid fa-angle-right ml-2"></i></a>
+                        <a id="previous_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="-1"><i class="fa-solid fa-angle-left mr-2"></i>前年</a>
+                        <a id="next_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="1">翌年<i class="fa-solid fa-angle-right ml-2"></i></a>
                     </div>
                 </div>
             </div>
 
             <div class="col-start-4 grid grid-rows-3">
-                <a role="button" class="row-start-2 row-span-2 bg-[#198754] hover:bg-[#157347] font-bold text-white rounded h-full flex items-center justify-center transition-all"
+                <a role="button" class="row-start-2 row-span-2 bg-white border-2 border-[#0F5132] font-bold text-[#0F5132] hover:bg-[#E9F1EC] h-full flex items-center justify-center transition-all"
                     onclick="yearList(current_year_id.value)">
-                    <div class="rounded h-full flex items-center justify-center text-center">抽出</div>
+                    <div class="h-full flex items-center justify-center text-center">抽出</div>
                 </a>
             </div>
 
             <div class="col-start-5 col-span-2 grid grid-rows-3">
                 <div class="row-start-2 row-span-2 grid grid-rows-2">
-                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-[#0F5132] text-white">
+                    <div class="grid grid-cols-3 items-center text-center border-t bg-[#0F5132] text-white">
                         <div class="col-span-2 font-bold">集計単位</div>
                         <div class="font-bold">区分</div>
                     </div>
-                    <div class="grid grid-cols-3 items-center text-center border-l border-r border-b rounded-b bg-white">
+                    <div class="grid grid-cols-3 items-center text-center border-l border-r border-b bg-white">
                         <div id="aggregation_unit_id" class="col-span-2">-</div>
                         <div id="classification_id" class="">-</div>
                     </div>
                 </div>
             </div>
             <div class="col-start-12 grid grid-rows-3">
-                <a role="button" id="btn_print_pdf" target="_blank" class="row-start-2 row-span-2 disabled bg-gray-300 text-gray-500 rounded h-full flex items-center justify-center transition-all">
-                    <div class="rounded h-full flex items-center justify-center">印刷</div>
+                <a role="button" id="btn_print_pdf" target="_blank" class="row-start-2 row-span-2 disabled bg-gray-300 text-gray-500 h-full flex items-center justify-center transition-all">
+                    <div class="h-full flex items-center justify-center">印刷</div>
                 </a>
             </div>
         </div>
     </div>
     <!-- content section -->
-    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] rounded-md drop-shadow flex-1 h-full overflow-hidden">
+    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] drop-shadow flex-1 h-full overflow-hidden">
         <div class="grid grid-cols-7 h-full gap-2">
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">年月売上集計</div>
+                    <div class="py-1 bg-[#0F5132] text-md text-white flex items-center justify-center font-bold">年月売上集計</div>
                     <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-[#0F5132] text-white">
                         <div class="border-r text-sm flex items-center justify-center">年</div>
                         <div class="border-r text-sm flex items-center justify-center">月</div>
@@ -125,7 +125,7 @@
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">月日別売上合計</div>
+                    <div class="py-1 bg-[#0F5132] text-md text-white flex items-center justify-center font-bold">月日別売上合計</div>
                     <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-[#0F5132] text-white">
                         <div class="border-r text-sm flex items-center justify-center">月</div>
                         <div class="border-r text-sm flex items-center justify-center">日</div>
@@ -143,7 +143,7 @@
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">年月配送先別売上集計</div>
+                    <div class="py-1 bg-[#0F5132] text-md text-white flex items-center justify-center font-bold">年月配送先別売上集計</div>
                     <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-[#0F5132] text-white">
                         <div class="border-r text-sm flex items-center justify-center">取引先名</div>
                         <div class="border-r text-sm flex items-center justify-center">合計税抜</div>
@@ -159,7 +159,7 @@
             <div class="col-span-4 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">取引先別販売台帳</div>
+                    <div class="py-1 bg-[#0F5132] text-md text-white flex items-center justify-center font-bold">取引先別販売台帳</div>
                     <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-[#0F5132] text-white">
                         <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
                         <div class="col-span-2 border-r text-sm flex items-center justify-center">納品日</div>
