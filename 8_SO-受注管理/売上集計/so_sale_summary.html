@@ -45,7 +45,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <!-- block content -->
-  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col">
+  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#F5F5F4] flex flex-col">
     <!-- menu section -->
     <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
         <div class="grid grid-cols-12 gap-1 h-[130px]">
@@ -62,19 +62,19 @@
                 <div class="col-span-3 row-start-2 rounded border">
                     <div class="grid grid-cols-4 h-full">
                         <input id="current_year_id" class="col-span-3 text-center bg-white text-center rounded-l">
-                        <div class="bg-[#a9d18e] flex items-center justify-center rounded-r font-bold">年</div>
+                        <div class="bg-[#E9F1EC] flex items-center justify-center rounded-r font-bold">年</div>
                     </div>
                 </div>
                 <div class="col-span-3 row-start-3">
                     <div class="grid grid-cols-2 gap-1 h-full">
-                        <a id="previous_day" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="-1"><i class="fa-solid fa-angle-left mr-2"></i>前年</a>
-                        <a id="next_day" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="1">翌年<i class="fa-solid fa-angle-right ml-2"></i></a>
+                        <a id="previous_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="-1"><i class="fa-solid fa-angle-left mr-2"></i>前年</a>
+                        <a id="next_day" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-bold rounded text-center flex items-center justify-center h-full transition" href="#" type="button" data-diff="1">翌年<i class="fa-solid fa-angle-right ml-2"></i></a>
                     </div>
                 </div>
             </div>
 
             <div class="col-start-4 grid grid-rows-3">
-                <a role="button" class="row-start-2 row-span-2 bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center transition-all"
+                <a role="button" class="row-start-2 row-span-2 bg-[#0F5132] hover:bg-[#0A3D26] font-bold text-white rounded h-full flex items-center justify-center transition-all"
                     onclick="yearList(current_year_id.value)">
                     <div class="rounded h-full flex items-center justify-center text-center">抽出</div>
                 </a>
@@ -82,7 +82,7 @@
 
             <div class="col-start-5 col-span-2 grid grid-rows-3">
                 <div class="row-start-2 row-span-2 grid grid-rows-2">
-                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-[#a9d18e]">
+                    <div class="grid grid-cols-3 items-center text-center border-t rounded-t bg-[#E9F1EC]">
                         <div class="col-span-2 font-bold">集計単位</div>
                         <div class="font-bold">区分</div>
                     </div>
@@ -105,8 +105,8 @@
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">年月売上集計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-[#a9d18e]">
+                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">年月売上集計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-5 bg-[#E9F1EC]">
                         <div class="border-r text-sm flex items-center justify-center">年</div>
                         <div class="border-r text-sm flex items-center justify-center">月</div>
                         <div class="col-span-3 text-sm flex items-center justify-center">合計税抜</div>
@@ -122,8 +122,8 @@
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">月日別売上合計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-[#a9d18e]">
+                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">月日別売上合計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-6 bg-[#E9F1EC]">
                         <div class="border-r text-sm flex items-center justify-center">月</div>
                         <div class="border-r text-sm flex items-center justify-center">日</div>
                         <div class="border-r text-sm flex items-center justify-center">曜</div>
@@ -140,8 +140,8 @@
             <div class="col-span-1 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">年月配送先別売上集計</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-[#a9d18e]">
+                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">年月配送先別売上集計</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-2 bg-[#E9F1EC]">
                         <div class="border-r text-sm flex items-center justify-center">取引先名</div>
                         <div class="border-r text-sm flex items-center justify-center">合計税抜</div>
                     </div>
@@ -156,8 +156,8 @@
             <div class="col-span-4 flex flex-col h-full">
                 <!-- table header -->
                 <div class="grid grid-rows-3 gap-1">
-                    <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">取引先別販売台帳</div>
-                    <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-[#a9d18e]">
+                    <div class="py-1 bg-[#0F5132] rounded text-md text-white flex items-center justify-center font-bold">取引先別販売台帳</div>
+                    <div class="row-start-2 border row-span-2 grid grid-cols-18 bg-[#E9F1EC]">
                         <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
                         <div class="col-span-2 border-r text-sm flex items-center justify-center">納品日</div>
                         <div class="col-span-2 border-r text-sm flex items-center justify-center">店舗名</div>
@@ -307,23 +307,23 @@
     // function set color when click
     function setTagColor(){
         $('#summary_list_data').on('click','.div-color',function () {
-            $(this).parent().find('.div-color').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.div-color').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
     }
 
     function setTagColorPrice(){
         $('#summary_list_data').on('dblclick','.div-color',function () {
-            $(this).parent().find('.div-color').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.div-color').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
     }
 
     function printByClient(customer){
         customerId = customer;
         $('#summary_list_id').on('click','.set-tag-print',function () {
-            $(this).parent().find('.set-tag-print').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.set-tag-print').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
         flag1 = true;
         checkFlagStatus();
@@ -331,8 +331,8 @@
 
     function setTagColorByTotalPrice(){
         $('#summary_list_id').on('click','.set-color-by-total',function () {
-            $(this).parent().find('.set-color-by-total').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.set-color-by-total').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
         flag1 = true;
         checkFlagStatus();
@@ -340,15 +340,15 @@
 
     function setTagColorByMonth(){
         $('#daily_summary_id').on('click','.set-color',function () {
-            $(this).parent().find('.set-color').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.set-color').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
     }
 
     function setTagColorDetail(){
         $('#summary_list_id').on('click','.set-tag-color',function () {
-            $(this).parent().find('.set-tag-color').removeClass('bg-[#f9cdaa]');
-            $(this).addClass('bg-[#f9cdaa]');
+            $(this).parent().find('.set-tag-color').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
     }
   </script>
@@ -359,7 +359,7 @@
         let confirmButton1 = document.getElementById('btn_print_pdf');
         confirmButton1.classList.remove('disabled');
         confirmButton1.classList.remove('bg-gray-300', 'text-gray-500');
-        confirmButton1.classList.add('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        confirmButton1.classList.add('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'cursor-pointer');
         confirmButton1.setAttribute('onclick', 'btnPrintPDF()');
     }
 
@@ -367,7 +367,7 @@
         let disableBtn = document.getElementById('btn_print_pdf');
         disableBtn.classList.add('disabled');
         disableBtn.classList.add('bg-gray-300', 'text-gray-500');
-        disableBtn.classList.remove('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        disableBtn.classList.remove('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'cursor-pointer');
         disableBtn.removeAttribute('onclick', '');
         disableBtn.removeAttribute('href', '');
     }

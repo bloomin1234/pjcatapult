@@ -40,18 +40,18 @@
         overflow-x: hidden;
     }
     /* SS primary カラー（ネイビー系）を CSS 変数で代替 */
-    .bg-primary-200 { background-color: #C3D2E2; }
+    .bg-primary-200 { background-color: #E9EEF5; }
     .bg-primary-300 { background-color: #95AEC9; }
     .bg-primary-600 { background-color: #1A3A63; }
     .bg-primary-100 { background-color: #E9EEF5; }
-    .hover\:bg-primary-500:hover { background-color: #2B5A96; }
+    .hover\:bg-primary-500:hover { background-color: #0E2746; }
   </style>
 </head>
 <body>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <!-- block content -->
-  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col">
+  <div class="p-2 w-full h-screen min-w-screen overflow-hidden mx-auto bg-[#F5F5F4] flex flex-col">
     <!-- menu section -->
     <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
         <div class="grid grid-cols-12 gap-1 h-[130px]">
@@ -81,7 +81,7 @@
             </div>
 
             <div class="col-start-4 grid grid-rows-3">
-                <a role="button" class="row-start-2 row-span-2 bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center transition-all"
+                <a role="button" class="row-start-2 row-span-2 bg-[#1A3A63] hover:bg-[#0E2746] font-bold text-white rounded h-full flex items-center justify-center transition-all"
                     onclick="yearList(current_year_id.value)">
                     <div class="rounded h-full flex items-center justify-center text-center">抽出</div>
                 </a>
@@ -363,7 +363,7 @@
         let confirmButton1 = document.getElementById('btn_print_pdf');
         confirmButton1.classList.remove('disabled');
         confirmButton1.classList.remove('bg-gray-300', 'text-gray-500');
-        confirmButton1.classList.add('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        confirmButton1.classList.add('bg-[#1A3A63]', 'hover:bg-[#0E2746]', 'text-white', 'cursor-pointer');
         confirmButton1.setAttribute('onclick', 'btnPrintPDF()');
     }
 
@@ -371,7 +371,7 @@
         let disableBtn = document.getElementById('btn_print_pdf');
         disableBtn.classList.add('disabled');
         disableBtn.classList.add('bg-gray-300', 'text-gray-500');
-        disableBtn.classList.remove('bg-[#C7996B]', 'hover:bg-[#d8b897]', 'text-white', 'cursor-pointer');
+        disableBtn.classList.remove('bg-[#1A3A63]', 'hover:bg-[#0E2746]', 'text-white', 'cursor-pointer');
         disableBtn.removeAttribute('onclick', '');
         disableBtn.removeAttribute('href', '');
     }
