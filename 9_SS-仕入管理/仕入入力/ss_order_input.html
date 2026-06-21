@@ -56,34 +56,35 @@
     .specific-table-delivery-print .tooltip div { font-size: 12px; }
 
     /*
-     * SSカラーテーマ: primary-* = 青緑/teal系
-     * primary-600 ≈ #0d7369  primary-500 ≈ #0f8a7f  primary-400 ≈ #3aa89e
-     * primary-300 ≈ #7ec8c3  primary-200 ≈ #b2dedd  primary-100 ≈ #d9f0ef
+     * SSカラーテーマ: primary-* = ブルー系 (実際の画面に合わせて)
+     * primary-600 = #2563eb  primary-500 = #3b82f6  primary-400 = #60a5fa
+     * primary-300 = #93c5fd  primary-200 = #bfdbfe  primary-100 = #dbeafe
+     * primary-800 = #1e40af
      */
-    .ss-600  { background-color: #0d7369; }
-    .ss-500  { background-color: #0f8a7f; }
-    .ss-400  { background-color: #3aa89e; }
-    .ss-300  { background-color: #7ec8c3; }
-    .ss-200  { background-color: #b2dedd; }
-    .ss-100  { background-color: #d9f0ef; }
+    .ss-600  { background-color: #2563eb; }
+    .ss-500  { background-color: #3b82f6; }
+    .ss-400  { background-color: #60a5fa; }
+    .ss-300  { background-color: #93c5fd; }
+    .ss-200  { background-color: #bfdbfe; }
+    .ss-100  { background-color: #dbeafe; }
 
     /* ボタンホバー色 */
-    .ss-btn-600 { background-color: #0d7369; color: white; }
-    .ss-btn-600:hover { background-color: #0f8a7f; }
+    .ss-btn-600 { background-color: #2563eb; color: white; }
+    .ss-btn-600:hover { background-color: #3b82f6; }
 
     /* リスト行 */
     .client-row { display: grid; grid-template-columns: 1fr 4fr; font-size: 12px; border-bottom: 1px solid #e5e7eb; }
-    .client-row:hover { background-color: #d9f0ef; cursor: pointer; }
-    .client-row.active { background-color: #7ec8c3; }
+    .client-row:hover { background-color: #dbeafe; cursor: pointer; }
+    .client-row.active { background-color: #bfdbfe; }
 
     .dest-row { display: grid; grid-template-columns: 3fr 9fr 2fr 2fr 2fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; }
-    .dest-row:hover { background-color: #d9f0ef; cursor: pointer; }
+    .dest-row:hover { background-color: #dbeafe; cursor: pointer; }
 
     .material-row { display: grid; grid-template-columns: 2fr 6fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; }
     .material-row:hover { background-color: #fef9c3; cursor: pointer; }
 
     .order-summary-row { display: grid; grid-template-columns: 1fr 4fr 1fr 1fr 1fr; font-size: 11px; border-bottom: 1px solid #e5e7eb; height: 28px; }
-    .order-summary-row:hover { background-color: #d9f0ef; cursor: pointer; }
+    .order-summary-row:hover { background-color: #dbeafe; cursor: pointer; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -111,7 +112,7 @@
 
         <!-- スタッフ名 -->
         <div class="grid grid-cols-5 w-[260px] rounded bg-white overflow-hidden drop-shadow text-sm font-bold">
-          <div class="col-span-1 text-base flex items-center justify-center" style="color:#0d7369;"><i class="fa-solid fa-user"></i></div>
+          <div class="col-span-1 text-base flex items-center justify-center" style="color:#2563eb;"><i class="fa-solid fa-user"></i></div>
           <input id="staff_name" class="col-span-4 bg-white text-sm text-center font-bold" value="山田 太郎" disabled>
         </div>
 
@@ -123,9 +124,9 @@
             <input id="calendar_current" class="col-span-3 my-auto bg-white text-lg font-bold h-full text-center border-r" value="6/21(土)" readonly>
             <input id="day" class="col-span-1 my-auto bg-white text-lg h-full text-center" maxlength="3" placeholder="##" disabled>
             <div class="col-span-6 grid grid-cols-6">
-              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border-l border-y border-teal-400">暦管理</button>
-              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border border-teal-400"><i class="fa-solid fa-caret-left"></i>前日</button>
-              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border-r border-y border-teal-400">翌日<i class="fa-solid fa-caret-right"></i></button>
+              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border-l border-y border-[#60a5fa]">暦管理</button>
+              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border border-[#60a5fa]"><i class="fa-solid fa-caret-left"></i>前日</button>
+              <button class="col-span-2 text-sm ss-btn-600 font-bold transition border-r border-y border-[#60a5fa]">翌日<i class="fa-solid fa-caret-right"></i></button>
             </div>
           </div>
 
@@ -179,15 +180,20 @@
           <div class="grid grid-rows-2 w-[140px] h-full rounded overflow-hidden drop-shadow">
             <input class="w-full font-bold text-base text-center bg-white rounded-l p-0" value="2026/06/21(土)" readonly>
             <div class="flex rounded-r drop-shadow overflow-hidden h-full">
-              <button class="w-full text-sm ss-btn-600 font-bold transition px-2 border border-teal-400"><i class="fa-solid fa-caret-left"></i>前日</button>
-              <button class="w-full text-sm ss-btn-600 font-bold transition px-2 border-r border-y border-teal-400">翌日<i class="fa-solid fa-caret-right"></i></button>
+              <button class="w-full text-sm ss-btn-600 font-bold transition px-2 border border-[#60a5fa]"><i class="fa-solid fa-caret-left"></i>前日</button>
+              <button class="w-full text-sm ss-btn-600 font-bold transition px-2 border-r border-y border-[#60a5fa]">翌日<i class="fa-solid fa-caret-right"></i></button>
             </div>
           </div>
 
           <!-- ダブルクリック説明 -->
           <div class="relative flex overflow-hidden drop-shadow h-[35px] my-auto">
+            <div class="absolute h-[35px] p-[1px] rounded-md flex bg-neutral-700 m-auto">
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256" enable-background="new 0 0 256 256" xml:space="preserve">
+                <g><g><g><path fill="#ffffff" d="M103.5,10.5c-8.4,1.2-15.7,3.5-23.2,7.2C59.6,27.9,45.3,46.9,40.6,69.9c-1.5,7.6-1.5,20,0,27.5c4.8,23.1,18.6,41.5,39,51.9c2.3,1.2,4.6,2.1,5.1,2.1c4.2,0,6.7-5,4.1-7.9c-0.5-0.5-2.8-1.9-5.2-3.2C64.2,130.1,51.6,111.2,49.5,89c-1.1-11.4,1-22.6,6.2-33.3c6-12.5,16.3-22.9,28.6-29.1c9.7-4.8,18-6.8,28.8-6.8c10.8,0,18.2,1.7,27.9,6.3c21.9,10.5,35.8,32.6,35.9,57c0,9.1-1.5,17.2-4.6,24.5c-0.6,1.5-1.1,3.4-1.1,4.2c0,3.1,3.3,5.3,6.5,4.2c2-0.6,3.1-2.6,5.3-9.1c5.6-16.8,5.1-34.6-1.5-51.2c-9.2-23-29.6-39.8-54.4-44.7C121.1,10,109.5,9.6,103.5,10.5z"/><path fill="#ffffff" d="M105.5,40c-14.9,2.7-27.8,13.1-33.3,27c-2.5,6.2-3,9.2-3,16.8c0,5.5,0.2,7.6,1,10.4c2.3,8.5,6.5,15.6,12.7,21.4c4.1,3.9,10.4,7.9,12.9,8.3c4.8,0.8,7.7-5,4.1-8.1c-0.7-0.6-2.6-1.9-4.2-2.8c-3.6-2-9.7-8-11.9-11.7c-10.6-17.9-3.4-40.7,15.5-49.2c6-2.8,13-3.6,19.5-2.5c9.7,1.7,17.9,6.9,23.1,14.9c2.9,4.3,4.5,8.4,5.4,13.9c0.6,3.8,0.7,5.1,0.2,8.8c-0.3,2.4-1.1,5.8-1.7,7.6c-1.6,4.4-1.8,6.5-0.9,7.9c1.2,1.8,3.6,2.7,5.5,2c2.1-0.7,2.8-1.7,4.3-5.9c4.7-12.9,3.3-26.9-3.7-38.5c-3.1-5.1-9.5-11.5-14.6-14.6C127.2,40.4,115.7,38.1,105.5,40z"/><path fill="#ffffff" d="M111,79.3c-3.1,1.5-2.9-3.5-2.9,72.3c0,75.4-0.2,70.9,2.8,72.5c2.8,1.5,3.6,1,17.3-9.7c11.4-8.9,12.9-9.9,13.4-9.2c0.3,0.4,5.4,9.5,11.3,20c11.1,20,11.7,20.8,14.5,20.8c1.8,0,32.2-15.4,33.4-16.9c0.5-0.7,1-1.9,1-2.7c0-1-3.1-7.1-10.6-20.5l-10.6-19H197h16.4l1.6-1.6c1.8-1.8,2-3.6,0.9-5.7c-1.1-1.9-99.5-100.1-101-100.7C113.2,78.4,112.7,78.4,111,79.3z"/></g></g></g>
+              </svg>
+            </div>
             <div class="m-auto flex rounded-md bg-neutral-400/60 h-[35px]">
-              <span class="my-auto px-3 py-2 text-sm">ダブルクリックで詳細</span>
+              <span class="my-auto ml-[37px] p-2 text-sm">ダブルクリックで詳細</span>
             </div>
           </div>
         </div>
@@ -207,14 +213,14 @@
 
         <!-- 番号フィルタ (100〜1000) -->
         <div class="grid grid-rows-3 rounded py-1">
-          <div class="grid grid-cols-5 ss-600 text-white font-bold h-[30px] text-center border-t border-x border-teal-800 rounded-t">
+          <div class="grid grid-cols-5 ss-600 text-white font-bold h-[30px] text-center border-t border-x border-[#1e40af] rounded-t">
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">100</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">200</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">300</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">400</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">500</a>
           </div>
-          <div class="grid grid-cols-5 ss-600 text-white font-bold h-[30px] text-center border border-teal-800">
+          <div class="grid grid-cols-5 ss-600 text-white font-bold h-[30px] text-center border border-[#1e40af]">
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">600</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">700</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">800</a>
@@ -222,7 +228,7 @@
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80">1000</a>
           </div>
           <!-- 読みがなフィルタ -->
-          <div class="grid grid-cols-10 ss-600 text-white font-bold h-[30px] border-b border-x border-teal-800">
+          <div class="grid grid-cols-10 ss-600 text-white font-bold h-[30px] border-b border-x border-[#1e40af]">
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80 text-xs">あ</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80 text-xs">か</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80 text-xs">さ</a>
@@ -234,7 +240,7 @@
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80 text-xs">ら</a>
             <a role="button" class="ss-400 h-full flex items-center justify-center transition hover:opacity-80 text-xs">わ</a>
           </div>
-          <button class="text-white border-b border-x rounded-b w-full ss-600 border-teal-800 hover:opacity-80"><i class="fa-solid fa-rotate-right"></i></button>
+          <button class="text-white border-b border-x rounded-b w-full ss-600 border-[#1e40af] hover:opacity-80"><i class="fa-solid fa-rotate-right"></i></button>
         </div>
 
         <!-- 取引先リスト本体 -->
@@ -312,13 +318,17 @@
             <span class="font-bold">全商品表示</span>
           </button>
 
-          <div class="grid grid-cols-[auto_1fr] rounded border border-teal-600 overflow-hidden mx-1">
-            <div class="ss-200 text-base flex items-center justify-center font-bold px-2">商品名</div>
+          <div class="grid grid-cols-[auto_1fr] rounded border border-[#2563eb] overflow-hidden">
+            <div class="ss-200 text-base flex items-center justify-center font-bold px-2 max-w-[250px]">商品名</div>
             <input class="text-md bg-neutral-100 text-center h-[45px] font-bold" value="トマト" disabled>
           </div>
 
+          <!-- 商品台帳タイトルバー -->
+          <div class="grid rounded-t ss-200">
+            <span class="mx-auto my-auto text-sm font-bold py-1">商品台帳</span>
+          </div>
           <!-- メーカー検索 + 商品名検索 -->
-          <div class="mx-1 flex flex-col gap-1 bg-white border border-gray-300 p-1">
+          <div class="flex flex-col gap-1 bg-white border-x border-gray-300 p-1">
             <div class="text-center text-xs font-bold py-1 bg-blue-100 text-blue-800 rounded shadow-inner">
               全商品台帳 (全件検索中)
             </div>
@@ -511,7 +521,7 @@
                 <th class="ss-200 border-l text-xs" style="width:3%;">外装</th>
               </tr>
             </thead>
-            <tbody class="overflow-auto block font-extrabold" style="height: 220px;">
+            <tbody class="overflow-auto h-[310px] block font-extrabold">
               <!-- サンプルデータ: 商品台帳行 -->
               <tr class="flex w-full text-xs border-b hover:bg-teal-50 cursor-pointer new-color">
                 <td style="width:4%;" class="py-1 border-r"><button class="text-red-500 font-bold text-xs w-full">✕</button></td>
@@ -598,9 +608,16 @@
                 <div class="text-xs">一括で印刷</div>
               </button>
               <div class="grid bg-neutral-200 p-1 gap-1">
-                <!-- SSは「検品票は伝票」「注文書は点数」 -->
-                <span class="text-xs">検品票は伝票</span>
-                <span class="text-xs">注文書は点数</span>
+                <span class="text-xs flex gap-1 align-center">検品票は伝票
+                  <div class="w-[18px] h-[18px] p-[1px] rounded-md flex bg-neutral-700">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" xml:space="preserve"><g><g><g><path fill="#ffffff" d="M103.5,10.5c-8.4,1.2-15.7,3.5-23.2,7.2C59.6,27.9,45.3,46.9,40.6,69.9c-1.5,7.6-1.5,20,0,27.5c4.8,23.1,18.6,41.5,39,51.9c2.3,1.2,4.6,2.1,5.1,2.1c4.2,0,6.7-5,4.1-7.9c-0.5-0.5-2.8-1.9-5.2-3.2C64.2,130.1,51.6,111.2,49.5,89c-1.1-11.4,1-22.6,6.2-33.3c6-12.5,16.3-22.9,28.6-29.1c9.7-4.8,18-6.8,28.8-6.8c10.8,0,18.2,1.7,27.9,6.3c21.9,10.5,35.8,32.6,35.9,57c0,9.1-1.5,17.2-4.6,24.5c-0.6,1.5-1.1,3.4-1.1,4.2c0,3.1,3.3,5.3,6.5,4.2c2-0.6,3.1-2.6,5.3-9.1c5.6-16.8,5.1-34.6-1.5-51.2c-9.2-23-29.6-39.8-54.4-44.7C121.1,10,109.5,9.6,103.5,10.5z"/><path fill="#ffffff" d="M105.5,40c-14.9,2.7-27.8,13.1-33.3,27c-2.5,6.2-3,9.2-3,16.8c0,5.5,0.2,7.6,1,10.4c2.3,8.5,6.5,15.6,12.7,21.4c4.1,3.9,10.4,7.9,12.9,8.3c4.8,0.8,7.7-5,4.1-8.1c-0.7-0.6-2.6-1.9-4.2-2.8c-3.6-2-9.7-8-11.9-11.7c-10.6-17.9-3.4-40.7,15.5-49.2c6-2.8,13-3.6,19.5-2.5c9.7,1.7,17.9,6.9,23.1,14.9c2.9,4.3,4.5,8.4,5.4,13.9c0.6,3.8,0.7,5.1,0.2,8.8c-0.3,2.4-1.1,5.8-1.7,7.6c-1.6,4.4-1.8,6.5-0.9,7.9c1.2,1.8,3.6,2.7,5.5,2c2.1-0.7,2.8-1.7,4.3-5.9c4.7-12.9,3.3-26.9-3.7-38.5c-3.1-5.1-9.5-11.5-14.6-14.6C127.2,40.4,115.7,38.1,105.5,40z"/><path fill="#ffffff" d="M111,79.3c-3.1,1.5-2.9-3.5-2.9,72.3c0,75.4-0.2,70.9,2.8,72.5c2.8,1.5,3.6,1,17.3-9.7c11.4-8.9,12.9-9.9,13.4-9.2c0.3,0.4,5.4,9.5,11.3,20c11.1,20,11.7,20.8,14.5,20.8c1.8,0,32.2-15.4,33.4-16.9c0.5-0.7,1-1.9,1-2.7c0-1-3.1-7.1-10.6-20.5l-10.6-19H197h16.4l1.6-1.6c1.8-1.8,2-3.6,0.9-5.7c-1.1-1.9-99.5-100.1-101-100.7C113.2,78.4,112.7,78.4,111,79.3z"/></g></g></g></svg>
+                  </div>
+                </span>
+                <span class="text-xs flex gap-1 align-center">注文書は点数
+                  <div class="w-[18px] h-[18px] p-[1px] rounded-md flex bg-neutral-700">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" xml:space="preserve"><g><g><g><path fill="#ffffff" d="M103.5,10.5c-8.4,1.2-15.7,3.5-23.2,7.2C59.6,27.9,45.3,46.9,40.6,69.9c-1.5,7.6-1.5,20,0,27.5c4.8,23.1,18.6,41.5,39,51.9c2.3,1.2,4.6,2.1,5.1,2.1c4.2,0,6.7-5,4.1-7.9c-0.5-0.5-2.8-1.9-5.2-3.2C64.2,130.1,51.6,111.2,49.5,89c-1.1-11.4,1-22.6,6.2-33.3c6-12.5,16.3-22.9,28.6-29.1c9.7-4.8,18-6.8,28.8-6.8c10.8,0,18.2,1.7,27.9,6.3c21.9,10.5,35.8,32.6,35.9,57c0,9.1-1.5,17.2-4.6,24.5c-0.6,1.5-1.1,3.4-1.1,4.2c0,3.1,3.3,5.3,6.5,4.2c2-0.6,3.1-2.6,5.3-9.1c5.6-16.8,5.1-34.6-1.5-51.2c-9.2-23-29.6-39.8-54.4-44.7C121.1,10,109.5,9.6,103.5,10.5z"/><path fill="#ffffff" d="M105.5,40c-14.9,2.7-27.8,13.1-33.3,27c-2.5,6.2-3,9.2-3,16.8c0,5.5,0.2,7.6,1,10.4c2.3,8.5,6.5,15.6,12.7,21.4c4.1,3.9,10.4,7.9,12.9,8.3c4.8,0.8,7.7-5,4.1-8.1c-0.7-0.6-2.6-1.9-4.2-2.8c-3.6-2-9.7-8-11.9-11.7c-10.6-17.9-3.4-40.7,15.5-49.2c6-2.8,13-3.6,19.5-2.5c9.7,1.7,17.9,6.9,23.1,14.9c2.9,4.3,4.5,8.4,5.4,13.9c0.6,3.8,0.7,5.1,0.2,8.8c-0.3,2.4-1.1,5.8-1.7,7.6c-1.6,4.4-1.8,6.5-0.9,7.9c1.2,1.8,3.6,2.7,5.5,2c2.1-0.7,2.8-1.7,4.3-5.9c4.7-12.9,3.3-26.9-3.7-38.5c-3.1-5.1-9.5-11.5-14.6-14.6C127.2,40.4,115.7,38.1,105.5,40z"/><path fill="#ffffff" d="M111,79.3c-3.1,1.5-2.9-3.5-2.9,72.3c0,75.4-0.2,70.9,2.8,72.5c2.8,1.5,3.6,1,17.3-9.7c11.4-8.9,12.9-9.9,13.4-9.2c0.3,0.4,5.4,9.5,11.3,20c11.1,20,11.7,20.8,14.5,20.8c1.8,0,32.2-15.4,33.4-16.9c0.5-0.7,1-1.9,1-2.7c0-1-3.1-7.1-10.6-20.5l-10.6-19H197h16.4l1.6-1.6c1.8-1.8,2-3.6,0.9-5.7c-1.1-1.9-99.5-100.1-101-100.7C113.2,78.4,112.7,78.4,111,79.3z"/></g></g></g></svg>
+                  </div>
+                </span>
               </div>
             </div>
             <!-- テーブルヘッダー (SS: 「受入場所」) -->
@@ -666,7 +683,7 @@
       <div class="relative bg-neutral-100 rounded-lg p-5 w-[450px] h-[400px] z-10">
         <div class="flex gap-2 mb-4">
           <div class="grid rounded-full ss-100 w-[50px] h-[50px] my-auto border ss-200">
-            <i class="fa-regular fa-address-book fa-lg m-auto" style="color:#0d7369;"></i>
+            <i class="fa-regular fa-address-book fa-lg m-auto" style="color:#2563eb;"></i>
           </div>
           <span class="my-auto font-bold text-xl">取引先追加</span>
         </div>
@@ -696,7 +713,7 @@
         </div>
         <div class="absolute bottom-[10px] right-[10px] flex gap-2">
           <button onclick="document.getElementById('modal-create-client').classList.add('hidden')" class="px-4 py-2 rounded border border-gray-400 bg-white text-sm">キャンセル</button>
-          <button class="px-4 py-2 rounded border ss-200 text-sm font-bold" style="border-color:#0d7369;">追加</button>
+          <button class="px-4 py-2 rounded border ss-200 text-sm font-bold" style="border-color:#2563eb;">追加</button>
         </div>
       </div>
     </div>
