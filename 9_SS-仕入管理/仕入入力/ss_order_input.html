@@ -72,6 +72,9 @@
     .ss-btn-600 { background-color: #2563eb; color: white; }
     .ss-btn-600:hover { background-color: #3b82f6; }
 
+    /* 18列グリッド (Tailwind非標準) */
+    .grid-cols-18 { grid-template-columns: repeat(18, minmax(0, 1fr)); }
+
     /* リスト行 */
     .client-row { display: grid; grid-template-columns: 1fr 4fr; font-size: 12px; border-bottom: 1px solid #e5e7eb; }
     .client-row:hover { background-color: #dbeafe; cursor: pointer; }
@@ -193,7 +196,7 @@
               </svg>
             </div>
             <div class="m-auto flex rounded-md bg-neutral-400/60 h-[35px]">
-              <span class="my-auto ml-[37px] p-2 text-sm">ダブルクリックで詳細</span>
+              <span class="my-auto ml-[37px] p-2">ダブルクリックで詳細</span>
             </div>
           </div>
         </div>
@@ -288,12 +291,25 @@
 
         <!-- 発送元テーブルヘッダー (SSは「発送元CD / 発送元」) -->
         <div class="grid overflow-hidden">
-          <div class="grid ss-200 font-bold text-xs" style="grid-template-columns: 3fr 9fr 2fr 2fr 2fr;">
-            <div class="border-r text-center flex items-center justify-center py-1">発送元<br>CD</div>
-            <div class="border-r text-center flex items-center justify-center py-1 cursor-pointer">発送元</div>
-            <div class="border-r text-center flex items-center justify-center py-1">4<br>便</div>
-            <div class="border-r text-center flex items-center justify-center py-1">3<br>便</div>
-            <div class="text-center flex items-center justify-center py-1">金額<br>表示</div>
+          <div class="grid grid-cols-18 rounded-t group text-sm ss-200 font-bold">
+            <div class="col-span-3 grid border-r">
+              <span class="text-center text-xs flex items-center justify-center">発送元CD</span>
+            </div>
+            <div class="col-span-9 grid border-r cursor-pointer specific-table-delivery-print" onclick="toggleDestinationData(this)">
+              <span class="text-center text-sm flex items-center justify-center">発送元</span>
+              <div class="tooltip text-start flex-col">
+                <div>・クリック : 非表示&lt;-&gt;表示</div>
+              </div>
+            </div>
+            <div class="col-span-2 grid border-r">
+              <span class="text-center text-xs flex items-center justify-center">4<br>便</span>
+            </div>
+            <div class="col-span-2 grid border-r">
+              <span class="text-center text-xs flex items-center justify-center">3<br>便</span>
+            </div>
+            <div class="col-span-2 grid">
+              <span class="text-center text-xs flex items-center justify-center">金額<br>表示</span>
+            </div>
           </div>
           <!-- サンプルデータ -->
           <div class="overflow-y-auto" style="height: calc(100vh - 320px);">
@@ -568,16 +584,29 @@
             </tbody>
           </table>
 
-          <!-- ミックス品入力エリア -->
-          <div class="h-[200px] mt-1">
-            <div class="grid grid-cols-12 bg-orange-50 border rounded p-1">
-              <span class="col-span-12 text-xs text-center text-orange-600 font-bold">ミックス品配分エリア (材料区分=9 の場合に表示)</span>
-              <div class="col-span-1 ss-200 text-center text-xs border-r flex items-center justify-center">No</div>
-              <div class="col-span-1 ss-200 text-center text-xs border-r">商品<br>番号</div>
-              <div class="col-span-2 ss-200 text-center text-xs border-r flex items-center justify-center">商品名</div>
-              <div class="col-span-1 ss-200 text-xs border-r"><span class="block">配分(kg)</span><span class="block bg-[#f4b183]">入数</span></div>
-              <div class="col-span-3 ss-200 text-center text-xs border-r flex items-center justify-center">加工方法</div>
-              <div class="col-span-3 ss-200 text-center text-xs flex items-center justify-center">セット方法</div>
+          <!-- ミックス品入力エリア (通常非表示) -->
+          <div class="h-[250px] mt-1">
+            <div id="div_mix" class="hidden">
+              <div class="grid grid-cols-12">
+                <input id="standard_cd_mix" class="col-start-2 col-span-1 text-base text-center bg-white w-full mt-1 mb-1" disabled>
+                <button class="col-span-2 bg-[#feb888] hover:bg-orange-400 rounded border-4 border-x-[#866441] border-y-[#ffc28f] text-sm ml-2 mr-2 mt-1 mb-1 transition hover:font-bold" onclick="addRowMix()">追加</button>
+                <button class="col-start-6 col-span-7 bg-[#ffe16a] hover:bg-yellow-400 rounded border-4 border-x-[#6a5a2a] border-y-[#ffed64] text-sm mt-1 mb-1 w-24 justify-self-center transition hover:font-bold" onclick="saveOrderMix()">確定</button>
+                <div class="col-span-1 ss-200 text-center ml-1 rounded-tl border-r flex items-center justify-center">No</div>
+                <div class="col-span-1 ss-200 text-center border-r">商品<br>番号</div>
+                <div class="col-span-2 ss-200 text-center border-r flex items-center justify-center">商品名</div>
+                <div class="col-span-1 grid grid-rows-2 border-r">
+                  <span class="row-span-1 ss-200 text-sm">配分<span class="text-xs">(kg)</span></span>
+                  <span class="row-span-1 bg-[#f4b183] text-center text-sm">入数</span>
+                </div>
+                <div class="col-span-7 grid grid-cols-6 mr-1">
+                  <div class="col-span-3 ss-200 text-center border-r flex items-center justify-center">加工方法</div>
+                  <div class="col-span-3 ss-200 text-center rounded-tr flex items-center justify-center">セット方法</div>
+                </div>
+              </div>
+              <div class="h-[162px] overflow-y-auto">
+                <div id="mix_ingredient" class="h-[22px]">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -593,19 +622,19 @@
           <div class="flex-none flex flex-col">
             <!-- 方向フィルタ + 日付 -->
             <div class="grid grid-cols-8">
-              <input class="col-span-3 bg-white text-base text-center" value="06/21" disabled>
-              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition text-sm text-white">西</button>
-              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition text-sm text-white">南</button>
-              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition text-sm text-white">北</button>
-              <button class="col-span-2 ss-400 hover:opacity-80 font-bold text-center transition text-xs text-white">中央</button>
+              <input id="date_sort" class="col-span-3 bg-white text-lg text-center" value="06/21" disabled>
+              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition" type="button" onclick="orderSummaryList('西')">西</button>
+              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition" type="button" onclick="orderSummaryList('南')">南</button>
+              <button class="ss-400 hover:opacity-80 font-bold text-center border-r transition" type="button" onclick="orderSummaryList('北')">北</button>
+              <button class="col-span-2 ss-400 hover:opacity-80 font-bold text-center transition" type="button" onclick="orderSummaryList('中央')">中央</button>
             </div>
             <!-- 伝票更新/一括印刷 -->
             <div class="grid grid-cols-3">
-              <button class="bg-[#ffe16a] hover:bg-yellow-400 font-bold h-full transition text-center flex items-center justify-center">
-                <div class="text-xs">伝票更新</div>
+              <button class="bg-[#ffe16a] hover:bg-yellow-400 font-bold h-full transition text-center flex items-center justify-center" onclick="orderSummaryList('')">
+                <div class="text-sm">伝票更新</div>
               </button>
-              <button class="ss-600 hover:opacity-80 font-bold w-full h-full text-white text-center flex items-center justify-center transition" disabled>
-                <div class="text-xs">一括で印刷</div>
+              <button class="ss-600 hover:opacity-80 font-bold w-full h-full text-center flex items-center justify-center transition disabled:bg-gray-200 disabled:text-gray-400" onclick="showTotalPrintModal()" disabled>
+                <div class="text-sm">一括で印刷</div>
               </button>
               <div class="grid bg-neutral-200 p-1 gap-1">
                 <span class="text-xs flex gap-1 align-center">検品票は伝票
@@ -622,15 +651,15 @@
             </div>
             <!-- テーブルヘッダー (SS: 「受入場所」) -->
             <div class="grid grid-cols-8 border ss-200">
-              <div class="border-r text-center font-bold text-xs specific-table-delivery-print py-1">伝票
+              <div class="border-r text-center font-bold specific-table-delivery-print">伝票
                 <div class="tooltip"><div>伝票番号</div><div>ダブルクリック</div><div>検品票印刷</div></div>
               </div>
-              <div class="col-span-4 border-r text-center font-bold text-xs py-1">受入場所</div>
-              <div class="border-r text-center font-bold text-xs specific-table-delivery-print py-1">点数
+              <div class="col-span-4 border-r text-center font-bold">受入場所</div>
+              <div class="border-r text-center font-bold specific-table-delivery-print">点数
                 <div class="tooltip"><div>点数</div><div>ダブルクリック</div><div>注文書印刷</div></div>
               </div>
-              <div class="border-r text-center font-bold text-xs py-1">方向</div>
-              <div class="text-center font-bold text-xs py-1">都度</div>
+              <div class="border-r text-center font-bold">方向</div>
+              <div class="text-center font-bold">都度</div>
             </div>
           </div>
 
