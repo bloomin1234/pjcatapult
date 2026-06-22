@@ -43,14 +43,14 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <!-- block content -->
-  <div class="w-full p-1 w-[1920px] h-screen overflow-hidden mx-auto bg-[#D9D9D9]">
+  <div class="w-full p-1 w-[1920px] h-screen overflow-hidden mx-auto bg-[#F5F5F4]">
     <!-- menu section -->
-    <div class="p-2 mb-1 bg-[#4a4949] rounded-md">
+    <div class="p-2 mb-1 bg-neutral-100 border border-neutral-300">
         <div class="grid grid-cols-12 gap-1">
             <a href="#" role="button">
-                <div class="text-sm bg-[#9dc3e6] hover:bg-blue-400 hover:font-bold rounded border-4 border-x-[#5c7286] border-y-[#aed7fc] h-full py-3 transition flex items-center justify-center">閉じる</div>
+                <div class="text-sm bg-[#363636] hover:bg-[#727272] text-white font-bold h-full py-3 transition flex items-center justify-center">閉じる</div>
             </a>
-            <div class="col-start-3 col-span-4 grid grid-cols-7 bg-[#bdd7ee] text-xl rounded flex items-center justify-center text-center ml-5">
+            <div class="col-start-3 col-span-4 grid grid-cols-7 bg-white border border-neutral-300 text-xl flex items-center justify-center text-center ml-5">
                 <div class="col-span-1">特</div>
                 <div class="col-span-1">別</div>
                 <div class="col-span-1">集</div>
@@ -61,10 +61,10 @@
             </div>
             <div class="col-start-1 col-span-2 grid grid-cols-2 mt-5">
                 <div class="col-span-2 grid ">
-                    <span class="text-center bg-[#3C8865] py-1 text-white font-bold rounded-t">取引先一覧</span>
+                    <span class="text-center bg-[#0F5132] py-1 text-white font-bold">取引先一覧</span>
                 </div>
                 <div class="col-span-2 grid">
-                    <div class="grid grid-cols-6 group border text-sm bg-[#a9d18e]">
+                    <div class="grid grid-cols-6 group border text-sm bg-[#E9F1EC]">
                         <div class="col-span-2 grid border-r">
                             <span class="text-center">番号</span>
                         </div>
@@ -76,15 +76,15 @@
                 <div id="clientdata" class="col-span-2 h-[805px] fixed-content overflow-y-auto">
                     <!-- sample client list -->
                     <div class="div-main grid grid-cols-6 group text-base bg-white">
-                        <div class="col-span-2 group-hover:font-bold group-hover:bg-[#f7b580] cursor-pointer border-r border-b border-gray-200 text-center">1001</div>
+                        <div class="col-span-2 group-hover:font-bold group-hover:bg-[#E9F1EC] cursor-pointer border-r border-b border-gray-200 text-center">1001</div>
                         <div class="col-span-4 grid">
-                            <span class="group-hover:text-zinc-800 group-hover:font-bold group-hover:bg-[#f7b580] cursor-pointer border-r border-b border-gray-200 pl-2">サンプル食品株式会社</span>
+                            <span class="group-hover:text-zinc-800 group-hover:font-bold group-hover:bg-[#E9F1EC] cursor-pointer border-r border-b border-gray-200 pl-2">サンプル食品株式会社</span>
                         </div>
                     </div>
                     <div class="div-main grid grid-cols-6 group text-base bg-white">
-                        <div class="col-span-2 group-hover:font-bold group-hover:bg-[#f7b580] cursor-pointer border-r border-b border-gray-200 text-center">1002</div>
+                        <div class="col-span-2 group-hover:font-bold group-hover:bg-[#E9F1EC] cursor-pointer border-r border-b border-gray-200 text-center">1002</div>
                         <div class="col-span-4 grid">
-                            <span class="group-hover:text-zinc-800 group-hover:font-bold group-hover:bg-[#f7b580] cursor-pointer border-r border-b border-gray-200 pl-2">テスト青果株式会社</span>
+                            <span class="group-hover:text-zinc-800 group-hover:font-bold group-hover:bg-[#E9F1EC] cursor-pointer border-r border-b border-gray-200 pl-2">テスト青果株式会社</span>
                         </div>
                     </div>
                 </div>
@@ -93,39 +93,39 @@
             <div class="col-span-4 grid grid-cols-3 grid-rows-6 ml-5">
                 <div class="col-span-3 mt-5">
                     <div class="grid grid-cols-12 mb-2">
-                        <div class="col-span-2 bg-[#a9d18e] rounded-l text-center flex items-center justify-center">取引先</div>
+                        <div class="col-span-2 bg-[#E9F1EC] text-center flex items-center justify-center">取引先</div>
                         <input id="dis_client" class="client col-span-2 bg-white text-center" data-value=" ">
-                        <input id="dis_client_name" class="client col-span-5 bg-white text-center border rounded-r" data-value=" ">
+                        <input id="dis_client_name" class="client col-span-5 bg-white text-center border" data-value=" ">
                     </div>
                     <div class="grid grid-cols-12 mb-2">
-                        <div class="col-span-2 bg-[#a9d18e] rounded-l text-center flex items-center justify-center">期 間</div>
+                        <div class="col-span-2 bg-[#E9F1EC] text-center flex items-center justify-center">期 間</div>
                         <input id="start_date" class="col-span-3 bg-white text-center" data-value=" ">
-                        <div class="col-span-1 bg-[#a9d18e] text-center flex items-center justify-center">~</div>
-                        <input id="end_date" class="col-span-3 bg-white text-center rounded-r" data-value=" ">
+                        <div class="col-span-1 bg-[#E9F1EC] text-center flex items-center justify-center">~</div>
+                        <input id="end_date" class="col-span-3 bg-white text-center border" data-value=" ">
                         <a href="#" role="button" class="col-span-3 ml-2">
-                            <div class="bg-[#ffe16a] hover:bg-yellow-400 hover:font-bold rounded border-4 border-x-[#6a5a2a] border-y-[#ffed64] h-12 flex items-center justify-center" onclick="clientList()">抽出</div>
+                            <div class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-bold h-12 flex items-center justify-center" onclick="clientList()">抽出</div>
                         </a>
                     </div>
                 </div>
                 <div class="col-span-3  grid grid-cols-9">
-                    <a id="btn_daily_sales" role="button" target="_blank" class="col-start-2 col-span-3 text-center h-fit rounded border-4 bg-yellow-200 border-x-yellow-400
-                    border-y-yellow-300 py-4 flex items-center justify-center disabled">
+                    <a id="btn_daily_sales" role="button" target="_blank" class="col-start-2 col-span-3 text-center h-fit border bg-neutral-100 border-neutral-300
+                    py-4 flex items-center justify-center disabled">
                         取引先別<br>
                         日別売上一覧
                     </a>
-                    <a id="btn_summary_by_destination" target="_blank" role="button" class="col-start-6 col-span-3 text-center h-fit rounded border-4 bg-orange-200 border-x-orange-400
-                    border-y-orange-300 py-4 flex items-center justify-center disabled">
+                    <a id="btn_summary_by_destination" target="_blank" role="button" class="col-start-6 col-span-3 text-center h-fit border bg-neutral-100 border-neutral-300
+                    py-4 flex items-center justify-center disabled">
                         持込先別<br>
                         売上集計表
                     </a>
                 </div>
                 <div class="col-span-3 grid grid-cols-9">
-                    <a id="btn_daily_detail_by_client" target="_blank" role="button" class="col-start-2 col-span-3 text-center h-fit rounded border-4 bg-blue-200 border-x-blue-400
-                    border-y-blue-300 py-4 flex items-center justify-center disabled">
+                    <a id="btn_daily_detail_by_client" target="_blank" role="button" class="col-start-2 col-span-3 text-center h-fit border bg-neutral-100 border-neutral-300
+                    py-4 flex items-center justify-center disabled">
                         日別売上明細<br>
                         確認用
                     </a>
-                    <a id="btn_per_account_download_csv" role="button" class="col-start-6 col-span-3 text-center h-fit rounded border-4 bg-[#9dc3e6] hover:bg-blue-400 hover:font-bold border-x-[#5c7286] border-y-[#aed7fc] cursor-pointer py-1 flex items-center justify-center" onclick="downloadCSVAllAccount(event)">
+                    <a id="btn_per_account_download_csv" role="button" class="col-start-6 col-span-3 text-center h-fit border bg-[#0F5132] hover:bg-[#0A3D26] text-white font-bold cursor-pointer py-1 flex items-center justify-center" onclick="downloadCSVAllAccount(event)">
                         会計システム<br>
                         連携データ<br>
                         (全顧客データ)
@@ -199,8 +199,8 @@
 
     function setTagColorDiv(){
         $('#clientdata').on('click','.div-main',function () {
-            $(this).parent().find('.div-main').removeClass('bg-[#f7b580]');
-            $(this).addClass('bg-[#f7b580]');
+            $(this).parent().find('.div-main').removeClass('bg-[#E9F1EC]');
+            $(this).addClass('bg-[#E9F1EC]');
         });
     }
 
@@ -216,37 +216,37 @@
 
     function enableButton(){
         btnDailyReport.classList.remove('disabled');
-        btnDailyReport.classList.remove('bg-yellow-200', 'border-x-yellow-400', 'border-y-yellow-300');
-        btnDailyReport.classList.add('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+        btnDailyReport.classList.remove('bg-neutral-100', 'border-neutral-300');
+        btnDailyReport.classList.add('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnDailyReport.setAttribute('onclick', 'summaryReport("dailySalesSummary")');
 
         btnSummaryByDestination.classList.remove('disabled');
-        btnSummaryByDestination.classList.remove('bg-orange-200', 'border-x-orange-400', 'border-y-orange-300');
-        btnSummaryByDestination.classList.add('bg-[#feb888]', 'hover:bg-orange-400', 'hover:font-bold', 'border-x-[#866441]', 'border-y-[#ffc28f]', 'cursor-pointer');
+        btnSummaryByDestination.classList.remove('bg-neutral-100', 'border-neutral-300');
+        btnSummaryByDestination.classList.add('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnSummaryByDestination.setAttribute('onclick', 'summaryReport("summaryByDestination")');
 
         btnDailyDetail.classList.remove('disabled');
-        btnDailyDetail.classList.remove('bg-blue-200', 'border-x-blue-400', 'border-y-blue-300');
-        btnDailyDetail.classList.add('bg-[#9dc3e6]', 'hover:bg-blue-400', 'hover:font-bold', 'border-x-[#5c7286]', 'border-y-[#aed7fc]', 'cursor-pointer');
+        btnDailyDetail.classList.remove('bg-neutral-100', 'border-neutral-300');
+        btnDailyDetail.classList.add('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnDailyDetail.setAttribute('onclick', 'summaryReport("dailyDetailByClient")');
     }
 
     function disableButton(){
         btnDailyReport.classList.add('disabled');
-        btnDailyReport.classList.add('bg-yellow-200', 'border-x-yellow-400', 'border-y-yellow-300');
-        btnDailyReport.classList.remove('bg-[#ffe16a]', 'hover:bg-yellow-400', 'hover:font-bold', 'border-x-[#6a5a2a]', 'border-y-[#ffed64]', 'cursor-pointer');
+        btnDailyReport.classList.add('bg-neutral-100', 'border-neutral-300');
+        btnDailyReport.classList.remove('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnDailyReport.removeAttribute('onclick', '');
         btnDailyReport.removeAttribute('href', '');
 
         btnSummaryByDestination.classList.add('disabled');
-        btnSummaryByDestination.classList.add('bg-orange-200', 'border-x-orange-400', 'border-y-orange-300');
-        btnSummaryByDestination.classList.remove('bg-[#feb888]', 'hover:bg-orange-400', 'hover:font-bold', 'border-x-[#866441]', 'border-y-[#ffc28f]', 'cursor-pointer');
+        btnSummaryByDestination.classList.add('bg-neutral-100', 'border-neutral-300');
+        btnSummaryByDestination.classList.remove('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnSummaryByDestination.removeAttribute('onclick', '');
         btnSummaryByDestination.removeAttribute('href', '');
 
         btnDailyDetail.classList.add('disabled');
-        btnDailyDetail.classList.add('bg-blue-200', 'border-x-blue-400', 'border-y-blue-300');
-        btnDailyDetail.classList.remove('bg-[#9dc3e6]', 'hover:bg-blue-400', 'hover:font-bold', 'border-x-[#5c7286]', 'border-y-[#aed7fc]', 'cursor-pointer');
+        btnDailyDetail.classList.add('bg-neutral-100', 'border-neutral-300');
+        btnDailyDetail.classList.remove('bg-[#0F5132]', 'hover:bg-[#0A3D26]', 'text-white', 'font-bold', 'cursor-pointer');
         btnDailyDetail.removeAttribute('onclick', '');
         btnDailyDetail.removeAttribute('href', '');
     }
