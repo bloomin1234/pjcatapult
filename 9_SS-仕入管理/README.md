@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 9_SS-仕入管理 — モックアップ
 
 SMART STOCK 仕入管理画面のメニューボタン各遷移先を、スタンドアロン HTML モックアップとして収録。

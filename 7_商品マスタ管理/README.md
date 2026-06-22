@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 7_商品マスタ管理 — モックアップ
 
 SO / SS 両系の商品マスタ管理画面（`/productmastermanagement/`）を静的HTMLモックアップとして収録。

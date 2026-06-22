@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 8_SO-受注管理 — モックアップ
 
 SMART ORDER 受注管理画面のメニューボタン各遷移先を、スタンドアロン HTML モックアップとして収録。
