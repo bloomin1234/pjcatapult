@@ -50,24 +50,24 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <!-- block content の内容 -->
-<div class="p-2 w-full h-screen min-w-screen min-h-screen overflow-hidden mx-auto bg-[#E9E5DB] flex flex-col"
+<div class="p-2 w-full h-screen min-w-screen min-h-screen overflow-hidden mx-auto bg-[#F5F5F4] flex flex-col"
     x-data="{
         editFormalModal: false, fixClientNoteModal:false,
     }"
     x-cloak>
     <!-- menu section -->
-    <div class="p-2 mb-2 rounded-md border border-neutral-300 bg-neutral-100">
+    <div class="p-2 mb-2 border border-neutral-300 bg-neutral-100">
         <div class="grid grid-cols-12 gap-1">
 
             <div class="col-span-1 grid grid-rows-2 gap-1">
                 <!-- Back Btn-->
                 <a href="#" role="button">
-                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xl rounded h-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i><span class="my-auto">戻る</span></div>
+                    <div class="bg-[#363636] hover:bg-[#727272] text-white font-bold text-xlh-full flex items-center justify-center transition"><i class="fa-solid fa-caret-left mr-2 my-auto"></i><span class="my-auto">戻る</span></div>
                 </a>
                 <!-- Refresh Btn -->
                 <a href="#" role="button">
                     <!-- SMO-IMP-009 Start -->
-                    <div class="bg-[#C7996B] hover:bg-[#d8b897] text-white  font-bold rounded h-full flex items-center justify-center transition" onclick="customerList(year_id.value, month_id.value), setDateRange(year_id.value, month_id.value), resetPrintBtnState();"><i class="fa-solid fa-arrows-rotate mr-2"></i><span>取引先更新</span></div>
+                    <div class="bg-[#0F5132] hover:bg-[#0A3D26] text-white  font-boldh-full flex items-center justify-center transition" onclick="customerList(year_id.value, month_id.value), setDateRange(year_id.value, month_id.value), resetPrintBtnState();"><i class="fa-solid fa-arrows-rotate mr-2"></i><span>取引先更新</span></div>
                     <!-- SMO-IMP-009 End -->
                 </a>
             </div>
@@ -77,39 +77,39 @@
                     <span class="font-bold">納品書 · 請求書印刷</span>
                 </div>
                 <!-- Month Select -->
-                <div class="col-span-4 row-start-2 rounded border">
+                <div class="col-span-4 row-start-2border">
                     <div class="grid grid-cols-4 h-full">
-                        <input id="year_id" class="bg-white text-center rounded-l" data-value=" " disabled>
-                        <div class="bg-[#a9d18e] flex items-center justify-center font-bold">年</div>
+                        <input id="year_id" class="bg-white text-center" data-value=" " disabled>
+                        <div class="bg-[#E9F1EC] flex items-center justify-center font-bold">年</div>
                         <input id="month_id" class="bg-white text-center" data-value=" " disabled>
-                        <div class="bg-[#a9d18e] flex items-center justify-center rounded-r font-bold">月</div>
+                        <div class="bg-[#E9F1EC] flex items-center justify-center font-bold">月</div>
                     </div>
                 </div>
                 <div class="col-span-4 row-start-3">
                     <div class="grid grid-cols-2 gap-1 h-full">
-                        <a id="prev_date" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" data-diff="-1" href="#" role="button"><i class="fa-solid fa-angle-left mr-2"></i>前月</a>
-                        <a id="next_date" class="bg-[#3C8865] text-white hover:bg-[#77ac93] font-bold rounded text-center flex items-center justify-center h-full transition" data-diff="1" href="#" role="button">翌月<i class="fa-solid fa-angle-right ml-2"></i></a>
+                        <a id="prev_date" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-boldtext-center flex items-center justify-center h-full transition" data-diff="-1" href="#" role="button"><i class="fa-solid fa-angle-left mr-2"></i>前月</a>
+                        <a id="next_date" class="bg-[#0F5132] text-white hover:bg-[#0A3D26] font-boldtext-center flex items-center justify-center h-full transition" data-diff="1" href="#" role="button">翌月<i class="fa-solid fa-angle-right ml-2"></i></a>
                     </div>
                 </div>
             </div>
             <!-- SMO-IMP-009 Start -->
              <!-- Period Select -->
             <div class="col-span-2 grid grid-rows-3 gap-1">
-                <div class="row-start-1 rounded flex items-center justify-center bg-[#E5DAAC] font-bold">期間内検索</div>
+                <div class="row-start-1flex items-center justify-center bg-[#E9F1EC] font-bold">期間内検索</div>
                 <div class="row-start-2 grid grid-cols-5 gap-1">
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(10)">⁓10日</button>
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(15)">⁓15日</button>
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(20)">⁓20日</button>
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(25)">⁓25日</button>
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] text-white font-bold rounded h-full flex items-center justify-center" onclick="setStaticDate(0)">全件</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-boldh-full flex items-center justify-center" onclick="setStaticDate(10)">⁓10日</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-boldh-full flex items-center justify-center" onclick="setStaticDate(15)">⁓15日</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-boldh-full flex items-center justify-center" onclick="setStaticDate(20)">⁓20日</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-boldh-full flex items-center justify-center" onclick="setStaticDate(25)">⁓25日</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] text-white font-boldh-full flex items-center justify-center" onclick="setStaticDate(0)">全件</button>
                 </div>
                 <div class="row-start-3 grid grid-cols-5 gap-1">
                     <div class="col-span-4 flex">
-                        <input type="text" name="start-date" id="date_picker_start" class="w-full h-full rounded-md border-1 text-[#363636]">
+                        <input type="text" name="start-date" id="date_picker_start" class="w-full h-full border-1 text-[#363636]">
                         <span class="grow-0 mx-1 flex items-center justify-center">⁓</span>
-                        <input type="text" name="end-date" id="date_picker_end" class="w-full h-full rounded-md border-1 text-[#363636]">
+                        <input type="text" name="end-date" id="date_picker_end" class="w-full h-full border-1 text-[#363636]">
                     </div>
-                    <button class="bg-[#3C8865] hover:bg-[#77ac93] font-bold text-white rounded h-full flex items-center justify-center" onclick="filterList()">検索</button>
+                    <button class="bg-[#0F5132] hover:bg-[#0A3D26] font-bold text-whiteh-full flex items-center justify-center" onclick="filterList()">検索</button>
                 </div>
             </div>
             <!-- SMO-IMP-009 End -->
@@ -125,15 +125,15 @@
                     </div>
                 </div>
 
-                <div class="row-start-2 grid grid-cols-4 border rounded-l overflow-hidden">
-                    <div class="bg-[#a9d18e] flex items-center justify-center font-bold">取引先</div>
+                <div class="row-start-2 grid grid-cols-4 border overflow-hidden">
+                    <div class="bg-[#E9F1EC] flex items-center justify-center font-bold">取引先</div>
                     <input id="client_id" class="bg-white text-center text-base" disabled>
-                    <input id="client_name" class="grid col-span-2 bg-white text-center text-base rounded-r" disabled>
+                    <input id="client_name" class="grid col-span-2 bg-white text-center text-base" disabled>
                 </div>
-                <div class="row-start-3 grid grid-cols-4 border rounded-l overflow-hidden">
-                    <div class="bg-[#a9d18e] flex items-center justify-center font-bold">持込先</div>
+                <div class="row-start-3 grid grid-cols-4 border overflow-hidden">
+                    <div class="bg-[#E9F1EC] flex items-center justify-center font-bold">持込先</div>
                     <input id="destination_id" class="bg-white text-center text-base" onchange="inputtingPrint()">
-                    <input id="destination_name" class="grid col-span-2 bg-white text-center text-base rounded-r" disabled>
+                    <input id="destination_name" class="grid col-span-2 bg-white text-center text-base" disabled>
                 </div>
             </div>
 
@@ -164,33 +164,33 @@
                     <!-- 左2マス -->
                     <div class="col-span-2 grid grid-rows-2 gap-1">
                         <!-- 合算番号 -->
-                        <div class="grid grid-cols-6 border rounded-l overflow-hidden h-full">
-                            <div class="col-span-2 bg-[#a9d18e] flex items-center justify-center font-bold">合算番号</div>
-                            <input id="set_zero_id" class="col-span-4 bg-white text-center text-base rounded-r" disabled>
+                        <div class="grid grid-cols-6 border overflow-hidden h-full">
+                            <div class="col-span-2 bg-[#E9F1EC] flex items-center justify-center font-bold">合算番号</div>
+                            <input id="set_zero_id" class="col-span-4 bg-white text-center text-base" disabled>
                         </div>
                         <!-- 代表請求先 -->
-                        <div class="grid grid-cols-6 border rounded-l overflow-hidden h-full">
-                            <div class="col-span-2 bg-[#a9d18e] flex items-center justify-center text-sm font-bold">代表請求先</div>
-                            <input id="destination_name_no" class="col-span-4 bg-white text-center text-base rounded-r">
+                        <div class="grid grid-cols-6 border overflow-hidden h-full">
+                            <div class="col-span-2 bg-[#E9F1EC] flex items-center justify-center text-sm font-bold">代表請求先</div>
+                            <input id="destination_name_no" class="col-span-4 bg-white text-center text-base">
                         </div>
                     </div>
 
                     <!-- 右3マス（ボタンエリア） -->
                     <div class="col-span-3 grid grid-cols-3 gap-1">
                         <a id="print_print_zero" target="_blank">
-                            <div class="bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center text-center">
+                            <div class="bg-[#0F5132] hover:bg-[#0A3D26] font-bold text-whiteh-full flex items-center justify-center text-center">
                                 単価未設定<br>抽出
                             </div>
                         </a>
                         <button id="print_btn_1"
-                            class=" bg-[#C7996B] hover:bg-[#d8b897] text-white rounded h-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 transition-all" type="button" disabled>
+                            class=" bg-[#0F5132] hover:bg-[#0A3D26] text-whiteh-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 transition-all" type="button" disabled>
                             <div id="prnt_btn_normal" class="transition-all font-bold">請求書発行</div>
                             <div id="prnt_btn_process" class="flex flex-col hidden transition-all font-bold"><i class="fa-solid fa-spinner animate-spin"></i><span>発行中</span></div>
                             <div id="prnt_btn_done" class="flex flex-col hidden transition-all font-bold"><span>ダウンロード完了</span></div>
                             <div id="prnt_btn_failed" class="flex flex-col hidden transition-all font-bold text-red-700"><i class="fa-solid fa-triangle-exclamation"></i><span>エラー</span></div>
                         </button>
                         <a id="print_btn_2" target="_blank"
-                            class="bg-[#C7996B] hover:bg-[#d8b897] rounded h-full flex items-center justify-center text-white">
+                            class="bg-[#0F5132] hover:bg-[#0A3D26]h-full flex items-center justify-center text-white">
                             <span class="text-center font-bold">店舗別<br>売上表</span>
                         </a>
                     </div>
@@ -201,15 +201,15 @@
         </div>
     </div>
     <!-- content section -->
-    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] rounded-md drop-shadow flex-1 h-full overflow-hidden">
+    <div class="p-2 border border-neutral-300 bg-[#D9D9D9] drop-shadow flex-1 h-full overflow-hidden">
         <div class="grid grid-cols-18 h-full gap-1">
             <!-- 左：取引先一覧＋請求先番号 -->
             <div class="col-span-6 grid grid-cols-12 gap-1">
                 <!-- 取引先一覧 -->
                 <div class="col-span-8">
                     <div class="grid grid-rows-3 gap-1 h-[95px]">
-                        <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">取引先一覧</div>
-                        <div class="row-start-2 border row-span-2 grid grid-cols-22 bg-[#a9d18e]">
+                        <div class="py-1 bg-[#0F5132]text-md text-white flex items-center justify-center font-bold">取引先一覧</div>
+                        <div class="row-start-2 border row-span-2 grid grid-cols-22 bg-[#E9F1EC]">
                             <div class="col-span-2 border-r text-sm flex items-center justify-center">番号</div>
                             <div class="col-span-6 border-r text-sm flex items-center justify-center">取引先名</div>
                             <div class="col-span-3 border-r text-sm flex items-center justify-center text-center">振込<br>手数料</div>
@@ -230,8 +230,8 @@
                 <!-- 請求先番号 -->
                 <div class="col-span-4">
                     <div class="grid grid-rows-3 gap-1 h-[95px]">
-                        <div class="py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold text-nowrap">請求先番号</div>
-                        <div class="row-start-2 border row-span-2 grid grid-cols-12 bg-[#a9d18e]">
+                        <div class="py-1 bg-[#0F5132]text-md text-white flex items-center justify-center font-bold text-nowrap">請求先番号</div>
+                        <div class="row-start-2 border row-span-2 grid grid-cols-12 bg-[#E9F1EC]">
                             <div class="col-span-3 border-r text-sm flex items-center justify-center">請求順</div>
                             <div class="col-span-7 border-r text-sm flex items-center justify-center">店舗名</div>
                             <div class="col-span-2 text-sm flex items-center justify-center">合No</div>
@@ -250,34 +250,34 @@
             <div class="col-span-12">
                 <div class="grid grid-rows-3 gap-1 h-[95px]">
                     <div class="grid grid-cols-9 gap-1">
-                        <div class="col-span-2 py-1 bg-[#3C8865] rounded text-md text-white flex items-center justify-center font-bold">取引先別売上一覧</div>
+                        <div class="col-span-2 py-1 bg-[#0F5132]text-md text-white flex items-center justify-center font-bold">取引先別売上一覧</div>
                         <div class="col-span-3 grid grid-cols-12">
                             <!---- text -->
-                            <div class="col-span-3 bg-[#a9d18e] text-center text-xs flex items-center justify-center rounded-l">取引先番号</div>
+                            <div class="col-span-3 bg-[#E9F1EC] text-center text-xs flex items-center justify-center">取引先番号</div>
                             <input id="client_id_sum" class="col-span-2 bg-white text-center" disabled>
-                            <div class="col-span-3 bg-[#a9d18e] text-center text-xs flex items-center justify-center">取引先名</div>
-                            <input id="client_name_sum" class="col-span-4 bg-white text-center rounded-r" disabled>
+                            <div class="col-span-3 bg-[#E9F1EC] text-center text-xs flex items-center justify-center">取引先名</div>
+                            <input id="client_name_sum" class="col-span-4 bg-white text-center" disabled>
                         </div>
                         <!-- OHM edit -->
                         <div class="col-span-4 grid grid-cols-8 gap-1">
                             <!-- SMO-IMP-011 -->
                             <button id="download_full_csv" onclick="downloadCSV(null)" class="col-span-3">
-                                <div class="bg-[#C7996B] hover:bg-[#d8b897] font-bold text-white rounded h-full flex items-center justify-center">
+                                <div class="bg-[#0F5132] hover:bg-[#0A3D26] font-bold text-whiteh-full flex items-center justify-center">
                                     <i class="fa-solid fa-download mr-1"></i>
                                     CSV全ダウンロード
                                 </div>
                             </button>
                             <!-- OHM edit: button download csv -->
-                            <button id="btn_download_csv_01" target="_blank" class="bg-[#C7996B] hover:bg-[#d8b897] text-white rounded h-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 col-span-3" disabled>
+                            <button id="btn_download_csv_01" target="_blank" class="bg-[#0F5132] hover:bg-[#0A3D26] text-whiteh-full flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500 col-span-3" disabled>
                                 <div class="h-full flex items-center justify-center font-bold ">
                                     <i class="fa-solid fa-download mr-1"></i>
                                     CSVダウンロード
                                 </div>
                             </button>
-                            <input id="sum_total_id" class="col-span-2 bg-white text-center rounded" disabled>
+                            <input id="sum_total_id" class="col-span-2 bg-white text-center" disabled>
                         </div>
                     </div>
-                    <div class="row-start-2 row-span-2 grid border bg-[#a9d18e] overflow-auto">
+                    <div class="row-start-2 row-span-2 grid border bg-[#E9F1EC] overflow-auto">
                         <div class="grid grid-cols-25">
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">出荷日</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">伝票<br>番号</div>
@@ -287,15 +287,15 @@
                             <!-- jan_support=true ブランチ: col-span-2 -->
                             <div class="border-r text-sm flex items-center justify-center col-span-2
                             ">形状<br>大きさ等</div>
-                            <!-- jan_support=true ブランチ: bg-[#8ab8a3] -->
-                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#8ab8a3]
+                            <!-- jan_support=true ブランチ: bg-[#0F5132] text-white -->
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#0F5132] text-white
                             ">入数</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">入数<br>単位</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>容量</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>単位</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">注文<br>数量</div>
                             <!-- jan_support=true ブランチ -->
-                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#8ab8a3]">単品<br>単価</div>
+                            <div class="col-span-1 border-r text-sm flex items-center justify-center bg-[#0F5132] text-white">単品<br>単価</div>
                             <div class="col-span-2 border-r text-sm flex items-center justify-center">ｹｰｽ<br>単価</div>
                             <div class="col-span-2 border-r text-sm flex items-center justify-center">税前<br>金額</div>
                             <div class="col-span-1 border-r text-sm flex items-center justify-center">消費<br>税率</div>
@@ -340,7 +340,7 @@
             x-transition:leave-start="opacity-100 transform scale-200"
             x-transition:leave-end="opacity-0 transform scale-95"
             x-cloak
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            class="inline-block align-bottom bg-white text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
             >
                 <!-- Header -->
                 <div class="grid grid-cols-3 bg-white px-4 pt-2 pb-2">
@@ -354,7 +354,7 @@
                     </div>
                 </div>
                 <!-- content -->
-                <div class="bg-[#203864] px-4 pb-2">
+                <div class="bg-[#0F5132] px-4 pb-2">
                     <div class="sm:flex sm:items-start w-full">
                         <div class="mt-2 text-center sm:mt-0 sm:text-left w-full">
                             <div class="mt-2">
@@ -362,26 +362,26 @@
                                 <div class="grid text-sm">
                                     <div class="col-span-1 text-left mt-2 mx-5">
                                         <div class="grid grid-cols-5">
-                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">取引先番号</div>
+                                            <div class="col-start-1 col-span-2 bg-[#E9F1EC] text-sm flex items-center justify-center">取引先番号</div>
                                             <input id="pk_id" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" hidden>
                                             <input id="customer_number" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" value="" disabled>
                                         </div>
                                     </div>
                                     <div class="col-span-1 text-left mt-1 mx-5">
                                         <div class="grid grid-cols-5">
-                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">取引先名</div>
+                                            <div class="col-start-1 col-span-2 bg-[#E9F1EC] text-sm flex items-center justify-center">取引先名</div>
                                             <input id="customer_name" class="col-start-3 col-span-2 bg-[#f8cbad] text-sm text-center w-full mr-2" disabled>
                                         </div>
                                     </div>
                                     <div class="col-span-1 text-left mt-1 mx-5">
                                         <div class="grid grid-cols-5">
-                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">正式名称</div>
+                                            <div class="col-start-1 col-span-2 bg-[#E9F1EC] text-sm flex items-center justify-center">正式名称</div>
                                             <input id="formal_name" class="col-start-3 col-span-2 bg-white text-sm text-center w-full mr-2">
                                         </div>
                                     </div>
                                     <div class="col-span-1 text-left mt-1 mx-5">
                                         <div class="grid grid-cols-5">
-                                            <div class="col-start-1 col-span-2 bg-[#a9d18e] text-sm flex items-center justify-center">読み</div>
+                                            <div class="col-start-1 col-span-2 bg-[#E9F1EC] text-sm flex items-center justify-center">読み</div>
                                             <input id="reading_id" class="col-start-3 col-span-1 bg-[#f8cbad] text-sm text-center w-full" value="" disabled>
                                         </div>
                                     </div>
@@ -392,9 +392,9 @@
                     </div>
                 </div>
                 <!-- footer -->
-                <div class="grid grid-cols-6 bg-[#203864] px-4 py-3">
+                <div class="grid grid-cols-6 bg-[#0F5132] px-4 py-3">
                     <div class="col-start-4 col-span-2">
-                        <button onclick="editFormalName()" @click="editFormalModal = false"  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-4 bg-zinc-200 hover:bg-zinc-300 text-base font-medium text-gray-700">
+                        <button onclick="editFormalName()" @click="editFormalModal = false"  class="w-full inline-flex justify-center border border-transparent shadow-sm px-5 py-4 bg-zinc-200 hover:bg-zinc-300 text-base font-medium text-gray-700">
                             追加
                         </button>
                     </div>
@@ -430,12 +430,12 @@
             x-transition:leave-start="opacity-100 transform scale-200"
             x-transition:leave-end="opacity-0 transform scale-95"
             x-cloak
-            class="relative inline-block align-bottom bg-neutral-100 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle p-5 w-[450px] h-fit"
+            class="relative inline-block align-bottom bg-neutral-100 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle p-5 w-[450px] h-fit"
             >
                 <!-- Header -->
                 <div class="flex gap-2">
-                    <div class="grid rounded-full bg-green-200 w-[50px] h-[50px] my-auto border-1 border border-green-300">
-                        <i class="fa-regular fas fa-print fa-lg text-green-500 m-auto"></i>
+                    <div class="grid bg-[#E9F1EC] w-[50px] h-[50px] my-auto border-1 border border-[#0F5132]">
+                        <i class="fa-regular fas fa-print fa-lg text-[#0F5132] m-auto"></i>
                     </div>
                     <span class="my-auto font-bold text-xl">請求書にコメントを追記</span>
                 </div>
@@ -443,7 +443,7 @@
                 <div class="w-full h-fit grid content-center p-2 top-0 left-0">
                     <!-- 備考 -->
                     <div>
-                        <div class="bg-[#a9d18e] w-full h-10 flex items-center justify-center font-bold">備考</div>
+                        <div class="bg-[#E9F1EC] w-full h-10 flex items-center justify-center font-bold">備考</div>
                         <textarea id="remark_note" class="form-control block w-full max-h-[180px] min-h-[120px]  px-3 py-1.5 text-base text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 focus:text-gray-700 focus:bg-white focus:border-gray-100 focus:outline-none"
                             maxlength="200"
                             oninput="updateCharCount()" rows="5"></textarea>
@@ -454,7 +454,7 @@
                 </div>
                 <!-- Footer -->
                 <div class="bottom-[10px] right-[10px] flex justify-end gap-4 w-full">
-                    <button id="client_note_btn" class="w-[120px] py-2 rounded-md border border-green-600 bg-green-400 text-base text-white hover:bg-green-500 transition"
+                    <button id="client_note_btn" class="w-[120px] py-2 border border-[#0F5132] bg-[#0F5132] text-base text-white hover:bg-[#0A3D26] transition"
                     onclick="updateClientNote()" @click="fixClientNoteModal = false">
                         確定
                     </button>
@@ -605,7 +605,7 @@ var pickerYear = $('#year_id').pickadate({
 
                 // 番号
                 divClientId = document.createElement('div');
-                divClientId.classList.add('col-span-2', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'border-r', 'text-center', 'text-sm');
+                divClientId.classList.add('col-span-2', 'group-hover:bg-[#E9F1EC]', 'cursor-pointer', 'border-r', 'text-center', 'text-sm');
                 divClientId.innerHTML = ClientListObj[id].client_id;
                 divClientId.setAttribute('ondblclick', 'setAccountLedger(' + currentYear + ',' + currentMonth + ',' + ClientListObj[id]['pk'] + ', ' + ClientListObj[id].client_id + ', "' + ClientListObj[id].client_name + '", "' + ClientListObj[id].formal_name + '", "' + ClientListObj[id].pronunciation + '")');
 
@@ -614,7 +614,7 @@ var pickerYear = $('#year_id').pickadate({
                 divClientName.classList.add('col-span-6', 'grid', 'div-client-name', 'border-l','overflow-show');
 
                 let spanClientName = document.createElement('span');
-                spanClientName.classList.add('col-span-4', 'group-hover:text-zinc-800', 'group-hover:bg-[#f7b580]', 'cursor-pointer', 'pl-1' , 'whitespace-nowrap', 'truncate', 'hover:z-10', 'hover:bg-white', 'text-sm');
+                spanClientName.classList.add('col-span-4', 'group-hover:text-zinc-800', 'group-hover:bg-[#E9F1EC]', 'cursor-pointer', 'pl-1' , 'whitespace-nowrap', 'truncate', 'hover:z-10', 'hover:bg-white', 'text-sm');
                 spanClientName.innerHTML = ClientListObj[id].client_name;
                 spanClientName.title = ClientListObj[id].client_name;
                 spanClientName.setAttribute('onclick', 'billingDestinationList(' + currentYear + ',' + currentMonth + ',' + ClientListObj[id].client_id + '), setBillingDestination(' + ClientListObj[id].client_id + ', "' + ClientListObj[id].client_name + '", ' + ClientListObj[id].billing_destination_id+ ')');
@@ -791,9 +791,9 @@ var pickerYear = $('#year_id').pickadate({
     function setTagColorClient(){
         let previousDiv = null;
         $('#client_list').on('click', '.div-client-name', function() {
-            $(this).addClass('bg-[#f7b580]');
+            $(this).addClass('bg-[#E9F1EC]');
             if (previousDiv !== null) {
-                previousDiv.removeClass('bg-[#f7b580]').addClass('bg-white');
+                previousDiv.removeClass('bg-[#E9F1EC]').addClass('bg-white');
             }
             previousDiv = $(this);
         });
