@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smart-EMS — 青果販売データ分析ツール</title>
+<script>
+(function(){
+  var ua = navigator.userAgent || '';
+  var touchDevice = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
+  var narrowScreen = Math.min(screen.width || 9999, screen.height || 9999) <= 760;
+  var mobileUA = /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua);
+  if((touchDevice && narrowScreen) || mobileUA){
+    document.documentElement.classList.add('mobile-device');
+  }
+})();
+</script>
+<style>
+/* ============================================================
+   Smart-EMS ver0.5 - Wix Embed Compatible
+   ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  background:#FFFFFF;
+  font-family:'Noto Sans JP','Noto Sans','Helvetica Neue',Arial,sans-serif;
+  color:#0A0A0A;
+  font-size:13px;
+  -webkit-font-smoothing:antialiased;
+  padding:16px;
+  overflow-x:hidden
+}
+button,input,select,textarea{font-family:inherit;max-width:100%}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+/* ===== APP LAYOUT ===== */
+.app{
+  display:grid;
+  grid-template-columns:200px 1fr;
+  max-width:1400px;
+  margin:0 auto;
+  border:1px solid #BFBFBF;
+  border-radius:2px;
+  overflow:hidden;
+  background:#FFFFFF;
+  box-shadow:none;
+  min-height:680px
+}
+
+/* ===== SIDEBAR ===== */
+.side{
+  background:#E6E6E6;
+  padding:12px 10px;
+  border-right:1px solid #BFBFBF;
+  display:flex;
+  flex-direction:column;
+  gap:1px
+}
+.slogo{
+  display:flex;align-items:center;gap:9px;
+  padding:4px 6px 12px;
+  border-bottom:1px solid #BFBFBF;
+  margin-bottom:8px
+}
+.sic{
+  width:30px;height:30px;background:var(--primary);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:none}
+.brand{font-size:14px;font-weight:700;color:var(--primary);letter-spacing:-.01em}
+.brand-sub{font-size:10px;color:var(--primary);margin-top:1px}
+.slbl{font-size:10px;color:var(--primary);padding:8px 6px 3px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.ni{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 9px;border-radius:2px;
+  color:var(--primary);cursor:pointer;font-size:12px;
+  user-select:none;transition:background .12s
+}
+.ni:hover:not(.on){background:rgba(var(--primary-rgb),0.1)}
+.ni.on{
+  background:#FFFFFF;color:var(--primary);font-weight:600;
+  border:1px solid var(--primary);
+  box-shadow:none}
+.sep{border:none;border-top:1px solid #BFBFBF;margin:6px 0}
+
+/* ===== COMPANY BAR ===== */
+.comp-bar{
+  margin-top:auto;padding:9px 8px 4px;
+  border-top:1px solid #BFBFBF;
+  display:flex;align-items:center;gap:8px
+}
+
+/* ===== LOGIN OVERLAY ===== */
+.login-bg{
+  position:fixed;inset:0;
+  background:rgba(230,230,230,0.95);
+  display:none;align-items:center;justify-content:center;
+  z-index:300;padding:18px
+}
+.login-bg.show{display:flex}
+.login-card{
+  background:#FFFFFF;border-radius:2px;
+  padding:26px 28px;max-width:380px;width:100%;
+  box-shadow:none;
+  border:1px solid #D2D2D2
+}
+.login-input{
+  width:100%;padding:9px 12px;font-size:13px;font-family:inherit;
+  border:1px solid #BFBFBF;border-radius:2px;margin-bottom:10px;
+  box-sizing:border-box
+}
+.login-input:focus{outline:none;border-color:var(--primary);box-shadow:none}
+.code-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:#FFFFFF;border:1px solid var(--primary);
+  border-radius:2px;padding:0;cursor:pointer;
+  font-size:11px;color:var(--primary);
+  font-family:'Noto Sans JP','Noto Sans','Helvetica Neue',Arial,sans-serif
+}
+.code-chip-text{padding:5px 8px;cursor:pointer}
+.code-chip:hover{background:#FFFFFF}
+.code-chip-x{
+  width:20px;height:24px;display:flex;align-items:center;justify-content:center;
+  border-left:1px solid var(--primary);color:#B40010;font-size:13px;
+  cursor:pointer;border-radius:2px}
+.code-chip-x:hover{background:#FFFFFF}
+
+/* ===== MAIN BODY ===== */
+.body{background:#FFFFFF;overflow-x:hidden}
+.scr{padding:1.5rem;display:none;animation:fadeIn .2s}
+.scr.on{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ===== PAGE HEADER ===== */
+.ph{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:1.25rem;flex-wrap:wrap;gap:12px
+}
+.pt{font-size:18px;font-weight:600;color:#0A0A0A;letter-spacing:-.01em}
+.ps{font-size:11px;color:#6B6B6B;margin-bottom:3px;font-weight:500}
+
+/* ===== BADGES ===== */
+.bdg{display:inline-block;padding:3px 10px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:.01em}
+.bdg-g{background:#E6E6E6;color:var(--primary)}
+.bdg-am{background:#FFFFFF;color:#B40010}
+.bdg-rd{background:#FFFFFF;color:#B40010}
+.bdg-bl{background:#FFFFFF;color:#0A0A0A}
+.bdg-gy{background:#FAFAFA;color:#3A3A3A}
+
+/* ===== CARDS ===== */
+.card{
+  background:#FFFFFF;
+  border:1px solid #BFBFBF;
+  border-radius:2px;padding:14px;
+  box-shadow:none}
+.mc{
+  background:#FFFFFF;
+  border:1px solid #BFBFBF;
+  border-radius:2px;padding:11px 14px;
+  box-shadow:none}
+.ml{font-size:11px;color:#6B6B6B;margin-bottom:3px;font-weight:500}
+.mv{font-size:19px;font-weight:700;color:#0A0A0A;letter-spacing:-.01em}
+
+/* ===== GRIDS ===== */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
+
+/* ===== TABS ===== */
+.tab-row{
+  display:flex;border-bottom:1px solid #BFBFBF;margin-bottom:1.25rem;
+  background:#FFFFFF;border-radius:2px;padding:3px 4px 0
+}
+.tab{
+  padding:8px 16px;color:#6B6B6B;cursor:pointer;
+  border-bottom:2px solid transparent;font-size:12.5px;
+  margin-bottom:-1px;font-weight:500;border-radius:2px}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:700;background:#FFFFFF}
+
+/* ===== TABLES ===== */
+.tbl-w{
+  border:1px solid #BFBFBF;border-radius:2px;
+  overflow:hidden;background:#FFFFFF;
+  box-shadow:none}
+.tbl-h{
+  padding:9px 13px;background:#E6E6E6;
+  border-bottom:1px solid #BFBFBF;
+  font-size:12px;font-weight:600;
+  display:flex;justify-content:space-between;align-items:center;
+  color:#0A0A0A
+}
+.dt{width:100%;font-size:11.5px;border-collapse:collapse}
+.dt th{
+  padding:8px 10px;background:#E6E6E6;
+  font-weight:600;text-align:left;
+  border-bottom:1px solid #BFBFBF;
+  white-space:nowrap;font-size:10.5px;color:#3A3A3A
+}
+.dt td{
+  padding:6px 10px;border-bottom:1px solid #FAFAFA;
+  color:#3A3A3A;font-size:11.5px
+}
+.dt tbody tr:nth-child(even) td{background:#FFFFFF}
+.dt tbody tr:hover td{background:#FFFFFF}
+.dt tr:last-child td{border-bottom:none}
+.dt tbody tr.row-changed td{background:#FFFFFF}
+.sku-main{font-size:11.5px;color:#0A0A0A;font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.sku-sub{font-size:10px;color:#3A3A3A;margin-top:3px;line-height:1.35}
+.sku-pill{display:inline-block;background:#FFFFFF;border:1px solid var(--primary);color:var(--primary);border-radius:2px;padding:1px 5px;font-weight:600}
+.issue-list{margin-top:3px;font-size:9.5px;line-height:1.45;color:#B40010}
+.issue-list span{display:block}
+.save-dot{display:inline-block;width:6px;height:6px;border-radius:2px;background:var(--primary);margin-left:4px;vertical-align:middle}
+.hi{color:#0A0A0A!important;font-weight:600}
+.nr{text-align:right!important}
+.nc{text-align:center!important}
+
+/* ===== FORM ELEMENTS ===== */
+input[type="date"],input[type="number"],input[type="text"]{
+  font-family:inherit;color:#0A0A0A;background:#FFFFFF;
+  border:1px solid #BFBFBF;border-radius:2px;
+  padding:6px 9px;font-size:12px
+}
+select,textarea{
+  font-family:inherit;color:#0A0A0A;background:#FFFFFF;
+  border:1px solid #BFBFBF;border-radius:2px;
+  padding:6px 9px;font-size:12px
+}
+input[type="date"]:focus,input[type="number"]:focus,input[type="text"]:focus{
+  outline:none;border-color:var(--primary);box-shadow:none}
+select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:none}
+.inp-e{
+  font-size:11px;padding:3px 5px;
+  border:1px solid #BFBFBF;border-radius:2px;
+  text-align:right;background:#FFFFFF;
+  color:#0A0A0A;width:54px
+}
+.inp-e:focus{outline:none;border-color:var(--primary);box-shadow:none}
+/* 在庫点検：数値を大きく、入力は枠ではなくセル自体に打ち込むExcel風に */
+.stock-dt td.nr,
+.stock-dt td.nc{font-size:14px}
+.stock-dt td.stock-input-cell{padding:0}
+.stock-dt td.stock-input-cell .stock-inp{width:100%;border:none;background:transparent;border-radius:0;text-align:right;font-size:14px;font-weight:600;font-family:inherit;color:#0A0A0A;padding:10px 9px}
+.stock-dt td.stock-input-cell .stock-inp:focus{outline:none;box-shadow:inset 0 0 0 2px var(--primary);background:rgba(var(--primary-rgb),0.06)}
+
+/* ===== BUTTONS ===== */
+button{
+  cursor:pointer;padding:7px 14px;
+  border:1px solid #BFBFBF;border-radius:2px;
+  background:#FFFFFF;color:#0A0A0A;
+  font-size:12px;font-family:inherit;font-weight:500;
+  transition:all .15s
+}
+button:hover{background:#FFFFFF;border-color:#9A9A9A}
+button:active{transform:translateY(1px)}
+.btn-g{background:var(--primary);color:#E6E6E6;border-color:var(--primary)}
+.btn-g:hover{background:var(--primary);color:#E6E6E6}
+.btn-rd{background:#FFFFFF;color:#B40010;border-color:#D2D2D2}
+.btn-rd:hover{background:#FFFFFF;border-color:#E60012}
+.btn-sm{padding:5px 11px;font-size:11px}
+
+/* ===== UPLOAD ZONES ===== */
+.uz{
+  border:2px dashed var(--primary);border-radius:2px;
+  padding:14px 18px;text-align:center;cursor:pointer;
+  background:#FFFFFF;transition:all .15s;position:relative;
+  min-height:96px;display:flex;flex-direction:column;justify-content:center
+}
+.uz:hover,.uz.drag{border-color:var(--primary);background:#FFFFFF}
+.uz.done{border-style:solid;border-color:var(--primary);background:#E6E6E6;border-width:2px}
+.uz.done:hover{background:#E6E6E6}
+/* 読込完了は横並びでコンパクトに（縦の専有を抑える） */
+.uz.done{min-height:0;padding:11px 40px 11px 14px;flex-direction:row;align-items:center;justify-content:flex-start;text-align:left}
+.uz.done .uz-clear{top:50%;right:8px;transform:translateY(-50%)}
+.uz-done{display:flex;align-items:center;gap:10px;width:100%;min-width:0}
+.uz-done-ic{flex:0 0 auto;display:flex;align-items:center}
+.uz-done-body{display:flex;flex-direction:column;min-width:0}
+.uz-done-name{font-size:12px;font-weight:700;color:var(--primary-strong);word-break:break-all;line-height:1.3}
+.uz-done-meta{font-size:10.5px;font-weight:600;color:var(--primary);line-height:1.35;margin-top:1px}
+.uz.err{border-style:solid;border-color:#E60012;background:#FFFFFF;border-width:2px}
+.uz.err:hover{background:#FFFFFF}
+.uz-clear{
+  position:absolute;top:6px;right:6px;
+  background:#FFFFFF;border:1px solid #BFBFBF;border-radius:2px;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;color:#B40010;line-height:1;
+  font-weight:600;z-index:1
+}
+.uz-clear:hover{background:#FFFFFF;border-color:#E60012}
+.uz-st-label{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+.uz-st-name{font-size:11.5px;margin-top:2px;font-weight:600;word-break:break-all;line-height:1.3}
+.uz-st-meta{font-size:10.5px;margin-top:2px;line-height:1.35}
+.uz-st-action{font-size:10.5px;margin-top:4px;color:var(--primary);font-weight:500}
+
+/* ===== IMPORT STATUS BANNER ===== */
+.imp-st{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;
+  margin-bottom:1.1rem
+}
+.imp-st-row{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:9px 12px;border-radius:2px;font-size:11.5px;
+  border:1px solid transparent
+}
+.imp-st-row.ok{background:#FFFFFF;border-color:var(--primary);color:var(--primary-strong)}
+.imp-st-row.err{background:#FFFFFF;border-color:#D2D2D2;color:#B40010}
+.imp-st-row.empty{background:#FFFFFF;border-color:#BFBFBF;color:#6B6B6B}
+.imp-st-ic{flex-shrink:0;margin-top:1px}
+.imp-st-body{flex:1;min-width:0;line-height:1.5}
+.imp-st-title{font-weight:600;font-size:12px}
+.imp-st-detail{margin-top:2px;font-size:10.5px;opacity:.85;word-break:break-all}
+
+/* ===== TIPS / ALERTS ===== */
+.tip{
+  border:1px solid #D2D2D2;border-radius:2px;
+  padding:10px 14px;font-size:12px;margin-bottom:1rem;
+  line-height:1.6;background:#FFFFFF;color:var(--primary-strong)
+}
+.tip.w{background:#FFFFFF;border-left-color:#E60012;color:#B40010}
+.abox{
+  border-radius:2px;padding:10px 13px;
+  margin-bottom:1rem;font-size:12px;line-height:1.55
+}
+.abox.err{background:#FFFFFF;border:1px solid #D2D2D2;color:#B40010}
+.abox.warn{background:#FFFFFF;border:1px solid #E60012;color:#B40010}
+.abox.ok{background:#FFFFFF;border:1px solid var(--primary);color:var(--primary-strong)}
+.abox.info{background:#FFFFFF;border:1px solid #0A0A0A;color:#0A0A0A}
+
+/* 在庫列の色は下部（モバイル規定）で一元管理：実在庫=緑罫/淡緑、誤差=赤罫/淡赤、理論在庫=無彩色 */
+
+/* ===== EMPTY STATES ===== */
+.empty{
+  text-align:center;padding:48px 24px;
+  background:#FFFFFF;border:1px dashed #BFBFBF;
+  border-radius:2px;color:#6B6B6B
+}
+.empty-ic{display:flex;justify-content:center;margin-bottom:10px;color:#9A9A9A}
+.empty-t{font-size:14px;font-weight:600;color:#3A3A3A;margin-bottom:5px}
+.empty-d{font-size:12px;color:#6B6B6B;margin-bottom:14px;line-height:1.6}
+
+/* ===== MODAL ===== */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);
+  display:none;align-items:center;justify-content:center;
+  z-index:100;padding:20px
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:#FFFFFF;border-radius:2px;
+  padding:20px 24px;max-width:400px;width:100%;
+  box-shadow:none}
+.modal-t{font-size:15px;font-weight:600;margin-bottom:10px;color:#0A0A0A}
+.modal-d{font-size:12px;color:#3A3A3A;margin-bottom:16px;line-height:1.6}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;top:24px;right:24px;z-index:200;
+  background:#FFFFFF;border:1px solid #BFBFBF;
+  border-radius:2px;padding:10px 14px;
+  box-shadow:none;
+  font-size:12px;display:none;align-items:center;gap:8px;
+  max-width:340px
+}
+.toast.show{display:flex;animation:slideIn .2s}
+.toast.ok{border-color:var(--primary)}
+.toast.err{border-color:#E60012}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ===== UTILITIES ===== */
+.flex{display:flex;align-items:center;gap:8px}
+.flex-1{flex:1}
+.mb-1{margin-bottom:1rem}
+.mb-2{margin-bottom:1.5rem}
+.muted{color:#6B6B6B;font-size:11px}
+
+/* ===== RESPONSIVE HELPERS ===== */
+.table-controls,
+.stock-period-row,
+.stock-controls,
+.unit-controls{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap
+}
+/* 集計期間：既定は折りたたみの細い帯。変更時のみ下に展開（引き算） */
+.period-filter{
+  background:#FFFFFF;border:1px solid var(--hairline);
+  border-radius:2px;margin-bottom:1rem;overflow:hidden
+}
+.period-summary{
+  width:100%;display:flex;align-items:center;gap:9px;
+  padding:9px 12px;background:transparent;border:none;cursor:pointer;
+  font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent
+}
+.period-summary-label{font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap;letter-spacing:.02em}
+.period-summary-val{flex:1 1 auto;min-width:0;font-size:12px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-badge{font-size:10px;font-weight:700;color:var(--primary);background:var(--wash-green);padding:2px 7px;border-radius:2px;white-space:nowrap;flex:0 0 auto}
+.period-summary-chev{display:flex;align-items:center;color:var(--txt3);transition:transform .2s;flex:0 0 auto}
+.period-summary-chev svg{width:16px;height:16px;flex:0 0 auto;display:block}
+.period-filter.open .period-summary-chev{transform:rotate(180deg)}
+.period-body{max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease,opacity .2s ease,padding .25s ease;padding:0 12px}
+.period-filter.open .period-body{max-height:240px;opacity:1;padding:2px 12px 12px}
+.period-body .period-dates{margin-bottom:8px}
+.period-reset{width:100%;padding:8px 10px;font-size:12px}
+/* 在庫点検：折りたたみ。エラーは赤バッジ、なければ濃い灰色バッジで一目に */
+.stock-check{background:#FFFFFF;border:1px solid var(--hairline);border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.stock-check-summary-btn{width:100%;display:flex;align-items:center;gap:9px;padding:11px 12px;background:transparent;border:none;cursor:pointer;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent}
+.scc-label{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;letter-spacing:.02em}
+.scc-status{font-size:11px;font-weight:700;color:#FFFFFF;background:#4D4D4D;padding:3px 10px;border-radius:2px;white-space:nowrap;flex:0 0 auto}
+.stock-check.has-err .scc-status{background:var(--signal)}
+.scc-sub{flex:1 1 auto;min-width:0;font-size:11px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scc-chev{display:flex;align-items:center;color:var(--txt3);transition:transform .2s;flex:0 0 auto}
+.scc-chev svg{width:16px;height:16px;flex:0 0 auto;display:block}
+.stock-check.open .scc-chev{transform:rotate(180deg)}
+.stock-check-detail{max-height:0;overflow:hidden;opacity:0;transition:max-height .3s ease,opacity .2s ease,padding .3s ease;padding:0 12px}
+.stock-check.open .stock-check-detail{max-height:1400px;opacity:1;padding:2px 12px 12px}
+.scc-section-label{font-size:10.5px;font-weight:700;color:var(--txt3);margin:8px 0 6px;letter-spacing:.04em}
+/* 在庫：上部レイアウト（日付2列＋合計2列） */
+.stock-dates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.stock-date-f{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#3A3A3A}
+.stock-date-f input[type=date]{width:100%;box-sizing:border-box;padding:8px 9px;font-size:13px;border:1px solid var(--hairline);border-radius:2px;background:#FFFFFF;color:var(--ink);font-family:inherit;-webkit-appearance:none;appearance:none}
+.stock-date-f input[type=date]:focus{border-color:var(--primary);outline:none}
+.stock-totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+/* 在庫点検：優先的に見る（旧「優先確認」を統合） */
+.scc-priority{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.scc-priority-item{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:11.5px;color:#0A0A0A;padding:7px 10px;border:1px solid var(--hairline);border-radius:2px;background:#FFFFFF}
+.scc-pri-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scc-pri-diff{color:#E60012;font-weight:700;white-space:nowrap;flex:0 0 auto}
+/* 参考アプリ準拠：絞り込みをネイティブselectからファイルフォルダ型タブへ */
+.seg-filter-wrap{flex:1 1 100%;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.seg-filter-label{font-size:11px;color:var(--txt2);white-space:nowrap;font-weight:700}
+.seg-filter{display:flex;flex-wrap:wrap;gap:6px}
+.seg-btn{flex:0 1 auto;padding:8px 13px;font-size:12px;font-weight:700;font-family:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--line);border-radius:2px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s}
+.seg-btn:hover{border-color:var(--primary)}
+.seg-btn.on{background:var(--primary);border-color:var(--primary);color:#FFFFFF}
+.seg-btn:active{background:var(--wash-green)}
+.seg-btn.on:active{background:var(--primary-strong)}
+/* 画面内セクションの道しるべ：上部ジャンプ＋番号付き見出し（迷子防止） */
+.sec-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 1rem;padding:9px 11px;background:var(--wash-green);border:1px solid var(--hairline);border-radius:2px}
+.sec-nav-label{font-size:10.5px;font-weight:700;color:var(--primary);white-space:nowrap;margin-right:2px}
+.sec-nav-btn{padding:6px 12px;font-size:11.5px;font-weight:700;font-family:inherit;color:var(--primary);background:#FFFFFF;border:1px solid var(--primary);border-radius:2px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.sec-nav-btn:active{background:var(--wash-green)}
+.sec-num{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;background:var(--primary);color:#FFFFFF;font-size:11px;font-weight:700;border-radius:2px;margin-right:8px;flex:0 0 auto}
+.sec-h-title{display:inline-flex;align-items:center;font-weight:700}
+/* 売上：切替タブと絞り込みを同じ行に（絞り込みは右の余白へ寄せる） */
+.sales-tabbar{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
+.sales-tabbar .tab-row{flex:1 1 auto;margin-bottom:0}
+.sales-tabbar .sales-ftrig{flex:0 0 auto;margin-left:auto}
+.sales-tabbar .sales-ftrig .filter-bar{margin-bottom:0}
+html.mobile-device .sales-tabbar .tab{padding-left:12px;padding-right:12px}
+html.mobile-device .sales-tabbar .filter-count{display:none}
+.analytics-section{scroll-margin-top:70px}
+/* 受発注カレンダー完全準拠：下からせり上がるフィルタ・ボトムシート */
+.pw-scrim{position:fixed;inset:0;z-index:120000;background:rgba(10,40,26,.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s ease}
+.pw-scrim.open{opacity:1;pointer-events:auto}
+.pw-sheet{position:fixed;left:0;right:0;bottom:0;z-index:120001;background:#FAFAFA;border-top:3px solid var(--structure);border-radius:2px 2px 0 0;box-shadow:none;transform:translateY(102%);transition:transform .26s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;max-height:90vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.pw-sheet.open{transform:translateY(0)}
+.pw-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:9px auto 4px;flex:0 0 auto}
+.pw-head{flex:0 0 auto;padding:4px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--hairline)}
+.pw-head h3{font-size:16px;font-weight:900;color:var(--ink);flex:1 1 auto;margin:0}
+.pw-x{flex:0 0 40px;width:40px;height:40px;border:none;background:#F0F0F0;color:var(--ink);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.pw-x svg{width:20px;height:20px;display:block}
+.pw-x:active{background:#E4E4E4}
+.pw-body{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 18px)}
+/* 画面に置くのは細いトリガーだけ（フィルタは画面から退避） */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.filter-trigger{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;font-size:12.5px;font-weight:700;font-family:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--line);border-radius:2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.filter-trigger svg{width:15px;height:15px;flex:0 0 auto}
+.filter-trigger:active{background:var(--wash-green)}
+/* 絞り込みボタンはフィルタ適用中も色を変えず、全画面で同じ見た目に統一（適用状態は隣の「N/M件」で表示） */
+.filter-trigger.filtered{border-color:var(--line);color:var(--ink);background:#FFFFFF}
+.filter-count{font-size:11px;color:var(--txt3);font-weight:500}
+.fsheet-field{margin-bottom:16px}
+.fsheet-label{display:block;font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:7px}
+.pw-search{width:100%;box-sizing:border-box;border:1.5px solid var(--hairline);border-radius:2px;padding:11px 12px;font-size:15px;font-family:inherit;background:#FFFFFF;color:var(--ink)}
+.pw-search:focus{outline:none;border-color:var(--primary)}
+.fsheet-sort-dir{padding:9px 14px;font-size:12px;font-weight:700;font-family:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--line);border-radius:2px;cursor:pointer}
+.unit-sort-toggle{padding:3px 9px;font-size:10.5px;font-weight:700;font-family:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--ink);border-radius:2px;cursor:pointer;white-space:nowrap;line-height:1.4}
+.fsheet-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;padding-top:14px;border-top:1px solid var(--hairline)}
+.fsheet-clear{padding:9px 14px;font-size:12px;font-weight:700;font-family:inherit;color:var(--txt2);background:#FFFFFF;border:1px solid var(--line);border-radius:2px;cursor:pointer}
+.fsheet-csv{padding:9px 14px;font-size:12px;font-weight:700;font-family:inherit;border:1px solid var(--primary);background:#FFFFFF;color:var(--primary);border-radius:2px;cursor:pointer}
+.fsheet-result{font-size:12px;color:var(--txt3);font-weight:600;margin-left:auto}
+.fsheet-apply{width:100%;margin-top:12px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;color:#FFFFFF;background:var(--primary);border:none;border-radius:2px;cursor:pointer}
+.fsheet-apply:active{background:var(--primary-strong)}
+/* 折りたたみ警告（既定は件数だけ、開くと明細） */
+.alert-fold{border-radius:2px;margin-bottom:8px;overflow:hidden;padding:0}
+.alert-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:11px 13px;font-size:12px;font-weight:700;-webkit-tap-highlight-color:transparent}
+.alert-fold>summary::-webkit-details-marker{display:none}
+.alert-fold>summary::after{content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:auto;opacity:.7;transition:transform .18s}
+.alert-fold[open]>summary::after{transform:rotate(-135deg)}
+.alert-fold .alert-fold-count{font-weight:800}
+.alert-fold .alert-fold-body{padding:0 13px 12px;font-size:11px;line-height:1.7}
+.home-alert-line{font-size:11.5px;line-height:1.7;color:#3A3A3A}
+.home-alert-line strong{color:#0A0A0A}
+.home-alert-line + .home-alert-line{margin-top:8px;padding-top:8px;border-top:1px solid var(--hairline)}
+.tc-search-row{flex:1 1 100%}
+.tc-search-row input,.stock-search-control input{border:1.5px solid var(--hairline)!important;border-radius:2px}
+.tc-search-row input:focus,.stock-search-control input:focus{outline:none;border-color:var(--primary)!important}
+.period-filter-title{font-size:11.5px;font-weight:600;color:#3A3A3A;white-space:nowrap}
+.period-dates{display:flex;align-items:center;gap:10px}
+.period-filter-sep{color:#6B6B6B;font-size:13px}
+.period-filter-status{font-size:11px;color:#6B6B6B}
+.period-filter-status.on{
+  color:var(--primary);font-weight:600;background:#FFFFFF;
+  padding:2px 8px;border-radius:2px}
+.period-filter-range{font-size:10.5px;color:#6B6B6B}
+.table-controls,
+.unit-controls{
+  margin-bottom:8px;padding:9px 11px;background:#FFFFFF;
+  border:1px solid #BFBFBF;border-radius:2px}
+.table-control-search,
+.unit-search-control{display:flex;align-items:center;gap:6px;flex:1;min-width:160px}
+.table-control-search span,
+.table-control-filter span,
+.stock-search-control span,
+.stock-filter-control span,
+.unit-search-control span{font-size:11px;color:#3A3A3A;white-space:nowrap}
+.table-control-search input,
+.unit-search-control input{flex:1;padding:5px 9px;font-size:12px}
+.table-control-filter{display:flex;align-items:center;gap:6px}
+.table-control-actions{margin-left:auto}
+.chart-scroll,
+.table-scroll{
+  overflow:auto;max-width:100%;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain
+}
+button,.ni,.tab,.unit-row,.advice-row,.matrix-kpi-card,.matrix-filter-btn,.unit-filter-card{
+  touch-action:manipulation
+}
+
+/* ===== AI ADVISOR ===== */
+.ai-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:12px}
+.ai-panel{
+  background:#FFFFFF;border:1px solid #BFBFBF;border-radius:2px;
+  padding:14px;box-shadow:none}
+.ai-topic-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ai-topic{
+  padding:6px 10px;font-size:11.5px;border-radius:2px;
+  border:1px solid #BFBFBF;background:#FFFFFF;color:#3A3A3A
+}
+.ai-topic.on{background:var(--primary);border-color:var(--primary);color:#E6E6E6;font-weight:600}
+.ai-prompt{
+  width:100%;min-height:390px;resize:vertical;
+  font-family:'Noto Sans JP','Noto Sans','Helvetica Neue',Arial,sans-serif;
+  font-size:11.5px;line-height:1.65;color:#0A0A0A;
+  background:#FFFFFF;border:1px solid #BFBFBF;border-radius:2px;
+  padding:10px 12px
+}
+.ai-prompt:focus{outline:none;border-color:var(--primary);box-shadow:none}
+.ai-insight{display:flex;gap:9px;padding:10px 12px;border-radius:2px;margin-bottom:8px;border:1px solid #BFBFBF;background:#FFFFFF}
+.ai-insight strong{display:block;font-size:12px;color:#0A0A0A;margin-bottom:2px}
+.ai-insight div:last-child{font-size:11.5px;line-height:1.55;color:#3A3A3A}
+.ai-rank{font-size:11px;line-height:1.7}
+.ai-rank li{margin-left:18px;margin-bottom:4px}
+
+/* ===== SEGMENTED ICON TABS（内容切替タブ・アイコン入り） ===== */
+.seg-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.seg-tab{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-size:12.5px;font-weight:700;font-family:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--ink);border-radius:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s,color .12s,border-color .12s}
+.seg-tab svg{width:15px;height:15px;flex:0 0 auto;display:block}
+.seg-tab.on{background:var(--primary);border-color:var(--primary);color:#FFFFFF}
+.seg-tab:not(.on):hover{background:var(--wash-green)}
+.seg-tab:not(.on):active{background:#E3EFE8}
+
+/* ===== ICON ACTION BUTTON（操作＝アイコン。選択の緑と区別） ===== */
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto;min-width:38px;height:34px;padding:0 11px;background:#FFFFFF;border:1px solid var(--ink);border-radius:2px;color:var(--ink);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.icon-btn svg{width:16px;height:16px;flex:0 0 auto;display:block}
+.icon-btn:hover{background:#FAFAFA;border-color:var(--ink)}
+.icon-btn:active{transform:translateY(1px)}
+.icon-btn .icon-btn-lbl{font-size:11.5px;font-weight:700}
+
+/* ===== ボトムシート誘導ボタン ===== */
+.sheet-trigger{display:none}
+html.mobile-device .sheet-trigger{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:1rem;padding:12px 13px;background:#FFFFFF;border:1px solid var(--ink);border-radius:2px;font-size:12.5px;font-weight:700;color:var(--ink);font-family:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html.mobile-device .sheet-trigger .st-ic{flex:0 0 auto;display:flex;align-items:center;color:var(--primary)}
+html.mobile-device .sheet-trigger .st-ic svg{width:17px;height:17px;display:block}
+html.mobile-device .sheet-trigger .st-label{flex:1 1 auto;min-width:0}
+html.mobile-device .sheet-trigger .st-sub{flex:0 0 auto;font-size:11px;font-weight:600;color:var(--txt3)}
+html.mobile-device .sheet-trigger .st-chev{flex:0 0 auto;display:flex;align-items:center;color:var(--txt3)}
+html.mobile-device .sheet-trigger .st-chev svg{width:16px;height:16px;display:block}
+html.mobile-device .sheet-trigger:active{background:var(--wash-green)}
+
+/* ===== UNIT PRICE ANALYSIS ===== */
+.unit-grid{display:grid;grid-template-columns:minmax(280px,390px) minmax(0,1fr);gap:12px}
+.unit-list{
+  border:1px solid #BFBFBF;background:#FFFFFF;max-height:650px;
+  overflow:auto
+}
+.unit-row{
+  display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #EDEDED;
+  border-left:3px solid transparent;border-radius:0;background:#FFFFFF;padding:9px 11px;color:#0A0A0A
+}
+.unit-row:hover:not(.on){background:#FAFAFA}
+.unit-row.on{background:var(--wash-green);border-left-color:var(--primary);font-weight:700}
+.unit-row:last-child{border-bottom:none}
+.unit-row-head{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+.unit-row-price{font-size:12px;font-weight:700;color:var(--primary-strong);font-variant-numeric:tabular-nums;flex:0 0 auto;white-space:nowrap}
+.unit-row-sub{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:3px}
+.unit-row-meta{font-size:10.5px;color:#6B6B6B;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
+.unit-row-stat{font-size:10.5px;color:#3A3A3A;display:flex;align-items:center;gap:6px;flex:0 0 auto;white-space:nowrap}
+.unit-title{font-size:12px;font-weight:700;line-height:1.3;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.unit-meta{font-size:10.5px;color:#6B6B6B;line-height:1.55;margin-top:2px}
+.unit-signal{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.unit-sec-h{font-size:12px;font-weight:700;color:#0A0A0A;margin:2px 0 7px}
+/* 単価レンジ可視化（min/中央/max + 取引先別） */
+.unit-range{border:1px solid #D2D2D2;border-radius:2px;background:#FFFFFF;padding:13px 14px;margin-bottom:10px}
+.unit-range-h{font-size:12px;font-weight:700;color:#0A0A0A;margin-bottom:10px}
+.ur-track{position:relative;height:12px;background:#F4F4F4;border:1px solid #E6E6E6;border-radius:2px;margin:16px 0 8px}
+.ur-span{position:absolute;top:-1px;bottom:-1px;background:var(--wash-green);border-left:2px solid var(--primary);border-right:2px solid var(--primary)}
+.ur-median{position:absolute;top:-5px;bottom:-5px;width:2px;background:#0A0A0A}
+.ur-scale{display:flex;justify-content:space-between;font-size:11px;gap:8px}
+.ur-scale .s{color:#6B6B6B}
+.ur-scale b{color:#0A0A0A;font-weight:700;font-variant-numeric:tabular-nums}
+.ur-cps{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.ur-cps-h{font-size:10.5px;color:#6B6B6B;margin-bottom:1px}
+.ur-cp{display:grid;grid-template-columns:minmax(64px,28%) 1fr auto;align-items:center;gap:10px}
+.ur-cp-name{font-size:11px;color:#0A0A0A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ur-cp-bar-wrap{height:14px;background:#FAFAFA;border:1px solid #EDEDED;border-radius:2px;overflow:hidden}
+.ur-cp-bar{height:100%;background:var(--primary);border-radius:2px 0 0 2px}
+.ur-cp-val{font-size:11px;font-weight:700;color:#0A0A0A;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ur-note{font-size:11.5px;color:#3A3A3A;line-height:1.65;margin-top:12px}
+.ur-note b{font-weight:800}
+/* 単価分析の主役ボックス：商品詳細＋単価レンジを一つに束ね、緑の枠で強調する（肝） */
+.unit-focus{background:#FFFFFF;border:2px solid var(--primary);border-radius:2px;padding:15px 15px 17px;margin-bottom:12px}
+.unit-focus-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.unit-focus-name-wrap{border-left:4px solid var(--primary);padding-left:11px;min-width:0;flex:1 1 auto}
+.unit-focus-title{font-size:15px;font-weight:800;color:#0A0A0A;line-height:1.35}
+.unit-focus-sep{border:none;border-top:1px solid var(--hairline);margin:15px 0 13px}
+.unit-range-sec .unit-range-h{margin-top:0}
+.unit-trend-box{height:200px;border:1px solid #D2D2D2;border-radius:2px;background:#FFFFFF;padding:10px}
+.unit-trend-empty{border:1px solid #E6E6E6;border-radius:2px;background:#FAFAFA;padding:18px;text-align:center;color:#6B6B6B;font-size:11.5px;line-height:1.6}
+.unit-chart-box{height:310px;border:1px solid #D2D2D2;border-radius:2px;background:#FFFFFF;padding:10px}
+.unit-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.unit-filter-card{
+  position:relative;
+  width:100%;text-align:left;display:block;
+  background:#FFFFFF;border:1px solid #BFBFBF;border-radius:2px;
+  padding:11px 30px 11px 14px;box-shadow:none;
+  cursor:pointer
+}
+.unit-filter-card:hover{background:#FFFFFF;border-color:var(--primary)}
+.unit-filter-card.on{background:#FFFFFF;border-color:var(--primary);box-shadow:none}
+.unit-filter-card:active{transform:none}
+/* 押下可能性を示す共通の最小アイコン（右端中央のシェブロン）。単価KPI・経営の象限カードで共通 */
+.unit-filter-card::after,
+.matrix-kpi-card::after{content:"";position:absolute;right:11px;top:50%;width:7px;height:7px;border-right:1.6px solid #6B6B6B;border-top:1.6px solid #6B6B6B;transform:translateY(-50%) rotate(45deg);pointer-events:none;z-index:2}
+.unit-filter-card:hover::after,
+.matrix-kpi-card:hover::after,
+.unit-filter-card.on::after,
+.matrix-kpi-card.on::after{border-color:var(--primary)}
+.unit-note{font-size:10.5px;color:#6B6B6B;line-height:1.55}
+
+/* ===== CHECK POINTS / MANAGEMENT ADVICE ===== */
+.advice-grid{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:12px}
+.advice-list{max-height:560px;overflow:auto;border:1px solid #BFBFBF;border-radius:2px;background:#FFFFFF}
+.advice-row{
+  width:100%;display:block;text-align:left;border:none;border-bottom:1px solid #FAFAFA;
+  border-radius:2px;background:#FFFFFF;padding:10px 12px;color:#0A0A0A
+}
+.advice-row:hover{background:#FFFFFF;border-color:#FAFAFA}
+.advice-row.on{background:#FAFAFA;font-weight:700}
+.advice-row:last-child{border-bottom:none}
+.advice-title{font-size:12px;font-weight:700;line-height:1.45;color:#0A0A0A}
+.advice-meta{font-size:10.5px;color:#3A3A3A;line-height:1.55;margin-top:3px}
+.ar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.ar-cat{font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.04em}
+.ar-metric{display:flex;align-items:baseline;gap:6px;margin-top:7px}
+.ar-metric-v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.ar-metric-l{font-size:10.5px;color:#6B6B6B}
+.advice-filter-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.advice-filter{
+  border:1px solid #BFBFBF;background:#FFFFFF;color:#3A3A3A;
+  border-radius:2px;padding:5px 10px;font-size:11px;font-weight:600
+}
+.advice-filter.on{background:var(--primary);border-color:var(--primary);color:#E6E6E6}
+.advice-filter-alert:not(.on){background:var(--wash-red);border-color:#E60012;color:#B40010}
+.advice-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.advice-score{display:flex;align-items:baseline;gap:10px;background:#FFFFFF;border:1px solid var(--hairline);border-radius:2px;padding:9px 14px;margin-bottom:10px}
+.advice-score-l{font-size:12px;font-weight:700;color:var(--ink)}
+.advice-score-v{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1;margin-left:auto}
+.advice-score-u{font-size:12px;color:#6B6B6B;font-weight:400}
+.advice-panel{background:#FFFFFF;border:1px solid #BFBFBF;border-radius:2px;padding:13px;box-shadow:none}
+.advice-panel-t{font-size:12px;font-weight:700;color:#0A0A0A;margin-bottom:6px}
+.advice-text{font-size:11.5px;line-height:1.7;color:#3A3A3A}
+.advice-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+
+/* ===== MANAGEMENT MATRIX ===== */
+.matrix-wrap{
+  position:relative;overflow:hidden;
+  background:#FFFFFF;
+  border:1px solid var(--primary);border-radius:2px;
+  padding:14px;box-shadow:none}
+.matrix-wrap::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:4px;
+  background:#0A0A0A
+}
+.matrix-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.matrix-kpi-card{
+  position:relative;overflow:hidden;text-align:left;
+  border:1px solid #D2D2D2;background:#FFFFFF;border-radius:2px;
+  min-height:76px;padding:10px 12px 9px;
+  box-shadow:none}
+/* KPIカードの左帯は廃止。区分は見出し前の小さな正方形で示す */
+.matrix-kpi-card:hover{background:#FFFFFF;border-color:var(--primary);transform:none}
+.matrix-kpi-card.on{border-color:var(--primary);box-shadow:none}
+.matrix-kpi-card.q-foundation{--matrix-q-color:var(--primary);background:#FFFFFF}
+.matrix-kpi-card.q-profit{--matrix-q-color:#0A0A0A;background:#FFFFFF}
+.matrix-kpi-card.q-reprice{--matrix-q-color:#B40010;background:#FFFFFF}
+.matrix-kpi-card.q-withdraw{--matrix-q-color:#E60012;background:#FFFFFF}
+.matrix-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative;z-index:1}
+.matrix-kpi-label::before{content:"";display:inline-block;width:9px;height:9px;background:var(--matrix-q-color,#0A0A0A);margin-right:7px;vertical-align:-1px;border-radius:1px}
+.matrix-kpi-label{font-size:11px;color:#3A3A3A;font-weight:800;letter-spacing:.02em}
+.matrix-kpi-tag{font-size:9.5px;color:#6B6B6B;font-weight:700;background:rgba(255,255,255,0.72);border:1px solid rgba(210,216,206,0.85);border-radius:2px;padding:1px 6px;white-space:nowrap}
+.matrix-kpi-value{position:relative;z-index:1;margin-top:6px;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#0A0A0A}
+.matrix-kpi-value span{font-size:11px;color:#6B6B6B;font-weight:500;letter-spacing:0}
+.matrix-kpi-sub{position:relative;z-index:1;margin-top:2px;font-size:10.5px;color:#3A3A3A;line-height:1.35}
+.matrix-bench-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:10.5px;color:#3A3A3A}
+.matrix-bench-foot{margin-bottom:0;margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline)}
+.matrix-bench-foot-label{font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.06em;margin-right:2px}
+.matrix-bench-pill{display:inline-flex;align-items:center;gap:5px;background:#FFFFFF;border:1px solid #D2D2D2;border-radius:2px;padding:4px 9px;box-shadow:none}
+.matrix-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin-bottom:10px;padding:8px 10px;
+  background:rgba(255,255,255,0.92);border:1px solid #D2D2D2;border-radius:2px;
+  box-shadow:none}
+.matrix-toolbar-main{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.matrix-search{display:flex;align-items:center;gap:6px;flex:1 1 240px;min-width:220px;max-width:360px}
+.matrix-search span{font-size:10.5px;color:#3A3A3A;font-weight:700;white-space:nowrap}
+.matrix-search input{width:100%;height:30px;padding:5px 8px;font-size:11.5px;border:1px solid #BFBFBF;border-radius:2px;background:#FFFFFF}
+.matrix-legend{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:10.5px;color:#3A3A3A}
+.matrix-legend span{display:inline-flex;align-items:center;gap:4px}
+.matrix-dot{width:9px;height:9px;border-radius:2px;display:inline-block;border:1px solid transparent}
+.matrix-dot.normal{background:#0A0A0A;border-color:#0A0A0A}
+.matrix-dot.selected{background:#FFFFFF;border:2px solid #0A0A0A}
+.matrix-filter-btn{
+  display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:6px 10px;border-radius:2px;
+  border:1px solid #BFBFBF;background:#FFFFFF;color:#0A0A0A;font-size:11.5px;font-weight:700;
+  box-shadow:none}
+.matrix-filter-btn::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--matrix-q-color);border:1px solid var(--matrix-q-stroke);box-shadow:none}
+.matrix-filter-btn:hover{background:#FFFFFF;border-color:var(--primary)}
+.matrix-filter-btn.on{border-color:var(--primary);box-shadow:none}
+.matrix-filter-btn b{font-size:10.5px;color:#3A3A3A;font-weight:600}
+.matrix-filter-btn.q-foundation{--matrix-q-color:var(--primary);--matrix-q-stroke:var(--primary)}
+.matrix-filter-btn.q-profit{--matrix-q-color:#0A0A0A;--matrix-q-stroke:#0A0A0A}
+.matrix-filter-btn.q-reprice{--matrix-q-color:#B40010;--matrix-q-stroke:#B40010}
+.matrix-filter-btn.q-withdraw{--matrix-q-color:#E60012;--matrix-q-stroke:#B40010}
+.matrix-selected-chip{display:inline-flex;align-items:center;gap:5px;min-height:26px;padding:4px 8px;border-radius:2px;background:#FFFFFF;border:1px solid var(--primary);color:var(--primary);font-size:10.5px;font-weight:700}
+.matrix-main-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,400px);gap:12px;align-items:start}
+.matrix-plot-panel,.matrix-detail-slot{min-width:0}
+.matrix-chart-box{
+  position:relative;height:408px;background:#FFFFFF;
+  border:1px solid var(--primary);border-radius:2px;overflow:hidden;
+  box-shadow:none}
+.matrix-chart-box::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:none}
+.matrix-chart-box canvas{width:100%!important;height:100%!important;touch-action:none}
+.matrix-selection-box{position:absolute;border:1px solid #0A0A0A;background:rgba(10,10,10,0.14);display:none;pointer-events:none;z-index:2;border-radius:2px;box-shadow:none}
+.matrix-x-label{display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;font-size:11px;line-height:1.45;color:#3A3A3A;font-weight:600;margin-top:8px}
+.matrix-axis-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #BFBFBF;background:#FFFFFF;border-radius:2px;padding:3px 8px}
+.matrix-table-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;background:#FFFFFF;border-bottom:1px solid #BFBFBF;font-size:12px;font-weight:700;color:var(--primary-strong)}
+.matrix-table-heading{font-size:12.5px;font-weight:800;color:var(--primary-strong);line-height:1.35}
+.matrix-table-stats{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}
+.matrix-stat-pill{display:inline-flex;align-items:center;gap:3px;border:1px solid #D2D2D2;background:#FFFFFF;border-radius:2px;padding:2px 7px;font-size:9.8px;color:#3A3A3A;font-weight:700}
+.matrix-title-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.matrix-sort-th{cursor:pointer;user-select:none}
+.matrix-sort-th:hover{background:#FFFFFF!important}
+.matrix-sort-arrow{margin-left:4px;font-size:10px;color:#6B6B6B;font-weight:700}
+.matrix-detail-table{display:flex;flex-direction:column;max-height:398px;border:1px solid var(--hairline)}
+.matrix-table-scroll{overflow:auto;max-height:332px;max-width:100%;background:#FFFFFF}
+.matrix-detail-table .dt{font-size:10.5px;border-collapse:separate;border-spacing:0}
+.matrix-detail-table .dt th{background:#FFFFFF;border-bottom-color:#E6E6E6;color:#3A3A3A;padding:6px 8px;font-size:9.8px;position:sticky;top:0;z-index:1}
+.matrix-detail-table .dt td{padding:7px 8px;font-size:10.5px;background:#FFFFFF}
+.matrix-detail-table .dt tbody tr:nth-child(even) td{background:#FFFFFF}
+.matrix-detail-table .dt tbody tr:hover td{background:#FFFFFF}
+.matrix-detail-table .dt tbody tr td:first-child{}
+.matrix-row-foundation{--matrix-row-color:var(--primary)}
+.matrix-row-profit{--matrix-row-color:#0A0A0A}
+.matrix-row-reprice{--matrix-row-color:#B40010}
+.matrix-row-withdraw{--matrix-row-color:#E60012}
+.matrix-row-selected td{box-shadow:none}
+.matrix-product-cell{display:flex;align-items:flex-start;gap:7px;min-width:0}
+.matrix-rank{flex:0 0 auto;width:22px;height:22px;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #D2D2D2;color:#3A3A3A;font-size:10px;font-weight:800}
+.matrix-product-main{max-width:185px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0A0A0A;font-weight:700}
+.matrix-product-sub{font-size:10px;color:#6B6B6B;margin-top:3px}
+.matrix-metric-sub{font-size:9.5px;color:#6B6B6B;margin-top:2px;white-space:nowrap}
+.matrix-q-chip{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;border:1px solid var(--matrix-row-color,#D4D4D4);background:#FFFFFF;border-radius:2px;padding:3px 7px;color:var(--matrix-row-color,#3A3A3A);font-size:10px;font-weight:800}
+.matrix-q-chip::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--matrix-row-color,#D4D4D4)}
+.matrix-action-chip{display:inline-block;margin-top:5px;background:#FFFFFF;border:1px solid #D2D2D2;border-radius:2px;color:#3A3A3A;font-size:9.5px;font-weight:700;padding:2px 5px}
+.matrix-amount-main{font-weight:800;color:#0A0A0A}
+.matrix-bar-track{margin-top:5px;height:5px;background:#FFFFFF;border-radius:2px;overflow:hidden;box-shadow:none}
+.matrix-bar-fill{height:100%;border-radius:2px;background:var(--primary)}
+.matrix-bar-fill.sales{background:#0A0A0A}
+.matrix-bar-fill.profit{background:var(--primary)}
+.matrix-bar-fill.negative{background:#E60012}
+.matrix-value-pos{color:var(--primary)!important;font-weight:700}
+.matrix-value-neg{color:#E60012!important;font-weight:700}
+.matrix-empty-row{text-align:center;padding:28px!important;color:#6B6B6B!important;background:#FFFFFF!important}
+.matrix-help{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#FFFFFF;color:#3A3A3A;border:1px solid #D2D2D2;border-radius:2px;padding:8px 10px;font-size:10.5px;line-height:1.5;margin:0 0 8px}
+.matrix-help strong{font-size:11.5px;color:var(--primary-strong)}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:880px){
+  body{padding:8px}
+  .app{grid-template-columns:1fr;min-height:auto}
+  .side{
+    flex-direction:row;flex-wrap:nowrap;
+    border-right:none;border-bottom:1px solid #BFBFBF;
+    padding:8px;
+    overflow-x:auto;
+    gap:5px;
+    scrollbar-width:thin
+  }
+  .slogo{
+    flex:0 0 auto;margin-bottom:0;
+    border-bottom:none;padding:0 11px 0 4px;
+    border-right:1px solid #BFBFBF;
+    align-self:center
+  }
+  .slbl{display:none}
+  .sep{display:none}
+  .comp-bar{
+    margin-top:0;border-top:none;
+    padding:0 0 0 11px;border-left:1px solid #BFBFBF;
+    margin-left:auto;flex-shrink:0;align-self:center
+  }
+  .comp-bar > div:first-child > div:first-child{display:none}
+  .ni{
+    padding:6px 11px;font-size:11px;
+    white-space:nowrap;flex:0 0 auto;
+    align-self:center
+  }
+  .g4,.g3{grid-template-columns:1fr 1fr}
+  .ai-grid{grid-template-columns:1fr}
+  .unit-grid{grid-template-columns:1fr}
+  .unit-list{max-height:320px}
+  .unit-kpi{grid-template-columns:1fr 1fr}
+  .advice-grid{grid-template-columns:1fr}
+  .advice-kpi{grid-template-columns:1fr 1fr}
+  .advice-actions{grid-template-columns:1fr}
+  .matrix-summary{grid-template-columns:1fr 1fr}
+  .matrix-main-grid{grid-template-columns:1fr}
+  .matrix-chart-box{height:340px}
+  .matrix-detail-table{max-height:300px}
+  .matrix-table-scroll{max-height:248px}
+  .matrix-product-main{max-width:260px}
+  .ph{flex-direction:column;align-items:stretch}
+  .scr{padding:1rem}
+}
+@media (max-width:520px){
+  .g4,.g3,.g2{grid-template-columns:1fr}
+  .unit-kpi{grid-template-columns:1fr}
+  .advice-kpi{grid-template-columns:1fr}
+  .matrix-summary{grid-template-columns:1fr}
+}
+
+/* Wixや親ページ側でモバイル時も広いiframe幅になる場合の強制モバイルUI */
+html.mobile-device body{
+  padding:6px;
+  padding-left:max(6px,env(safe-area-inset-left));
+  padding-right:max(6px,env(safe-area-inset-right));
+  overflow-x:hidden
+}
+html.mobile-device .app{
+  display:block;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  min-height:auto;
+  border-radius:2px;
+  overflow:hidden
+}
+html.mobile-device .side{
+  position:sticky;top:0;z-index:30;
+  display:flex;flex-direction:row;flex-wrap:nowrap;
+  width:100%;max-width:100%;
+  border-right:none;border-bottom:1px solid #BFBFBF;
+  padding:7px;
+  overflow-x:auto;overflow-y:hidden;
+  gap:5px;
+  scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch
+}
+html.mobile-device .slogo{
+  flex:0 0 auto;margin-bottom:0;
+  border-bottom:none;border-right:1px solid #BFBFBF;
+  padding:0 10px 0 3px;
+  align-self:center
+}
+html.mobile-device .brand{font-size:13px}
+html.mobile-device .brand-sub{display:none}
+html.mobile-device .sic{width:28px;height:28px}
+html.mobile-device .slbl,
+html.mobile-device .sep{display:none}
+html.mobile-device .ni{
+  flex:0 0 auto;align-self:center;
+  min-height:38px;
+  padding:7px 10px;
+  white-space:nowrap;
+  font-size:11px
+}
+html.mobile-device .ni svg{width:13px;height:13px}
+html.mobile-device .comp-bar{
+  flex:0 0 auto;align-self:center;
+  margin-top:0;margin-left:0;
+  border-top:none;border-left:1px solid #BFBFBF;
+  padding:0 0 0 10px
+}
+html.mobile-device .comp-bar > div:first-child > div:first-child{display:none}
+html.mobile-device .body{overflow-x:hidden}
+html.mobile-device .scr{padding:.75rem}
+html.mobile-device .ph{
+  flex-direction:column;align-items:stretch;
+  gap:8px;margin-bottom:.9rem
+}
+html.mobile-device .pt{font-size:17px}
+html.mobile-device .ps{line-height:1.55}
+html.mobile-device .g2{grid-template-columns:1fr!important}
+html.mobile-device .g3,
+html.mobile-device .g4,
+html.mobile-device .unit-kpi,
+html.mobile-device .advice-kpi,
+html.mobile-device .matrix-summary{
+  grid-template-columns:1fr 1fr!important;
+  margin-bottom:8px!important;
+  gap:6px!important
+}
+/* 経営：4象限カードを縦に圧縮し、散布図が一目で入るように */
+html.mobile-device .matrix-kpi-card{min-height:0;padding:7px 9px}
+html.mobile-device .matrix-kpi-value{margin-top:2px;font-size:17px}
+html.mobile-device .matrix-kpi-value span{font-size:10px}
+html.mobile-device .matrix-kpi-sub{margin-top:1px;font-size:9.5px;line-height:1.25}
+html.mobile-device .ai-grid,
+html.mobile-device .unit-grid,
+html.mobile-device .advice-grid,
+html.mobile-device .advice-actions,
+html.mobile-device .matrix-main-grid,
+html.mobile-device .matrix-area{
+  grid-template-columns:1fr!important
+}
+html.mobile-device .imp-st{grid-template-columns:1fr!important}
+html.mobile-device .unit-list{max-height:300px}
+/* 確認事項：上部の赤い帯（最優先バッジ）はカード/チップと重複するため携帯では非表示 */
+html.mobile-device #advice-badge{display:none}
+/* 確認事項：フィルターは折り返さず一列に（横スワイプで全件） */
+html.mobile-device .advice-filter-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;gap:6px;padding-bottom:3px;scrollbar-width:none}
+html.mobile-device .advice-filter-row::-webkit-scrollbar{display:none}
+html.mobile-device .advice-filter{flex:0 0 auto;white-space:nowrap;padding:5px 9px}
+/* ホーム：下タブと重複するナビゲーションカードは携帯では非表示 */
+html.mobile-device .home-nav-cards{display:none}
+/* 確認事項：詳細は項目タップでボトムシート表示。インライン詳細は携帯では非表示 */
+html.mobile-device .advice-detail-inline{display:none}
+/* AI：自動診断メモはボトムシート表示。インライン版は携帯では非表示 */
+html.mobile-device .ai-memo-inline{display:none}
+/* 取込：列の対応づけドロップダウンは携帯ではボトムシートへ。インラインは非表示 */
+html.mobile-device .import-map-inline{display:none}
+/* 取込：自動検出された列の表示も携帯ではシートへ集約。インラインは非表示 */
+html.mobile-device .import-detect-inline{display:none}
+/* 取込：携帯では検出＋対応づけのまとまり（表の上）を隠し、表の下のトリガーへ集約 */
+html.mobile-device .import-detect-wrap{display:none}
+.import-trigger-wrap{display:none}
+html.mobile-device .import-trigger-wrap{display:block;padding:11px 13px 13px}
+/* 取込トリガーは「表が主役」のため、はっきりした緑で操作を明示 */
+html.mobile-device .sheet-trigger-strong{background:var(--wash-green);border-color:var(--primary);color:var(--primary-strong)}
+html.mobile-device .sheet-trigger-strong .st-ic,
+html.mobile-device .sheet-trigger-strong .st-chev{color:var(--primary)}
+/* KPIカードを縦にコンパクト化（売上・粗利ほか各画面） */
+html.mobile-device .mc{padding:6px 10px}
+html.mobile-device .mc .mv{font-size:15px}
+html.mobile-device .mc .ml{margin-bottom:0;font-size:10.5px;line-height:1.2}
+html.mobile-device .g4{gap:7px}
+/* 粗利のKPIは1行4枚の細い帯に（レイアウト変更＋縦圧縮） */
+html.mobile-device .kpi-strip{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:6px!important}
+html.mobile-device .kpi-strip .mc{padding:7px 7px}
+html.mobile-device .kpi-strip .mc .ml{font-size:9.5px;line-height:1.25}
+html.mobile-device .kpi-strip .mc .mv,
+html.mobile-device .kpi-strip .mc div[style*="font-size:18px"]{font-size:14px!important;letter-spacing:-.02em}
+html.mobile-device .kpi-strip.kpi-strip-3{grid-template-columns:repeat(3,1fr)!important}
+html.mobile-device .period-filter{
+  padding:0!important
+}
+html.mobile-device .period-dates{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:8px;
+  flex:1 1 100%!important;
+  width:100%;
+  max-width:100%
+}
+html.mobile-device .period-dates input[type="date"]{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  overflow:hidden;
+  font-size:14px!important;
+  padding:8px 8px!important;
+  text-align:center;
+  border:1px solid var(--hairline)!important;
+  border-radius:2px;
+  background:#FFFFFF;
+  color:var(--ink);
+  -webkit-appearance:none;
+  appearance:none
+}
+html.mobile-device .period-dates input[type="date"]:focus{
+  border-color:var(--primary)!important;
+  background:#FFFFFF
+}
+html.mobile-device .period-dates .period-filter-sep{display:none!important}
+html.mobile-device .period-filter button{flex:1 1 130px!important}
+html.mobile-device .table-controls,
+html.mobile-device .stock-controls,
+html.mobile-device .unit-controls{
+  align-items:stretch!important;
+  gap:8px!important
+}
+html.mobile-device .table-control-search,
+html.mobile-device .table-control-filter,
+html.mobile-device .table-control-actions,
+html.mobile-device .stock-search-control,
+html.mobile-device .stock-filter-control,
+html.mobile-device .unit-search-control{
+  flex:1 1 100%!important;
+  min-width:0!important
+}
+html.mobile-device .table-control-search input,
+html.mobile-device .table-control-filter select,
+html.mobile-device .stock-search-control input,
+html.mobile-device .stock-filter-control select,
+html.mobile-device .unit-search-control input,
+html.mobile-device .unit-controls select{
+  width:100%!important
+}
+html.mobile-device .table-control-actions,
+html.mobile-device .stock-actions{
+  margin-left:0!important;
+  width:100%!important;
+  display:flex!important;
+  justify-content:stretch!important;
+  gap:6px
+}
+html.mobile-device .table-control-actions button,
+html.mobile-device .stock-actions button,
+html.mobile-device .unit-controls button{
+  flex:1 1 auto
+}
+html.mobile-device input[type="date"],
+html.mobile-device input[type="number"],
+html.mobile-device input[type="text"],
+html.mobile-device select,
+html.mobile-device textarea{
+  min-height:40px;
+  font-size:16px!important
+}
+html.mobile-device button{min-height:40px}
+/* 携帯では一律16pxにしているが、長文の相談文と売上ソートだけは小さく戻す */
+html.mobile-device .ai-prompt{font-size:11.5px!important;line-height:1.6}
+html.mobile-device .chart-sort-select{font-size:12px!important;min-height:34px}
+html.mobile-device .btn-sm{min-height:36px}
+html.mobile-device .advice-list{max-height:none}
+html.mobile-device .unit-list{max-height:256px}
+html.mobile-device .unit-row{padding:7px 11px}
+html.mobile-device .unit-chart-box{height:260px}
+html.mobile-device .ai-prompt{min-height:280px}
+html.mobile-device .ai-panel,
+html.mobile-device .advice-panel{padding:12px}
+html.mobile-device .matrix-wrap{padding:11px}
+html.mobile-device .matrix-toolbar{align-items:stretch;gap:9px}
+html.mobile-device .matrix-toolbar-main{width:100%}
+html.mobile-device .matrix-filter-btn{
+  flex:1 1 calc(50% - 7px);
+  justify-content:center
+}
+html.mobile-device .matrix-search{
+  flex:1 1 100%;
+  min-width:0;
+  max-width:none
+}
+html.mobile-device .matrix-legend{width:100%;justify-content:flex-start}
+html.mobile-device .matrix-chart-box{height:320px}
+html.mobile-device .matrix-x-label{flex-wrap:wrap;gap:6px}
+html.mobile-device .matrix-detail-table{max-height:none}
+html.mobile-device .matrix-table-scroll{max-height:360px}
+html.mobile-device .matrix-table-title{align-items:flex-start;flex-wrap:wrap}
+html.mobile-device .matrix-product-main{max-width:230px}
+/* 経営：詳細テーブルを携帯ではカード型に（横スクロール不要・一目で分かる） */
+/* 経営：選択商品の詳細は携帯でも表のまま、要素を絞り複数を一目で（指示画像3） */
+.amt-short{display:none}
+html.mobile-device .matrix-detail-table .matrix-table-scroll{max-height:none;overflow-x:hidden;overflow-y:visible}
+html.mobile-device .matrix-detail-table table.dt{min-width:0;width:100%;table-layout:fixed}
+html.mobile-device .matrix-detail-table table.dt th,
+html.mobile-device .matrix-detail-table table.dt td{padding:6px 6px!important;font-size:10.5px;vertical-align:top}
+html.mobile-device .matrix-detail-table table.dt th:nth-child(2),
+html.mobile-device .matrix-detail-table table.dt td:nth-child(2){width:60px}
+html.mobile-device .matrix-detail-table table.dt th:nth-child(3),
+html.mobile-device .matrix-detail-table table.dt td:nth-child(3){width:60px}
+html.mobile-device .matrix-detail-table table.dt th:nth-child(4),
+html.mobile-device .matrix-detail-table table.dt td:nth-child(4){width:62px}
+html.mobile-device .matrix-detail-table .matrix-bar-track,
+html.mobile-device .matrix-detail-table .matrix-product-sub,
+html.mobile-device .matrix-detail-table .matrix-metric-sub,
+html.mobile-device .matrix-detail-table .matrix-action-chip{display:none}
+html.mobile-device .matrix-detail-table .matrix-product-cell{gap:6px}
+html.mobile-device .matrix-detail-table .matrix-product-main{max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+html.mobile-device .matrix-detail-table .matrix-amount-main{font-size:11px;white-space:nowrap}
+html.mobile-device .matrix-detail-table .amt-full{display:none}
+html.mobile-device .matrix-detail-table .amt-short{display:inline}
+html.mobile-device .matrix-detail-table .matrix-q-chip{font-size:9px;padding:1px 5px;white-space:nowrap}
+/* 売上・粗利の集計テーブルは携帯でもコンパクトな表に（縦に伸ばさず複数を一目で） */
+html.mobile-device .cardtable table.dt{min-width:0!important;width:100%}
+html.mobile-device .cardtable table.dt th,
+html.mobile-device .cardtable table.dt td{padding:6px 5px!important;font-size:11px;white-space:nowrap}
+html.mobile-device .cardtable table.dt th{font-size:9.4px;line-height:1.25;vertical-align:bottom}
+html.mobile-device .cardtable table.dt td:first-child,
+html.mobile-device .cardtable table.dt th:first-child{max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.mobile-device .cardtable .amt-full{display:none}
+html.mobile-device .cardtable .amt-short{display:inline}
+/* 売上「商品別」表は項目が多いので携帯では状況列を隠して収める */
+html.mobile-device #sec-sales-prod table.dt th:nth-child(6),
+html.mobile-device #sec-sales-prod table.dt td:nth-child(6){display:none}
+html.mobile-device .stock-period-row{align-items:stretch!important}
+html.mobile-device .stock-period-row > div{
+  flex:1 1 100%!important;
+  margin-left:0!important
+}
+html.mobile-device .stock-period-row .mc{flex:1 1 calc(50% - 8px)!important}
+html.mobile-device .stock-alert-grid{grid-template-columns:1fr 1fr!important}
+html.mobile-device .tbl-w{overflow:hidden}
+html.mobile-device .tbl-h{
+  gap:8px;align-items:flex-start;
+  flex-wrap:wrap;line-height:1.45
+}
+html.mobile-device .dt{min-width:max-content}
+html.mobile-device .dt th,
+html.mobile-device .dt td{padding:7px 8px}
+html.mobile-device .dt th:first-child,
+html.mobile-device .dt td:first-child{
+  position:sticky;left:0;z-index:1;
+  max-width:220px;
+  box-shadow:none}
+html.mobile-device .dt th:first-child{z-index:2}
+html.mobile-device .dt td:first-child{background:#FFFFFF}
+html.mobile-device .dt tbody tr:nth-child(even) td:first-child{background:#FFFFFF}
+html.mobile-device .dt tbody tr:hover td:first-child{background:#FFFFFF}
+html.mobile-device .dt tbody tr.row-changed td:first-child{background:#FFFFFF}
+/* 取込プレビュー表：商品名（先頭列）を狭めて右側の項目を見えやすく（指示画像2） */
+html.mobile-device table.import-preview td:first-child,
+html.mobile-device table.import-preview th:first-child{max-width:116px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mobile-device .chart-scroll,
+html.mobile-device .stock-table-wrap,
+html.mobile-device .matrix-table-scroll,
+html.mobile-device .tbl-w > div[style*="overflow-x:auto"]{
+  overflow:auto!important;
+  max-width:100%!important;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain
+}
+html.mobile-device .stock-table-wrap table{min-width:1040px!important}
+html.mobile-device .toast{
+  left:8px;right:8px;top:8px;max-width:none
+}
+
+@media (max-width:430px){
+  html.mobile-device .stock-alert-grid{
+    grid-template-columns:1fr!important
+  }
+  /* 四象限カードは散布図と同じ2×2で全体を一目で（確認事項・単価分析も2列維持） */
+  html.mobile-device .unit-kpi,
+  html.mobile-device .advice-kpi,
+  html.mobile-device .matrix-summary{grid-template-columns:1fr 1fr!important}
+  html.mobile-device .matrix-kpi-top{flex-wrap:wrap;gap:5px}
+  html.mobile-device .matrix-kpi-label{white-space:nowrap}
+  html.mobile-device .matrix-kpi-tag{font-size:9px;padding:1px 5px}
+  html.mobile-device .period-filter-sep{display:none}
+  html.mobile-device .period-filter button{
+    flex:1 1 100%!important;
+    width:100%!important
+  }
+  html.mobile-device .matrix-filter-btn{flex:1 1 100%}
+  html.mobile-device .sku-main{max-width:170px}
+}
+
+/* ---- 平面の保証（引き算）：インライン角丸→2px / 影は全廃 ---- */
+[style*="border-radius"]{border-radius:2px!important}
+.matrix-wrap,.matrix-chart-box,.matrix-kpi-card,.app,.card,.mc,.modal,.toast,.login-card,
+.tip,.abox,.uz,.bdg,.sku-pill,.tab-row,.tab{box-shadow:none!important}
+/* active期間フィルタ：白でなく淡緑washで「絞込中」を静かに示す */
+.period-filter-status.on{background:var(--wash-green)!important;color:var(--primary)!important}
+
+/* =====================================================================
+   UNIFIED DESIGN POLICY — 準拠レイヤー  (佐藤可士和スタイル / Bloomin v1.0)
+   引き算・明晰・一貫・機能美 / 緑var(--primary) 赤#E60012 墨#0A0A0A 白
+   ===================================================================== */
+:root{
+  --primary:#0A0A0A; --primary-strong:#000000; --primary-mid:#4A4A4A;
+  --primary-rgb:10,10,10; --primary-rgb-strong:0,0,0; --primary-rgb-mid:74,74,74;
+  --signal:#E60012;  --signal-text:#B40010;
+  --ink:#0A0A0A; --txt2:#3A3A3A; --txt3:#6B6B6B; --disabled:#9A9A9A;
+  --ground:#FFFFFF; --subtle:#FAFAFA; --hairline:#D2D2D2; --line:#BFBFBF; --structure:#0A0A0A;
+  --wash-green:#F4F4F4; --wash-red:#FCECEC;
+}
+
+/* ---- 地：無彩色基調。白の面 + ヘアラインで分離（影に頼らない） ---- */
+body{background:var(--subtle);line-height:1.7}
+.app{border:1px solid var(--hairline);border-radius:2px;box-shadow:none;background:var(--ground)}
+.body,.scr,.card,.mc,.tbl-w,.ai-panel,.advice-panel,.unit-list,.advice-list,
+.matrix-wrap,.matrix-chart-box,.matrix-kpi-card,.unit-chart-box,.unit-filter-card,
+.modal,.toast,.login-card,.empty,.ai-prompt{background:var(--ground)}
+
+/* ---- ナビ：深緑 + 墨の境界。赤の正方マーク。アクティブは白ブロック ---- */
+.side{background:var(--primary);border-right:1px solid var(--structure);gap:2px}
+.slogo{border-bottom:1px solid rgba(255,255,255,0.22)}
+.sic{background:#FFFFFF;border-radius:2px}            /* ブランドマーク：白地に緑のバーチャート */
+.sic svg{stroke:var(--primary)}
+.sic svg rect{fill:var(--primary)}
+.brand{color:#FFFFFF}
+.brand-sub{color:rgba(255,255,255,0.72)}
+.slbl{color:rgba(255,255,255,0.62)}
+.ni{color:rgba(255,255,255,0.85);border-radius:2px}
+.ni svg{stroke:rgba(255,255,255,0.85)}
+.ni:hover:not(.on){background:rgba(255,255,255,0.12)}
+.ni.on{background:#FFFFFF;color:var(--primary);font-weight:700;border:none}
+.ni.on svg{stroke:var(--primary)}
+.sep{border-top:1px solid rgba(255,255,255,0.18)}
+.comp-bar{border-top:1px solid rgba(255,255,255,0.18)}
+.comp-bar div div:first-child{color:rgba(255,255,255,0.62)!important}
+.comp-bar #comp-code{color:#FFFFFF!important}
+.comp-bar button{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,0.45)}
+.comp-bar button:hover{background:rgba(255,255,255,0.12);border-color:#FFFFFF}
+
+/* ---- 見出し：太さと余白で階層をつくる ---- */
+.pt{color:var(--ink);font-weight:700}
+.ps{color:var(--txt3)}
+.mv,.matrix-kpi-value,.unit-kpi .mv{color:var(--ink)}
+.ml,.muted{color:var(--txt3)}
+
+/* ---- テーブル：白基調・余白と細い罫で構造化。色は意味にだけ宿す（佐藤可士和ディレクション＝引き算）---- */
+.dt th{background:#FAFAFA!important;color:#1A1A1A!important;border-bottom:1.5px solid #C4C4C4!important;font-weight:700;letter-spacing:.02em}
+th.th-y{background:#FAFAFA!important;color:#1A1A1A!important;border-bottom:1.5px solid #C4C4C4!important}
+th.th-gr{background:#FAFAFA!important;color:#1A1A1A!important;border-bottom:2px solid var(--primary)!important}
+th.th-pk{background:#FAFAFA!important;color:#1A1A1A!important;border-bottom:2px solid var(--signal)!important}
+.matrix-detail-table .dt th{background:#FAFAFA!important;color:#1A1A1A!important;border-bottom:1.5px solid #C4C4C4!important}
+.tbl-h{background:#FFFFFF!important;color:#0A0A0A!important;border-bottom:1px solid var(--hairline)!important;font-weight:700}
+.dt td{color:var(--txt2);border-bottom:1px solid var(--hairline)}
+.dt tbody tr:nth-child(even) td{background:var(--subtle)}
+.dt tbody tr:hover td{background:#F1F1F1}
+.dt tbody tr.row-changed td{background:var(--wash-green)}
+.tbl-w,.tbl-h{border-color:var(--hairline)}
+.hi{color:var(--ink)!important}
+
+/* 在庫列：理論=無彩色 / 実在庫=緑(操作・入力) / 誤差=赤(信号)。位置とラベルで識別 */
+/* th-y/th-gr/th-pk は上部で淡色化（意味は細い色罫で表現） */
+.td-y{background:#FFFFFF!important}
+.td-gr{background:var(--wash-green)!important}
+.td-pk{background:var(--wash-red)!important}
+
+/* ---- フォーム：直角・ヘアライン・墨フォーカス。必須は赤箱 ---- */
+input[type="date"],input[type="number"],input[type="text"],select,textarea,
+.matrix-search input,.login-input,.inp-e{border:1px solid var(--line);border-radius:2px;color:var(--ink);background:#FFFFFF}
+input[type="date"]:focus,input[type="number"]:focus,input[type="text"]:focus,
+select:focus,textarea:focus,.matrix-search input:focus,.login-input:focus,.inp-e:focus{
+  border-color:var(--ink);outline:1.5px solid var(--ink);outline-offset:0}
+[required],.is-required,.req-box{border-color:var(--signal)!important}
+
+/* ---- ボタン：白/墨 + ヘアライン。主操作=緑。赤=警告 ---- */
+button{background:#FFFFFF;color:var(--ink);border:1px solid var(--line);border-radius:2px;font-weight:600}
+button:hover{background:var(--subtle);border-color:var(--ink)}
+.btn-g{background:var(--primary)!important;color:#FFFFFF!important;border-color:var(--primary)!important}
+.btn-g:hover{background:var(--primary-strong)!important;border-color:var(--primary-strong)!important}
+.btn-rd{background:#FFFFFF!important;color:var(--signal-text)!important;border-color:var(--signal)!important}
+.btn-rd:hover{background:var(--wash-red)!important}
+
+/* ---- バッジ/チップ：直角。状態色はソリッド、補助は無彩色 ---- */
+.bdg{border-radius:2px;letter-spacing:.02em}
+.bdg-g{background:#FFFFFF;color:var(--primary-strong);border:1px solid var(--line)}
+.bdg-rd,.bdg-am{background:var(--signal);color:#FFFFFF}
+.bdg-bl,.bdg-gy{background:#F0F0F0;color:var(--ink);border:1px solid var(--hairline)}
+.sku-pill{background:#FFFFFF;border:1px solid var(--hairline);color:var(--primary);border-radius:2px}
+
+/* ---- タブ：アクティブは緑の下線（色だけに頼らない） ---- */
+.tab-row{background:transparent;border-bottom:1px solid var(--hairline);border-radius:0;padding:0}
+.tab{color:var(--txt3);border-radius:0;border-bottom:2px solid transparent;font-weight:600}
+.tab.on{background:transparent;color:var(--ink);border-bottom-color:var(--primary);font-weight:700}
+
+/* ---- 注意喚起：緑=肯定/赤=警告。面は淡く、意味のある色のみ ---- */
+.tip{background:var(--wash-green);border:1px solid var(--hairline);border-radius:2px;color:var(--ink)}
+.tip.w{background:var(--wash-red);border-color:var(--hairline);color:var(--ink)}
+.abox{border-radius:2px}
+.abox.ok{background:var(--wash-green);border:1px solid var(--hairline);color:var(--ink)}
+.abox.err,.abox.warn{background:var(--wash-red);border:1px solid var(--hairline);color:var(--ink)}
+.abox.info{background:var(--subtle);border:1px solid var(--hairline);color:var(--ink)}
+.imp-st-row{border-radius:2px}
+.imp-st-row.ok{background:var(--wash-green);border-color:var(--hairline);color:var(--ink)}
+.imp-st-row.err{background:var(--wash-red);border-color:var(--hairline);color:var(--ink)}
+.imp-st-row.empty{background:var(--subtle);border-color:var(--hairline);color:var(--txt3)}
+
+/* ---- インライン課題注記：静かな墨（赤の乱用を避ける） ---- */
+.issue-list,.issue-list span{color:var(--txt3)}
+
+/* ---- アップロード：直角破線。完了=緑/エラー=赤 ---- */
+.uz{border:1px dashed var(--line);border-radius:2px;background:var(--subtle)}
+.uz:hover,.uz.drag{border-color:var(--ink);background:#F1F1F1}
+.uz.done{border:1px solid var(--primary);background:var(--wash-green)}
+.uz.err{border:1px solid var(--signal);background:var(--wash-red)}
+.uz-clear{border-radius:2px;border-color:var(--line);color:var(--signal-text)}
+.uz-st-action{color:var(--primary)}
+
+/* ---- モーダル/トースト：平面 + ヘアライン枠。スクリムは無彩色 ---- */
+.modal-bg{background:rgba(10,10,10,0.45)}
+.modal{border:1px solid var(--hairline);border-radius:2px}
+.toast{border:1px solid var(--hairline);border-radius:2px}
+.toast.ok{border-color:var(--primary)}
+.toast.err{border-color:var(--signal)}
+.login-bg{background:rgba(10,10,10,0.45)}
+.login-card{border:1px solid var(--hairline);border-radius:2px}
+
+/* ---- 選択状態：緑（操作・選択） ---- */
+.unit-row.on,.advice-row.on{background:var(--subtle);font-weight:700}
+.unit-filter-card.on,.matrix-kpi-card.on,.matrix-filter-btn.on{
+  border-color:var(--primary)!important;outline:1.5px solid var(--primary)!important;outline-offset:0;background:var(--wash-green)!important}
+.ai-topic.on,.advice-filter.on{background:var(--primary);border-color:var(--primary);color:#FFFFFF}
+
+/* ---- 経営アドバイス・マトリクス：単一色相（緑）の濃淡で4象限を識別 ---- */
+/* 収益基盤=最濃 → 高粗利 → 価格見直し → 撤退候補=最淡。同じ緑を薄くして区別する。 */
+:root{
+  --q1:var(--primary); --q2:var(--primary-mid); --q3:#EF8089; --q4:#E60012;  /* 緑2段(健全) + 赤2段(要対処): 価格見直し=淡い赤 / 撤退候補=濃い赤 */
+}
+.matrix-wrap,.matrix-chart-box{border:1px solid var(--hairline);border-radius:2px}
+.matrix-wrap::before{display:none}            /* 虹色トップバーを撤去 */
+.matrix-chart-box::after{display:none}         /* 内側ハイライト撤去 */
+.matrix-kpi-card{border:1px solid var(--hairline);border-radius:2px}
+/* 操作と表示を分ける：押せるカードは墨の枠で明示、表示専用は細いヘアライン（佐藤可士和ディレクション） */
+.unit-filter-card,.matrix-kpi-card{border:1px solid var(--ink)!important}
+.unit-filter-card:hover,.matrix-kpi-card:hover{background:var(--subtle)!important;border-color:var(--ink)!important}
+.matrix-filter-btn{border:1px solid var(--ink)}
+.matrix-filter-btn:hover{background:var(--subtle);border-color:var(--ink)}
+.mc{border:1px solid var(--hairline)!important}
+.matrix-kpi-card.q-foundation{--matrix-q-color:var(--q1)}
+.matrix-kpi-card.q-profit{--matrix-q-color:var(--q2)}
+.matrix-kpi-card.q-reprice{--matrix-q-color:var(--q3)}
+.matrix-kpi-card.q-withdraw{--matrix-q-color:var(--q4)}
+/* カード地に同色の淡いグラデーション感（選択時は緑の選択色を優先） */
+.matrix-kpi-card.q-foundation:not(.on){background:rgba(var(--primary-rgb),0.075)!important}
+.matrix-kpi-card.q-profit:not(.on){background:rgba(var(--primary-rgb),0.05)!important}
+.matrix-kpi-card.q-reprice:not(.on){background:rgba(230,0,18,0.045)!important}   /* 価格見直し=淡い赤 */
+.matrix-kpi-card.q-withdraw:not(.on){background:rgba(230,0,18,0.10)!important}    /* 撤退候補=濃い赤 */
+.matrix-kpi-card::before{width:6px}            /* 帯をやや太く＝濃淡を読み取りやすく */
+.matrix-filter-btn.q-foundation{--matrix-q-color:var(--q1);--matrix-q-stroke:var(--q1)}
+.matrix-filter-btn.q-profit{--matrix-q-color:var(--q2);--matrix-q-stroke:var(--q2)}
+.matrix-filter-btn.q-reprice{--matrix-q-color:var(--q3);--matrix-q-stroke:var(--q3)}
+.matrix-filter-btn.q-withdraw{--matrix-q-color:var(--q4);--matrix-q-stroke:var(--q4)}
+.matrix-row-foundation{--matrix-row-color:var(--q1)}
+.matrix-row-profit{--matrix-row-color:var(--q2)}
+.matrix-row-reprice{--matrix-row-color:var(--q3)}
+.matrix-row-withdraw{--matrix-row-color:var(--q4)}
+/* 明細チップの文字は墨で固定（淡い緑でも可読に保つ。色は左罫とドットで示す） */
+.matrix-q-chip{color:var(--ink)!important}
+.matrix-dot.normal{background:var(--q1);border-color:var(--q1)}
+/* JAN照合パネル */
+.jan-filter-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 12px;background:var(--subtle);border-bottom:1px solid var(--hairline)}
+.jan-filter{border:1px solid var(--line);background:#FFFFFF;color:var(--txt2);border-radius:2px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.jan-filter.on{background:var(--primary);border-color:var(--primary);color:#FFFFFF}
+.jan-why{font-size:10.5px;line-height:1.55;color:var(--txt2);margin-top:3px}
+.jan-fix{font-size:10.5px;line-height:1.55;color:var(--primary-strong);margin-top:4px;font-weight:600}
+.jan-evidence{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.jan-chip{display:inline-block;border:1px solid var(--hairline);background:var(--subtle);border-radius:2px;padding:1px 6px;font-size:10px;color:var(--txt2)}
+.jan-chip.err{background:var(--wash-red);border-color:#F0B8B8;color:var(--signal-text)}
+/* 画像保存ボタン / 在庫テーブル圧縮 */
+.stock-dt th,.stock-dt td{padding:5px 6px}
+.stock-dt .sku-main{max-width:150px}
+.stock-dt .sku-pill{font-size:9.5px}
+.stock-cols-toggle{display:none}
+html.mobile-device .stock-cols-toggle{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:8px;padding:11px 13px;background:var(--wash-green);border:1px solid var(--primary);border-radius:2px;font-size:12.5px;font-weight:700;color:var(--primary-strong);cursor:pointer;font-family:inherit;text-align:left;-webkit-tap-highlight-color:transparent}
+html.mobile-device .stock-cols-toggle .sct-label{flex:1 1 auto;min-width:0}
+html.mobile-device .stock-cols-toggle .sct-chev{flex:0 0 auto;display:flex;align-items:center;color:var(--primary);transition:transform .2s}
+html.mobile-device .stock-cols-toggle .sct-chev svg{width:16px;height:16px;display:block}
+html.mobile-device .stock-cols-toggle.open .sct-chev{transform:rotate(180deg)}
+html.mobile-device .stock-cols-toggle:active{background:#E3EFE8}
+html.mobile-device .stock-dt.mobile-condensed{min-width:0!important}
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(2),html.mobile-device .stock-dt.mobile-condensed td:nth-child(2),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(3),html.mobile-device .stock-dt.mobile-condensed td:nth-child(3),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(4),html.mobile-device .stock-dt.mobile-condensed td:nth-child(4),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(8),html.mobile-device .stock-dt.mobile-condensed td:nth-child(8),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(9),html.mobile-device .stock-dt.mobile-condensed td:nth-child(9),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(10),html.mobile-device .stock-dt.mobile-condensed td:nth-child(10){display:none}
+html.mobile-device .stock-dt.mobile-condensed th:first-child{min-width:0!important}
+html.mobile-device .stock-dt.mobile-condensed .sku-main{max-width:116px}
+/* 携帯の在庫点検：理論/実在庫/誤差/判定の列幅を揃える（ガタつき防止） */
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(5),html.mobile-device .stock-dt.mobile-condensed td:nth-child(5),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(6),html.mobile-device .stock-dt.mobile-condensed td:nth-child(6),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(7),html.mobile-device .stock-dt.mobile-condensed td:nth-child(7),
+html.mobile-device .stock-dt.mobile-condensed th:nth-child(11),html.mobile-device .stock-dt.mobile-condensed td:nth-child(11){width:58px;min-width:58px;max-width:58px}
+/* 判定バッジ「誤差 ×」が縦に折れないよう一行で収める */
+html.mobile-device .stock-dt.mobile-condensed td:nth-child(11) .bdg{white-space:nowrap;font-size:9.5px;padding:2px 4px}
+/* 携帯・全項目表示（展開）時：閉じた時と同じ整然さで、データ列を均一幅に揃える（金額はフル表記のまま収まる幅） */
+html.mobile-device .stock-dt:not(.mobile-condensed){
+  table-layout:fixed;
+  width:1110px!important;min-width:1110px!important
+}
+html.mobile-device .stock-dt:not(.mobile-condensed) th,
+html.mobile-device .stock-dt:not(.mobile-condensed) td{
+  width:96px;white-space:nowrap;overflow:hidden
+}
+html.mobile-device .stock-dt:not(.mobile-condensed) th:first-child,
+html.mobile-device .stock-dt:not(.mobile-condensed) td:first-child{
+  width:150px;white-space:normal;overflow:visible
+}
+html.mobile-device .stock-dt:not(.mobile-condensed) td.stock-input-cell .stock-inp{padding:10px 6px}
+/* 日次 粗利集計：携帯で粗利率まで全列を画面内に収める（金額はフル表記のまま、余白と文字を詰めて調整） */
+html.mobile-device table.dt.pdaily-dt{min-width:0!important;width:100%}
+html.mobile-device table.dt.pdaily-dt th,
+html.mobile-device table.dt.pdaily-dt td{padding:7px 4px!important;font-size:11px;white-space:nowrap}
+html.mobile-device table.dt.pdaily-dt th{font-size:9.6px;line-height:1.2;vertical-align:bottom}
+html.mobile-device table.dt.pdaily-dt th:first-child,
+html.mobile-device table.dt.pdaily-dt td:first-child{font-size:10.5px}
+.ph-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.img-export-btn{background:#FFFFFF;border:1px solid var(--primary);color:var(--primary-strong);cursor:pointer;border-radius:2px}
+.img-export-btn:hover{background:var(--wash-green)}
+html.mobile-device .ph-right{width:100%;justify-content:flex-start}
+html.mobile-device .img-export-btn{display:none}
+/* 携帯では上の緑帯と重複/不要なバッジを非表示 */
+html.mobile-device #sales-badge{display:none}
+html.mobile-device #home-status{display:none}
+html.mobile-device #unit-badge{display:none}
+html.mobile-device #management-badge{display:none}
+html.mobile-device #ai-badge{display:none}
+/* 画像で保存：受発注カレンダーと同じ全画面ビュー（長押しで写真に追加） */
+.img-save-screen{position:fixed;inset:0;z-index:120002;background:#FFFFFF;display:flex;flex-direction:column;opacity:0;transition:opacity .2s ease}
+.img-save-screen.open{opacity:1}
+.img-save-bar{flex:0 0 auto;display:flex;align-items:center;background:var(--primary);color:#FFFFFF;padding:12px 14px;position:relative}
+.img-save-back{flex:0 0 auto;background:rgba(255,255,255,0.16);color:#FFFFFF;border:none;border-radius:2px;font-family:inherit;font-size:14px;font-weight:700;padding:9px 18px;cursor:pointer;line-height:1}
+.img-save-back:hover{background:rgba(255,255,255,0.24)}
+.img-save-back:active{background:rgba(255,255,255,0.3)}
+.img-save-title{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;font-weight:700;pointer-events:none}
+.img-save-body{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 14px calc(env(safe-area-inset-bottom,0px) + 24px);background:#FFFFFF}
+.img-save-note{background:#F4F4F4;border-radius:2px;padding:14px 16px;font-size:13.5px;line-height:1.75;color:var(--ink);margin:0 auto 16px;max-width:760px}
+.img-save-note b{font-weight:700}
+.img-save-card{border:1px solid var(--hairline);border-radius:2px;padding:8px;background:#FFFFFF;max-width:760px;margin:0 auto}
+.img-save-img{display:block;width:100%;height:auto;border:1px solid #EFEFEF}
+/* サイドバー折り畳み */
+.side{position:relative}
+.side-toggle{align-self:flex-end;background:transparent;border:1px solid rgba(255,255,255,0.55);color:#FFFFFF;width:28px;height:28px;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-bottom:2px;flex:0 0 auto}
+.side-toggle:hover{background:rgba(255,255,255,0.16);border-color:#FFFFFF}
+.side-toggle svg{width:18px;height:18px;flex:0 0 auto;display:block}
+/* 配色スイッチャー（佐藤可士和：色は最後は好み。左の余白で切替）*/
+.theme-switch{display:flex;align-items:center;gap:7px;padding:9px 12px;border-top:1px solid rgba(255,255,255,0.18)}
+.theme-switch-label{font-size:10px;color:rgba(255,255,255,0.62);font-weight:600}
+.theme-swatch{width:20px;height:20px;border-radius:2px;border:1px solid rgba(255,255,255,0.4);cursor:pointer;padding:0;flex:0 0 auto}
+.theme-swatch:hover{border-color:rgba(255,255,255,0.85)}
+.theme-swatch.on{outline:2px solid #FFFFFF;outline-offset:1px;border-color:#FFFFFF}
+.app.side-collapsed .theme-switch{display:none}
+html.mobile-device .theme-switch{display:none}
+.app.side-collapsed{grid-template-columns:58px 1fr}
+.app.side-collapsed .side-toggle{align-self:center}
+.app.side-collapsed .side-toggle svg{transform:rotate(180deg)}
+.app.side-collapsed .slogo{justify-content:center;gap:0}
+.app.side-collapsed .slogo > div:last-child{display:none}
+.app.side-collapsed .slbl{display:none}
+.app.side-collapsed .ni span{display:none}
+.app.side-collapsed .ni{justify-content:center;padding-left:6px;padding-right:6px}
+.app.side-collapsed .comp-bar{display:none}
+.app.side-collapsed .sep{margin:6px 6px}
+html.mobile-device .side-toggle{display:none}
+/* ===== モバイル：ナビを下タブバー化 + 上部ブランドヘッダー（別アプリ準拠）===== */
+.m-topbar{display:none}
+html.mobile-device .m-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:35;background:var(--primary);color:#FFFFFF;padding:9px 14px;border-bottom:1px solid var(--structure)}
+html.mobile-device .m-topbar-brand{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.m-topbar-mark{width:24px;height:24px;background:#FFFFFF;border-radius:2px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.m-topbar-mark svg{fill:var(--primary)}
+.m-topbar-name{font-size:14px;font-weight:700;color:#FFFFFF;letter-spacing:-.01em}
+.m-topbar-titles{display:flex;flex-direction:column;min-width:0;line-height:1.18}
+.m-topbar-title{font-size:14px;font-weight:700;color:#FFFFFF;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-topbar-period{font-size:10.5px;color:rgba(255,255,255,0.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-topbar-switch{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,0.45);border-radius:2px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;flex:0 0 auto}
+.m-topbar-switch:hover{background:rgba(255,255,255,0.12)}
+.m-topbar-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.m-topbar-cam{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;padding:0;background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,0.45);border-radius:2px;cursor:pointer;flex:0 0 auto}
+.m-topbar-cam svg{width:18px;height:18px;display:block}
+.m-topbar-cam:hover{background:rgba(255,255,255,0.12)}
+.m-topbar-cam:active{background:rgba(255,255,255,0.2)}
+/* タイトル・期間は緑バーに集約。本文ヘッダーの重複表示はモバイルで隠して縦を節約 */
+html.mobile-device .ph .ps,
+html.mobile-device .ph .pt{display:none}
+html.mobile-device .ph{margin-bottom:8px}
+/* 下タブバー：別アプリ(order calendar)の作法を完全踏襲。グループ見出し＋緑の上罫でアクティブを明示 */
+.m-tabgroups{display:none}
+html.mobile-device .m-tabgroups{display:flex;position:fixed;left:0;right:0;bottom:56px;z-index:40;height:22px;background:#FFFFFF;border-top:2px solid var(--structure);align-items:stretch}
+.m-tg{display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:var(--txt3);letter-spacing:.06em}
+.m-tg-a{flex:2}.m-tg-b{flex:6}.m-tg-c{flex:2}
+.m-tg-b,.m-tg-c{border-left:1px solid #D2D2D2}
+html.mobile-device .side{position:fixed;bottom:0;left:0;right:0;top:auto;z-index:40;display:flex;flex-direction:row;flex-wrap:nowrap;width:100%;max-width:100%;height:56px;background:#FFFFFF;border-right:none;border-top:1px solid var(--hairline);border-bottom:none;padding:0;gap:0;overflow:hidden;-webkit-overflow-scrolling:touch}
+html.mobile-device .slogo{display:none}
+html.mobile-device .comp-bar{display:none}
+html.mobile-device .side .ni{position:relative;flex:1 1 0;min-width:0;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:56px;min-height:0;padding:6px 2px 5px;white-space:nowrap;font-size:10px;color:#9A9A9A;background:#F6F6F6;border-radius:0;border-top:3px solid transparent;border-bottom:none;transition:background .15s,color .15s}
+html.mobile-device .side .ni[data-s="sales"],html.mobile-device .side .ni[data-s="advice"]{border-left:1px solid #EAEAEA}
+html.mobile-device .side .ni svg{width:21px;height:21px;stroke:#A6A6A6}
+html.mobile-device .side .ni.on svg{stroke:var(--primary)}
+html.mobile-device .side .ni span{display:none}
+html.mobile-device .side .ni::after{content:attr(data-short);font-size:9.5px;line-height:1;font-weight:600}
+html.mobile-device .side .ni.on{background:#FFFFFF;color:var(--primary);border-top-color:var(--primary)}
+html.mobile-device .side .ni.on::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--primary);border-radius:0}
+html.mobile-device .side .ni.on::after{font-weight:700}
+html.mobile-device .body{padding-bottom:82px}
+/* ===== タブ遷移オーバーレイ ===== */
+/* 別アプリ(order calendar)のジャンプ演出に一致：緑のスクリム + 流れるシェブロン + カード出現 */
+.nav-transition{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(10,30,18,0.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.nav-transition.show{display:flex;animation:navTransFade .16s ease}
+.nav-transition-card{position:relative;overflow:hidden;background:#FFFFFF;border:1px solid var(--ink);border-radius:2px;padding:22px 28px 0;min-width:248px;max-width:80vw;text-align:center}
+.nav-transition-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--primary)}
+.nav-transition.show .nav-transition-card{animation:navCardIn .26s cubic-bezier(.34,1.56,.64,1) both}
+.nav-transition-flow{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:13px}
+.nav-transition-from{font-size:12px;font-weight:800;color:var(--txt3);background:var(--subtle);padding:5px 12px;border-radius:2px}
+.nav-transition-chev{display:inline-flex;gap:2px;align-items:center}
+.nav-transition-chev i{width:7px;height:7px;border-top:2.5px solid var(--primary);border-right:2.5px solid var(--primary);transform:rotate(45deg);opacity:.25;display:block}
+.nav-transition.show .nav-transition-chev i{animation:navChevFlow .65s linear infinite}
+.nav-transition.show .nav-transition-chev i:nth-child(2){animation-delay:.11s}
+.nav-transition.show .nav-transition-chev i:nth-child(3){animation-delay:.22s}
+.nav-transition-to{font-size:12px;font-weight:800;color:#FFFFFF;background:var(--primary);padding:5px 13px;border-radius:2px}
+.nav-transition-msg{font-size:17px;font-weight:800;color:var(--ink);text-align:center;padding-bottom:18px;letter-spacing:.03em}
+.nav-transition-bar{height:3px;background:var(--subtle);margin:0 -28px}
+.nav-transition.show .nav-transition-bar-fill{height:100%;background:var(--primary);width:0;animation:navTransBar .56s linear forwards}
+@keyframes navTransFade{from{opacity:0}to{opacity:1}}
+@keyframes navTransBar{from{width:0}to{width:100%}}
+@keyframes navCardIn{from{transform:translateY(12px) scale(.92);opacity:0}60%{opacity:1}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes navChevFlow{0%{opacity:.2}45%{opacity:1}100%{opacity:.2}}
+/* 情報の折り畳み（取込可能なCSV列名など） */
+.info-disclosure{border:1px solid var(--hairline);border-radius:2px;background:#FFFFFF}
+.info-disclosure>summary{list-style:none;cursor:pointer;padding:10px 14px;font-size:12px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:9px;user-select:none}
+.info-disclosure>summary::-webkit-details-marker{display:none}
+.info-disclosure>summary::before{content:"";width:6px;height:6px;border-right:1.5px solid var(--txt2);border-bottom:1.5px solid var(--txt2);transform:rotate(-45deg);transition:transform .15s;display:inline-block}
+.info-disclosure[open]>summary::before{transform:rotate(45deg)}
+.info-disclosure-body{padding:2px 14px 12px;font-size:11px;line-height:1.7;color:var(--txt2)}
+.info-disclosure-body code{font-size:10.5px;background:var(--subtle);padding:1px 5px;border-radius:2px;border:1px solid var(--hairline);color:var(--txt2)}
+.stock-check-summary{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:9px 13px;border:1px solid var(--hairline);border-radius:2px;background:#FFFFFF;margin-bottom:10px;font-size:12.5px;color:var(--ink)}
+.stock-check-summary.ok{}
+.stock-check-sub{font-size:11px;color:var(--txt3);font-weight:400}
+.matrix-bar-fill{background:var(--primary)}
+.matrix-bar-fill.sales{background:var(--ink)}
+.matrix-bar-fill.profit{background:var(--primary)}
+.matrix-bar-fill.negative{background:var(--signal)}
+.matrix-value-pos{color:var(--primary)!important}
+.matrix-value-neg{color:var(--signal-text)!important}
+.matrix-rank{background:var(--subtle);border:1px solid var(--hairline);color:var(--txt3);border-radius:2px}
+.matrix-stat-pill,.matrix-bench-pill,.matrix-axis-pill,.matrix-selected-chip,.matrix-q-chip,.matrix-action-chip{border-radius:2px}
+
+/* ---- AI/単価/確認の補助チップ：直角・無彩色基調 ---- */
+.ai-topic,.advice-filter,.unit-signal>*{border-radius:2px}
+.ai-insight{border-radius:2px;border-color:var(--hairline)}
+.ai-rank li::marker{color:var(--primary)}
+
+/* ---- ホーム：ナビカードのアイコンは緑（操作の入口）で統一。装飾的な赤を排す ---- */
+.g4 .card>div:first-child{background:var(--wash-green)!important;border:1px solid var(--hairline)}
+.g4 .card svg{stroke:var(--primary)!important}
+.g4 .card:hover{border-color:var(--ink)}
+
+/* ============================================================
+   ボタン・機能箇所の文字＝墨ではっきり（薄いグレーを排す）
+   操作対象（押せるカード/フィルタ）のラベルだけを濃くし、
+   表示専用カードの副ラベルは従来の階調を維持する。
+   ============================================================ */
+.unit-filter-card .ml{color:var(--ink);font-weight:700}
+.advice-kpi .unit-filter-card .ml,
+.unit-kpi .unit-filter-card .ml{color:var(--ink);font-weight:700}
+.matrix-kpi-label{color:var(--ink)}
+.advice-filter{color:var(--ink);font-weight:700}
+.matrix-filter-btn b{color:var(--ink);font-weight:700}
+.jan-filter{color:var(--ink);font-weight:700}
+/* 選択中（緑地ベタ）の白文字のみ維持。淡緑地のボタンは墨のまま */
+.advice-filter.on,.jan-filter.on{color:#FFFFFF}
+
+/* ===== 佐藤可士和リファイン v2（追加調整） ===== */
+/* 5: セクション番号は不要 */
+.sec-num{display:none!important}
+/* 1: AI相談テーマを一列（横スクロール） */
+.ai-topic-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:3px}
+.ai-topic{flex:0 0 auto;white-space:nowrap}
+/* 2: 単価のシグナルカードを一列に */
+.unit-signals{grid-template-columns:repeat(4,1fr)!important;gap:6px!important}
+html.mobile-device .unit-signals{grid-template-columns:repeat(4,1fr)!important}
+.unit-signals .unit-filter-card{padding:9px 9px 11px 10px}
+.unit-signals .ml{font-size:10px;line-height:1.25}
+.unit-signals .mv{font-size:17px}
+.unit-signals .mv span{font-size:9px!important}
+.unit-signals .unit-filter-card::after{content:"";display:block;right:8px;bottom:11px;top:auto;width:6px;height:6px;border-right:1.5px solid #6B6B6B;border-top:1.5px solid #6B6B6B;transform:rotate(45deg)}
+.unit-signals .unit-filter-card.on::after,.unit-signals .unit-filter-card:hover::after{border-color:var(--primary)}
+/* 8: AIに渡す相談文の枠だけを緑線でハイライト（相談で見るべき上位は対象外） */
+.ai-panel.ai-panel-main{border:2px solid var(--primary)}
+/* 4: 単価フォーカスをコンパクトに＋注記は灰文字、推移は枠内 */
+.unit-focus{padding:13px 13px 14px}
+.unit-focus-sep{margin:12px 0 11px}
+.unit-focus .unit-kpi{margin-bottom:9px}
+.unit-focus-note{font-size:11px;color:#6B6B6B;line-height:1.6}
+.unit-trend-note{font-size:11px;color:#6B6B6B;line-height:1.55;padding:4px 0 2px}
+.unit-focus .unit-trend-box{height:168px;margin-bottom:0;border-color:#E6E6E6}
+.unit-focus .unit-sec-h{margin-top:0}
+/* 3: 確認事項の行をコンパクト */
+html.mobile-device .advice-row{padding:8px 12px}
+.advice-row .advice-title{line-height:1.32}
+/* 確認事項: 3列レイアウト（左:カテゴリ+タイトル / 中:指標を右揃えで縦積み / 右:バッジ列）。数値・ラベル・バッジが行をまたいで縦に揃う */
+.advice-row{display:flex;align-items:center;gap:10px}
+.ar-main{flex:1 1 auto;min-width:0}
+.ar-cat{display:block;margin-bottom:2px}
+.advice-row .ar-metric{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;margin-top:0;white-space:nowrap}
+.advice-row .ar-metric-v{font-size:15px;font-weight:800;line-height:1.25}
+.advice-row .ar-metric-l{font-size:10px;color:#6B6B6B;line-height:1.2}
+.ar-badge{flex:0 0 64px;display:flex;justify-content:flex-end;align-items:center}
+/* 6: 在庫テーブルの行を狭く＋注記を詰める */
+html.mobile-device .stock-dt th,html.mobile-device .stock-dt td{padding:4px 6px!important}
+.stock-dt .issue-list{margin-top:2px;line-height:1.3}
+.stock-dt .issue-list span{font-size:9.5px}
+/* 9,10: 絞り込みシートのボタンは折り返し可（ボタンが少なければ自然に1行、多ければ折返し） */
+/* 11: 集計期間を緑帯の中のボタンへ（全ページ共通） */
+.m-topbar-period-btn{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,0.45);border-radius:2px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;flex:0 0 auto}
+.m-topbar-period-btn.on{background:#FFFFFF;color:var(--primary);border-color:#FFFFFF}
+html.mobile-device .period-filter{display:none}
+.m-topbar-period-btn:hover{background:rgba(255,255,255,0.12)}
+.m-topbar-period-panel{display:none;position:absolute;top:100%;left:0;right:0;z-index:40;background:#FFFFFF;border-bottom:1px solid var(--structure);box-shadow:0 6px 18px rgba(0,0,0,0.12);padding:12px 14px;flex-direction:column;gap:9px}
+.m-topbar-period-panel.open{display:flex}
+.m-topbar-period-panel .period-dates{display:flex;align-items:center;gap:8px}
+.m-topbar-period-panel label{flex:1 1 0;min-width:0}
+.m-topbar-period-panel input[type=date]{width:100%;box-sizing:border-box;min-width:0;height:42px;font-family:inherit;-webkit-appearance:none;appearance:none;background:#FFFFFF;color:#0A0A0A}
+/* 1: 経営アドバイスの意味のないグレー外枠を撤去（中身は他画面と同様に直接配置） */
+.matrix-wrap{border:none;background:transparent;padding:0;overflow:visible}
+html.mobile-device .matrix-wrap{padding:0}
+.matrix-wrap::before{display:none}
+/* 2-4: 緑帯（m-topbar）直下の余白を詰める */
+html.mobile-device .scr{padding-top:5px}
+/* 在庫: 合計金額ボックスを低く＋下の余白も詰める */
+.stock-totals{margin-bottom:.65rem}
+html.mobile-device .stock-totals .mc{padding:5px 11px}
+.stock-totals .mc .ml{margin-bottom:0}
+/* 単価: SKU一覧の見出し帯を低く */
+html.mobile-device .unit-list-head{padding-top:6px;padding-bottom:6px}
+html.mobile-device .unit-list-head .unit-sort-toggle{min-height:28px}
+/* 粗利: タブと凡例の間（上）の余白を詰める */
+html.mobile-device .tab-row-profit{margin-bottom:.55rem}
+</style>
+<body>
+
+<h1 class="sr-only">Smart-EMS 販売データ分析ツール</h1>
+
+<div class="app">
+
+<!-- ============= SIDEBAR ============= -->
+<nav class="side" aria-label="メインナビゲーション">
+  <button class="side-toggle" type="button" onclick="toggleSidebar()" aria-label="サイドバーの開閉" title="サイドバーを開閉">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 17 8 12 13 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+  </button>
+  <div class="slogo">
+    <div class="sic">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><rect x="4.5" y="12.5" width="3.6" height="7"/><rect x="10.2" y="8.5" width="3.6" height="11"/><rect x="15.9" y="4.5" width="3.6" height="15"/></svg>
+    </div>
+    <div>
+      <div class="brand">Smart-EMS</div>
+      <div class="brand-sub">青果販売データ分析</div>
+    </div>
+  </div>
+  <div class="ni on" data-s="home" data-short="ホーム">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+    <span>ホーム</span>
+  </div>
+  <div class="ni" data-s="import" data-short="取込">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+    <span>データ取込</span>
+  </div>
+  <hr class="sep">
+  <div class="slbl">分析</div>
+  <div class="ni" data-s="daily" data-short="日別">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/><g fill="currentColor" stroke="none"><circle cx="8" cy="13.5" r="1"/><circle cx="12" cy="13.5" r="1"/><circle cx="16" cy="13.5" r="1"/><circle cx="8" cy="17.3" r="1"/><circle cx="12" cy="17.3" r="1"/></g></svg>
+    <span>日別推移</span>
+  </div>
+  <div class="ni" data-s="product" data-short="品目">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="20.5" x2="21" y2="20.5"/><g fill="currentColor" stroke="none"><rect x="5.3" y="11" width="3.4" height="9" rx="0.6"/><rect x="10.3" y="6.5" width="3.4" height="13.5" rx="0.6"/><rect x="15.3" y="14" width="3.4" height="6" rx="0.6"/></g></svg>
+    <span>品名分析</span>
+  </div>
+  <div class="ni" data-s="customer" data-short="得意先">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8 L5.5 4 L18.5 4 L20 8 Z"/><path d="M5 8 V20 H19 V8"/><path d="M10 20 V14 H14 V20"/><line x1="3.5" y1="8" x2="20.5" y2="8"/></svg>
+    <span>得意先分析</span>
+  </div>
+  <div class="ni" data-s="shipper" data-short="出荷者">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 9h4l3 3v5h-7z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="18" cy="18.5" r="1.6"/></svg>
+    <span>出荷者分析</span>
+  </div>
+  <div class="ni" data-s="staff" data-short="担当者">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 21v-1.2A6.2 6.2 0 0 1 11.2 13h1.6A6.2 6.2 0 0 1 19 19.8V21"/></svg>
+    <span>担当者分析</span>
+  </div>
+  <div class="ni" data-s="unit" data-short="単価">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="19" cy="7" r="1"/></svg>
+    <span>単価分析</span>
+  </div>
+  <hr class="sep">
+  <div class="slbl">経営</div>
+  <div class="ni" data-s="matrix" data-short="助言">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="8" cy="14" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="16" cy="8" r="2"/><path d="M4 20h16"/><path d="M4 4v16"/></svg>
+    <span>経営アドバイス</span>
+  </div>
+  <div class="ni" data-s="check" data-short="確認">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>確認事項</span>
+  </div>
+
+  <div class="comp-bar" id="comp-bar">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:10px;color:var(--primary)">取込データ</div>
+      <div style="font-size:12px;font-weight:700;color:var(--primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="data-status">未取込</div>
+    </div>
+    <button class="btn-sm" style="padding:4px 9px;font-size:10.5px" onclick="go('import')" title="データ取込画面へ">取込</button>
+  </div>
+</nav>
+
+<!-- ============= BODY ============= -->
+<div class="body">
+  <div class="m-topbar">
+    <div class="m-topbar-brand">
+      <span class="m-topbar-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><rect x="4.5" y="12.5" width="3.6" height="7"/><rect x="10.2" y="8.5" width="3.6" height="11"/><rect x="15.9" y="4.5" width="3.6" height="15"/></svg></span>
+      <div class="m-topbar-titles">
+        <span class="m-topbar-title" id="m-topbar-title">Smart-EMS</span>
+        <span class="m-topbar-period" id="m-topbar-period"></span>
+      </div>
+    </div>
+    <div class="m-topbar-actions">
+      <button type="button" class="m-topbar-period-btn" id="m-topbar-period-btn" onclick="toggleTopbarPeriod(event)" style="display:none">期間</button>
+      <button type="button" class="m-topbar-cam" id="m-topbar-cam" onclick="exportCurrentScreen()" title="この画面を画像で保存" aria-label="画像で保存" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.1-1.8A1 1 0 0 1 9.7 4.7h4.6a1 1 0 0 1 .9.5L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v8A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.2" r="3.1"/></svg></button>
+    </div>
+    <div class="m-topbar-period-panel" id="m-topbar-period-panel">
+      <div style="display:flex;gap:10px">
+        <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+          <span style="font-size:9.5px;font-weight:700;color:#6B6B6B;letter-spacing:.02em">開始日</span>
+          <input type="date" id="tb-period-start" onchange="updateGlobalPeriod('start', this.value)" style="width:100%;box-sizing:border-box;padding:10px 9px;font-size:13px;border:1px solid var(--hairline);border-radius:2px;color:#0A0A0A;font-family:inherit">
+        </label>
+        <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+          <span style="font-size:9.5px;font-weight:700;color:#6B6B6B;letter-spacing:.02em">終了日</span>
+          <input type="date" id="tb-period-end" onchange="updateGlobalPeriod('end', this.value)" style="width:100%;box-sizing:border-box;padding:10px 9px;font-size:13px;border:1px solid var(--hairline);border-radius:2px;color:#0A0A0A;font-family:inherit">
+        </label>
+      </div>
+      <button class="btn-sm" style="width:100%;margin-top:10px;padding:11px" onclick="resetGlobalPeriod()">期間リセット（全期間）</button>
+    </div>
+  </div>
+
+  <!-- 共有フィルタ・ボトムシート -->
+  <div class="pw-scrim" id="filter-scrim" onclick="closeFilterSheet()" aria-hidden="true"></div>
+  <div class="pw-sheet" id="filter-sheet" role="dialog" aria-modal="true" aria-labelledby="filter-sheet-title">
+    <div class="pw-grab"></div>
+    <div class="pw-head"><h3 id="filter-sheet-title">絞り込み</h3><button type="button" class="pw-x" onclick="closeFilterSheet()" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></svg></button></div>
+    <div class="pw-body" id="filter-sheet-body"></div>
+  </div>
+
+  <div class="m-tabgroups" aria-hidden="true">
+    <span class="m-tg m-tg-a">データ</span>
+    <span class="m-tg m-tg-b">分析</span>
+    <span class="m-tg m-tg-c">経営</span>
+  </div>
+
+  <div class="nav-transition" id="nav-transition" aria-hidden="true">
+    <div class="nav-transition-card">
+      <div class="nav-transition-flow"><span class="nav-transition-from" id="nav-trans-from"></span><span class="nav-transition-chev" aria-hidden="true"><i></i><i></i><i></i></span><span class="nav-transition-to" id="nav-trans-to"></span></div>
+      <div class="nav-transition-msg" id="nav-trans-msg"></div>
+      <div class="nav-transition-bar"><div class="nav-transition-bar-fill"></div></div>
+    </div>
+  </div>
+
+<!-- ===== HOME ===== -->
+<div id="s-home" class="scr on">
+  <div class="ph">
+    <div>
+      <div class="ps" id="home-period">データ未取込</div>
+      <div class="pt">ホーム</div>
+    </div>
+    <span id="home-status" class="bdg bdg-gy">未取込</span>
+  </div>
+  <div id="home-content"></div>
+</div>
+
+<!-- ===== IMPORT ===== -->
+<div id="s-import" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps">日次CSV（仕入・販売・粗利を含む明細）を取り込むと合算され、各分析画面が自動更新されます</div>
+      <div class="pt">データ取込</div>
+    </div>
+    <div class="flex">
+      <button class="btn-sm" onclick="loadSample()" id="btn-sample">サンプル読込</button>
+      <button class="btn-sm btn-rd" onclick="confirmReset()" id="btn-reset">全データ削除</button>
+    </div>
+  </div>
+
+  <div class="mb-1">
+    <div style="font-size:12px;font-weight:600;color:#3A3A3A;margin-bottom:6px">販売明細 CSV（Shift-JIS / 複数選択可）</div>
+    <div class="uz" id="uz" onclick="document.getElementById('uf').click()">
+      <input type="file" id="uf" accept=".csv,.txt" multiple style="display:none">
+      <div id="ui"></div>
+    </div>
+  </div>
+
+  <div id="import-detail"></div>
+
+  <details class="info-disclosure" style="margin-bottom:1.25rem">
+    <summary>取込対象のCSV列（自動検出）</summary>
+    <div class="info-disclosure-body">
+    品名＝<code>S:品名 / 品名 / 商品名</code>　得意先＝<code>H:得意先名 / 得意先名</code>　出荷者＝<code>S:出荷者名 / 出荷者名</code>　担当者＝<code>H:販売担当者名</code>　重量＝<code>H:販売重量（Kg）</code>　仕入＝<code>H:仕入金額</code>　販売＝<code>H:販売金額</code>　粗利＝<code>H:粗利金額</code>　販売日＝<code>H:販売日</code>　入荷日＝<code>H:入荷日</code>　区分＝<code>H:データ区分</code><br><span style="display:inline-block;margin-top:7px;color:#3A3A3A;line-height:1.7">日付は <code>YYYYMMDD</code> 形式（例 20260521）に対応。文字コードは <strong>Shift-JIS</strong> を自動判定します（UTF-8も可）。1明細に仕入・販売・粗利が含まれるため、売上／仕入を別々に取り込む必要はありません。</span>
+    </div>
+  </details>
+</div>
+
+<!-- ===== DAILY ===== -->
+<div id="s-daily" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="daily-period">データ未取込</div>
+      <div class="pt">日別推移</div>
+    </div>
+    <div class="ph-right"><span id="daily-badge" class="bdg bdg-gy">— 日</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#daily-content','日別推移.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="daily-content"></div>
+</div>
+
+<!-- ===== PRODUCT ===== -->
+<div id="s-product" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="product-period">データ未取込</div>
+      <div class="pt">品名分析</div>
+    </div>
+    <div class="ph-right"><span id="product-badge" class="bdg bdg-gy">— 品目</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#product-content','品名分析.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="product-content"></div>
+</div>
+
+<!-- ===== CUSTOMER ===== -->
+<div id="s-customer" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="customer-period">データ未取込</div>
+      <div class="pt">得意先分析</div>
+    </div>
+    <div class="ph-right"><span id="customer-badge" class="bdg bdg-gy">— 社</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#customer-content','得意先分析.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="customer-content"></div>
+</div>
+
+<!-- ===== SHIPPER ===== -->
+<div id="s-shipper" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="shipper-period">データ未取込</div>
+      <div class="pt">出荷者分析</div>
+    </div>
+    <div class="ph-right"><span id="shipper-badge" class="bdg bdg-gy">— 社</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#shipper-content','出荷者分析.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="shipper-content"></div>
+</div>
+
+<!-- ===== STAFF ===== -->
+<div id="s-staff" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="staff-period">データ未取込</div>
+      <div class="pt">担当者分析</div>
+    </div>
+    <div class="ph-right"><span id="staff-badge" class="bdg bdg-gy">— 名</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#staff-content','担当者分析.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="staff-content"></div>
+</div>
+
+<!-- ===== UNIT PRICE ===== -->
+<div id="s-unit" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="unit-period">データ未取込</div>
+      <div class="pt">単価分析（円/kg）</div>
+    </div>
+    <div class="ph-right"><span id="unit-badge" class="bdg bdg-gy">— 品目</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#unit-content','単価分析.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="unit-content"></div>
+</div>
+
+<!-- ===== CHECK POINTS ===== -->
+<div id="s-check" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="check-period">データ未取込</div>
+      <div class="pt">確認事項</div>
+    </div>
+    <div class="ph-right"><span id="check-badge" class="bdg bdg-gy">—</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#check-content','確認事項.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="check-content"></div>
+</div>
+
+<!-- ===== MANAGEMENT ADVICE ===== -->
+<div id="s-matrix" class="scr">
+  <div class="ph">
+    <div>
+      <div class="ps" id="matrix-period">データ未取込</div>
+      <div class="pt">経営アドバイス</div>
+    </div>
+    <div class="ph-right"><span id="matrix-badge" class="bdg bdg-gy">—</span><button class="btn-sm img-export-btn" onclick="exportScreenImage('#matrix-content','経営アドバイス.png')" title="この画面を画像として保存">画像で保存</button></div>
+  </div>
+  <div id="matrix-content"></div>
+</div>
+
+</div><!-- /.body -->
+</div><!-- /.app -->
+
+<!-- ===== MODAL ===== -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-t" id="modal-t">確認</div>
+    <div class="modal-d" id="modal-d"></div>
+    <div class="modal-acts">
+      <button onclick="closeModal()">キャンセル</button>
+      <button class="btn-rd" id="modal-ok">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+/* =====================================================================
+   Smart-EMS — 青果販売データ分析（再設計版 / ログイン廃止・単一CSVスキーマ）
+   1明細に「仕入金額・販売金額・粗利金額」を含むShift-JIS日次CSVに対応
+   ===================================================================== */
+
+/* ---------- SVG ICONS ---------- */
+const ICON_PATHS = {
+  'database-off':'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3"/><path d="M4 12v6c0 1.5 2.7 2.7 6.3 3"/><path d="M20 12V6"/><line x1="3" y1="3" x2="21" y2="21"/>',
+  'package-off':'<path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-3.4 1.94"/><path d="M3.3 7l8.7 5 .6-.34"/><path d="M3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l3-1.71"/><line x1="12" y1="22" x2="12" y2="12"/><line x1="3" y1="3" x2="21" y2="21"/>',
+  'chart-bar':'<line x1="3" y1="20" x2="21" y2="20"/><rect x="6" y="10" width="3" height="10" rx="0.5"/><rect x="11" y="6" width="3" height="14" rx="0.5"/><rect x="16" y="13" width="3" height="7" rx="0.5"/>',
+  'trending-up':'<polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/>',
+  'upload':'<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/>',
+  'check-circle':'<circle cx="12" cy="12" r="10"/><polyline points="9 12 12 15 16 9"/>',
+  'alert-triangle':'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'
+};
+function svgIcon(name,size,color,sw){size=size||16;color=color||'currentColor';sw=sw||2;return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]||''}</svg>`;}
+
+/* ---------- STORAGE ---------- */
+const STORAGE_KEY = 'smart_ems_produce_v1';
+const IDB_NAME='smart_ems_db', IDB_STORE='kv';
+function getEmptyState(){ return { rows:[], meta:{ files:[], importedAt:'', cols:null, period:{start:'',end:''} } }; }
+let state = getEmptyState();
+let uploadError = null;
+
+/* IndexedDB key-value helpers (大容量データ対応。localStorageは約5MB上限のため不可) */
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    try{
+      if(!window.indexedDB){ rej(new Error('no-idb')); return; }
+      const req=indexedDB.open(IDB_NAME,1);
+      req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE); };
+      req.onsuccess=()=>res(req.result);
+      req.onerror=()=>rej(req.error);
+    }catch(e){ rej(e); }
+  });
+}
+function idbSet(key,val){
+  return idbOpen().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).put(val,key);
+    tx.oncomplete=()=>{ db.close(); res(true); };
+    tx.onerror=()=>{ db.close(); rej(tx.error); };
+    tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); };
+  }));
+}
+function idbGet(key){
+  return idbOpen().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(IDB_STORE,'readonly');
+    const r=tx.objectStore(IDB_STORE).get(key);
+    r.onsuccess=()=>{ db.close(); res(r.result); };
+    r.onerror=()=>{ db.close(); rej(r.error); };
+  }));
+}
+function adoptState(s){
+  state = s && s.rows ? s : getEmptyState();
+  if(!state.meta) state.meta = getEmptyState().meta;
+  if(!state.meta.period) state.meta.period = {start:'',end:''};
+  if(!state.meta.files) state.meta.files = [];
+}
+let _saveTimer=null, _quotaWarned=false;
+function saveState(){ if(_saveTimer) clearTimeout(_saveTimer); _saveTimer=setTimeout(persistState, 350); }
+function persistState(){
+  idbSet(STORAGE_KEY, state)
+    .then(()=>{ try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} })
+    .catch(()=>{
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+      catch(e){ if(!_quotaWarned){ _quotaWarned=true; toast('データ量が多いため自動保存できません（端末の保存容量上限）','err'); } }
+    });
+}
+function loadStateAsync(){
+  return idbGet(STORAGE_KEY).then(val=>{
+    if(val && val.rows){ adoptState(val); return true; }
+    try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw){ const p=JSON.parse(raw); if(p&&p.rows){ adoptState(p); persistState(); return true; } } }catch(e){}
+    return false;
+  }).catch(()=>{
+    try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw){ const p=JSON.parse(raw); if(p&&p.rows) adoptState(p); } }catch(e){}
+    return false;
+  });
+}
+function loadState(){ /* 旧API: 非同期版 loadStateAsync を init で使用 */ }
+
+/* ---------- COLUMN DETECTION ---------- */
+const COL_HINTS = {
+  product:    ['品名','商品名','品目'],
+  customer:   ['得意先名','得意先','販売先','納品先'],
+  shipper:    ['出荷者名','出荷者','仕入先','産地','生産者'],
+  staff:      ['販売担当者名','担当者名','担当者'],
+  saleDate:   ['販売日','売上日'],
+  arrivalDate:['入荷日','仕入日'],
+  weight:     ['販売重量','重量','数量'],
+  purchase:   ['仕入金額','仕入額','仕入'],
+  sales:      ['販売金額','売上金額','販売額'],
+  gross:      ['粗利金額','粗利益','粗利'],
+  kubun:      ['H:データ区分','データ区分','区分'],
+  juchu:      ['荷受票','伝票']
+};
+function detectColumns(headers){
+  const cols = {};
+  for(const field in COL_HINTS){
+    for(const hint of COL_HINTS[field]){
+      const found = headers.find(h => String(h).includes(hint));
+      if(found){ cols[field] = found; break; }
+    }
+  }
+  return cols;
+}
+
+/* ---------- PARSERS / FORMATTERS ---------- */
+function cleanText(v){ return v===null||v===undefined ? '' : String(v).replace(/\u3000/g,' ').trim(); }
+function parseNum(v){
+  if(v===null||v===undefined||v==='') return 0;
+  if(typeof v==='number') return isFinite(v)?v:0;
+  let s = String(v).replace(/,/g,'').replace(/[¥￥]/g,'').replace(/\s/g,'');
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+function parseDate(v){
+  if(v===null||v===undefined||v==='') return null;
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if(m){ const d=new Date(+m[1],+m[2]-1,+m[3]); return isNaN(d)?null:d; }
+  m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+  if(m){ const d=new Date(+m[1],+m[2]-1,+m[3]); return isNaN(d)?null:d; }
+  const d2 = new Date(s);
+  return isNaN(d2)?null:d2;
+}
+function dateKey(d){ if(!d) return ''; return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtDate(d){ if(!d) return '—'; return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'); }
+function keyToMD(key){ const p=String(key).split('-'); return p.length===3 ? (+p[1])+'/'+(+p[2]) : key; }
+function fmtYen(v){ if(v===null||v===undefined||!isFinite(v)) return '—'; const n=Math.round(v); return (n<0?'-¥':'¥')+Math.abs(n).toLocaleString('ja-JP'); }
+function fmtYenShort(v){
+  if(v===null||v===undefined||!isFinite(v)) return '—';
+  const sign=v<0?'-':''; const a=Math.abs(v);
+  if(a>=1e8) return sign+'¥'+(a/1e8).toFixed(2)+'億';
+  if(a>=1e4) return sign+'¥'+(a/1e4).toFixed(1)+'万';
+  return sign+'¥'+Math.round(a).toLocaleString('ja-JP');
+}
+function fmtKg(v){ if(v===null||v===undefined||!isFinite(v)) return '—'; const n=Math.round(v*10)/10; return n.toLocaleString('ja-JP')+'kg'; }
+function fmtPct(v){ if(v===null||v===undefined||!isFinite(v)) return '—'; return (v*100).toFixed(1)+'%'; }
+function fmtUnit(v){ if(v===null||v===undefined||!isFinite(v)) return '—'; return '¥'+Math.round(v).toLocaleString('ja-JP'); }
+function escapeHtml(s){ return String(s===null||s===undefined?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g,'&#39;'); }
+
+/* ---------- ROW NORMALIZATION ---------- */
+function classifyRow(r){
+  const cust = r.customer || '';
+  if(cust.indexOf('傷み')>=0) return 'spoilage';
+  if(cust.indexOf('値引')>=0 || cust.indexOf('値増')>=0) return 'adjust';
+  if(r.kubun==='7' || r.kubun==='8') return 'transfer';
+  if(r.kubun==='1') return 'return';
+  return 'normal';
+}
+function normalizeRow(raw, cols){
+  const g = (k)=> cols[k] ? raw[cols[k]] : '';
+  const sd = parseDate(g('saleDate'));
+  const ad = parseDate(g('arrivalDate'));
+  const r = {
+    juchu: cleanText(g('juchu')),
+    kubun: cleanText(g('kubun')),
+    product: cleanText(g('product')) || '（品名なし）',
+    customer: cleanText(g('customer')) || '（得意先なし）',
+    shipper: cleanText(g('shipper')) || '（出荷者なし）',
+    staff: cleanText(g('staff')) || '（担当者なし）',
+    saleKey: dateKey(sd),
+    arrivalKey: dateKey(ad),
+    weight: parseNum(g('weight')),
+    purchase: parseNum(g('purchase')),
+    sales: parseNum(g('sales')),
+    gross: parseNum(g('gross'))
+  };
+  if(!cols.gross) r.gross = r.sales - r.purchase;
+  r.type = classifyRow(r);
+  return r;
+}
+
+/* ---------- CSV IMPORT (Shift-JIS aware) ---------- */
+function decodeBuffer(buf){
+  let text='';
+  try{ text = new TextDecoder('shift-jis',{fatal:false}).decode(buf); }catch(e){ text=''; }
+  const looksOk = /[\u3040-\u30ff\u4e00-\u9fff]/.test(text) && !/[\ufffd]{3,}/.test(text.slice(0,400));
+  if(looksOk) return text;
+  try{
+    const utf = new TextDecoder('utf-8',{fatal:false}).decode(buf);
+    if(/[\u3040-\u30ff\u4e00-\u9fff]/.test(utf)) return utf;
+  }catch(e){}
+  return text || '';
+}
+function readFileSmart(file){
+  return new Promise((resolve,reject)=>{
+    const fr = new FileReader();
+    fr.onload = ()=> resolve(decodeBuffer(fr.result));
+    fr.onerror = ()=> reject(fr.error);
+    fr.readAsArrayBuffer(file);
+  });
+}
+function rowsRange(rows){
+  const ks = rows.map(r=>r.saleKey).filter(Boolean).sort();
+  return { from: ks[0]||'', to: ks[ks.length-1]||'' };
+}
+async function handleFiles(fileList){
+  const files = Array.from(fileList||[]);
+  if(!files.length) return;
+  uploadError = null;
+  let added=0, totalRows=0;
+  for(const file of files){
+    try{
+      const text = await readFileSmart(file);
+      const parsed = Papa.parse(text, {header:true, skipEmptyLines:'greedy', dynamicTyping:false});
+      const headers = parsed.meta && parsed.meta.fields ? parsed.meta.fields : [];
+      const cols = detectColumns(headers);
+      const missing = ['product','sales','purchase'].filter(k=>!cols[k]);
+      if(missing.length){
+        uploadError = { file:file.name, headers, msg:'必須列（品名・販売金額・仕入金額）を検出できませんでした' };
+        toast(file.name+'：列を検出できませんでした','err');
+        continue;
+      }
+      const rows = (parsed.data||[]).map(rr=>normalizeRow(rr, cols)).filter(r=> r.sales || r.purchase || (r.product && r.product!=='（品名なし）'));
+      if(!rows.length){ continue; }
+      state.meta.cols = cols;
+      state.rows = state.rows.concat(rows);
+      const range = rowsRange(rows);
+      state.meta.files.push({ name:file.name, rows:rows.length, at:new Date().toISOString(), from:range.from, to:range.to });
+      added++; totalRows += rows.length;
+    }catch(e){ console.error(e); toast(file.name+'：読込エラー','err'); }
+  }
+  if(added){
+    state.meta.importedAt = new Date().toISOString();
+    saveState();
+    toast(`${added}ファイル / ${totalRows.toLocaleString()}件を取り込みました`,'ok');
+    renderAll(); go('home');
+  } else if(!uploadError){
+    toast('取り込めるデータがありませんでした','err'); renderAll();
+  } else { renderAll(); }
+}
+
+/* ---------- COMPUTED ---------- */
+function aggBy(rows, key, valFn){
+  const m={};
+  rows.forEach(r=>{ const k=r[key]; if(!m[k]) m[k]={name:k,value:0,count:0}; m[k].value+=valFn(r); m[k].count++; });
+  return Object.values(m).sort((a,b)=>b.value-a.value);
+}
+function getComputed(){
+  const period = state.meta.period||{start:'',end:''};
+  const start = period.start||'', end = period.end||'';
+  const all = state.rows||[];
+  const allKeys = all.map(r=>r.saleKey).filter(Boolean).sort();
+  const fullMin = allKeys[0]||'', fullMax = allKeys[allKeys.length-1]||'';
+  const inPeriod = (k)=>{ if(!k) return !(start||end); if(start && k<start) return false; if(end && k>end) return false; return true; };
+  const rows = (start||end) ? all.filter(r=>inPeriod(r.saleKey)) : all;
+
+  const totals = {sales:0,purchase:0,gross:0,weight:0,count:rows.length};
+  const dayMap={}, prodMap={}, custMap={}, shipMap={}, staffMap={};
+  const uniqJuchu = new Set();
+  function bump(map,key,r){
+    if(!map[key]) map[key]={name:key,sales:0,purchase:0,gross:0,weight:0,count:0,_sets:{}};
+    const o=map[key]; o.sales+=r.sales; o.purchase+=r.purchase; o.gross+=r.gross; o.weight+=r.weight; o.count++;
+    return o;
+  }
+  rows.forEach(r=>{
+    totals.sales+=r.sales; totals.purchase+=r.purchase; totals.gross+=r.gross; totals.weight+=r.weight;
+    if(r.juchu) uniqJuchu.add(r.juchu);
+    if(r.saleKey) bump(dayMap,r.saleKey,r);
+    bump(prodMap,r.product,r);
+    const c=bump(custMap,r.customer,r); c._sets.prod=c._sets.prod||new Set(); c._sets.prod.add(r.product); c._type=r.type;
+    const s=bump(shipMap,r.shipper,r); s._sets.prod=s._sets.prod||new Set(); s._sets.prod.add(r.product);
+    const t=bump(staffMap,r.staff,r); t._sets.cust=t._sets.cust||new Set(); t._sets.cust.add(r.customer); t._sets.prod=t._sets.prod||new Set(); t._sets.prod.add(r.product);
+  });
+  totals.grossRate = totals.sales>0 ? totals.gross/totals.sales : null;
+  totals.juchuCount = uniqJuchu.size;
+
+  const fin = o=>{ o.grossRate = o.sales>0 ? o.gross/o.sales : null; return o; };
+  const products = Object.values(prodMap).map(o=>{ fin(o); o.sellUnit=o.weight>0?o.sales/o.weight:null; o.buyUnit=o.weight>0?o.purchase/o.weight:null; o.unitSpread=(o.sellUnit!=null&&o.buyUnit!=null)?o.sellUnit-o.buyUnit:null; return o; }).sort((a,b)=>b.sales-a.sales);
+  const customers = Object.values(custMap).map(o=>{ fin(o); o.products=o._sets.prod?o._sets.prod.size:0; o.type=o._type; o.isDisposition=(o.type==='spoilage'||o.type==='adjust'); return o; }).sort((a,b)=>b.sales-a.sales);
+  const shippers = Object.values(shipMap).map(o=>{ fin(o); o.products=o._sets.prod?o._sets.prod.size:0; return o; }).sort((a,b)=>b.purchase-a.purchase);
+  const staff = Object.values(staffMap).map(o=>{ fin(o); o.customers=o._sets.cust?o._sets.cust.size:0; o.products=o._sets.prod?o._sets.prod.size:0; return o; }).sort((a,b)=>b.sales-a.sales);
+  const days = Object.values(dayMap).map(fin).sort((a,b)=>a.name<b.name?-1:1);
+
+  const unitMetrics = products.filter(p=>p.weight>0 && p.sales>0).map(p=>({
+    name:p.name, sellUnit:p.sellUnit, buyUnit:p.buyUnit, spread:p.unitSpread,
+    grossRate:p.grossRate, sales:p.sales, weight:p.weight, gross:p.gross,
+    spreadRate: p.sellUnit>0 ? (p.sellUnit-p.buyUnit)/p.sellUnit : null
+  })).sort((a,b)=>b.sales-a.sales);
+
+  const lossRows = rows.filter(r=>r.type==='normal' && r.gross<0).sort((a,b)=>a.gross-b.gross);
+  const spoilRows = rows.filter(r=>r.type==='spoilage');
+  const spoilTotal = spoilRows.reduce((s,r)=>s+r.purchase,0);
+  const spoilByProduct = aggBy(spoilRows, 'product', r=>r.purchase);
+  const adjustRows = rows.filter(r=>r.type==='adjust');
+  const adjustTotal = adjustRows.reduce((s,r)=>s+r.sales,0);
+  const returnRows = rows.filter(r=>r.type==='return');
+  const transferRows = rows.filter(r=>r.type==='transfer');
+  const lossProducts = products.filter(p=>p.gross<0).sort((a,b)=>a.gross-b.gross);
+  const salesMin = totals.sales>0 ? Math.max(20000, totals.sales*0.001) : 20000;
+  const lowMarginProducts = products.filter(p=>p.sales>=salesMin && p.grossRate!==null && p.grossRate<0.03 && p.gross>=0).sort((a,b)=>a.grossRate-b.grossRate);
+
+  const kubunMap={};
+  rows.forEach(r=>{ const k=r.kubun||'(空)'; if(!kubunMap[k]) kubunMap[k]={kubun:k,count:0,sales:0,gross:0}; kubunMap[k].count++; kubunMap[k].sales+=r.sales; kubunMap[k].gross+=r.gross; });
+  const kubunRows = Object.values(kubunMap).sort((a,b)=>b.count-a.count);
+
+  return {
+    rows, totals, products, customers, shippers, staff, days, unitMetrics,
+    period:{start,end}, fullMin, fullMax,
+    isFiltered: !!(start||end),
+    hasData: all.length>0,
+    alerts:{ lossRows, spoilRows, spoilTotal, spoilByProduct, adjustRows, adjustTotal, returnRows, transferRows, lossProducts, lowMarginProducts, kubunRows }
+  };
+}
+
+/* =====================================================================
+   GENERIC SORTABLE / SEARCHABLE TABLE
+   ===================================================================== */
+const tableState = {};
+const tableCfg = {};
+function getTS(id, def){ if(!tableState[id]) tableState[id]={sortKey:def&&def.sortKey||'',dir:def&&def.dir||'desc',search:''}; return tableState[id]; }
+function setTblSort(id,key){ const ts=getTS(id); if(ts.sortKey===key){ ts.dir = ts.dir==='desc'?'asc':'desc'; } else { ts.sortKey=key; ts.dir='desc'; } renderTableInto(id,false); }
+function tblSearch(id,val){ getTS(id).search=val; renderTableInto(id,true); }
+function buildAnalysisTable(id, rows, columns, opts){
+  opts = opts||{};
+  tableCfg[id] = {rows, columns, opts};
+  getTS(id, {sortKey:opts.defaultSort||(columns[1]&&columns[1].key)||columns[0].key, dir:opts.defaultDir||'desc'});
+  const searchHtml = opts.searchable===false ? '' :
+    `<div class="tc-search-row" style="display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap">
+       <input type="text" id="search-${id}" oninput="tblSearch('${id}',this.value)" placeholder="${escapeAttr(opts.searchPlaceholder||'名称で検索')}" value="${escapeAttr(getTS(id).search)}" style="flex:1;min-width:160px;padding:7px 11px;font-size:12px;border:1px solid var(--hairline);border-radius:2px">
+       <span class="muted" id="count-${id}"></span>
+     </div>`;
+  return `<div class="card mb-1">
+    ${opts.title?`<div style="font-size:13px;font-weight:700;color:#0A0A0A;margin-bottom:10px">${escapeHtml(opts.title)}</div>`:''}
+    ${searchHtml}
+    <div class="tbl-w"><div style="overflow-x:auto"><table class="dt" id="dt-${id}"></table></div></div>
+  </div>`;
+}
+function renderTableInto(id, tbodyOnly){
+  const cfg = tableCfg[id]; if(!cfg) return;
+  const ts = getTS(id);
+  const {columns, opts} = cfg;
+  let rows = cfg.rows.slice();
+  const q = (ts.search||'').trim().toLowerCase();
+  if(q){ const sf = opts.searchField || ((r)=>r.name); rows = rows.filter(r=> String(sf(r)||'').toLowerCase().indexOf(q)>=0 ); }
+  const col = columns.find(c=>c.key===ts.sortKey) || columns[0];
+  const sv = col.sortVal || col.get;
+  rows.sort((a,b)=>{
+    let av=sv(a), bv=sv(b);
+    const an=(av===null||av===undefined||(typeof av==='number'&&!isFinite(av)));
+    const bn=(bv===null||bv===undefined||(typeof bv==='number'&&!isFinite(bv)));
+    if(an&&bn) return 0; if(an) return 1; if(bn) return -1;
+    if(typeof av==='number'&&typeof bv==='number') return ts.dir==='desc'?bv-av:av-bv;
+    av=String(av); bv=String(bv); return ts.dir==='desc'?bv.localeCompare(av,'ja'):av.localeCompare(bv,'ja');
+  });
+  if(opts.limit) rows = rows.slice(0,opts.limit);
+  const cntEl=document.getElementById('count-'+id);
+  if(cntEl) cntEl.textContent = `${rows.length.toLocaleString()} / ${cfg.rows.length.toLocaleString()} 件`;
+  const table=document.getElementById('dt-'+id); if(!table) return;
+  const thead = '<thead><tr>'+columns.map(c=>{
+    const arrow = ts.sortKey===c.key ? (ts.dir==='desc'?' ↓':' ↑') : ' ⇅';
+    const al = c.align==='r'?'text-align:right':'';
+    return `<th class="${c.cls||''}" onclick="setTblSort('${id}','${c.key}')" style="cursor:pointer;user-select:none;${al}">${escapeHtml(c.label)}<span style="color:#9A9A9A;font-weight:600">${arrow}</span></th>`;
+  }).join('')+'</tr></thead>';
+  const tbody = '<tbody>'+ (rows.length? rows.map((r,i)=>{
+    return '<tr>'+columns.map(c=>{
+      const al = c.align==='r'?'text-align:right':'';
+      let v = c.fmt ? c.fmt(c.get(r), r, i) : escapeHtml(c.get(r));
+      return `<td style="${al}">${v}</td>`;
+    }).join('')+'</tr>';
+  }).join('') : `<tr><td colspan="${columns.length}" style="text-align:center;color:#9A9A9A;padding:18px">該当データがありません</td></tr>`) +'</tbody>';
+  if(tbodyOnly){ const tb=table.querySelector('tbody'); if(tb){ tb.outerHTML = tbody; return; } }
+  table.innerHTML = thead+tbody;
+}
+function rateCell(v){ if(v===null||v===undefined||!isFinite(v)) return '<span class="muted">—</span>'; return `<span class="${v<0?'matrix-value-neg':''}">${fmtPct(v)}</span>`; }
+function yenCell(v){ return `<span class="${v<0?'matrix-value-neg':''}">${fmtYen(v)}</span>`; }
+
+/* =====================================================================
+   PERIOD FILTER (global by 販売日)
+   ===================================================================== */
+function periodFilterHTML(c){
+  const sVal=c.period.start||'', eVal=c.period.end||'';
+  const sDisp=sVal||c.fullMin||'', eDisp=eVal||c.fullMax||'';
+  const full = (c.fullMin&&c.fullMax) ? `${keyToMD(c.fullMin)}〜${keyToMD(c.fullMax)}` : '—';
+  const sel = (sVal||eVal) ? `${sVal?sVal.replace(/-/g,'/'):'最初'} 〜 ${eVal?eVal.replace(/-/g,'/'):'最後'}（絞込中）` : `全期間（${full}）`;
+  const mn = c.fullMin?`min="${c.fullMin}"`:'', mx = c.fullMax?`max="${c.fullMax}"`:'';
+  return `<div class="period-filter">
+    <div class="period-filter-row" style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <div class="period-filter-title" style="font-size:11px;font-weight:700;color:#3A3A3A">表示期間（販売日）</div>
+        <div class="period-filter-status muted">対象: ${sel}</div>
+      </div>
+      <div class="period-dates" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+        <label style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:9.5px;font-weight:700;color:#6B6B6B;letter-spacing:.02em">開始日</span>
+          <input type="date" value="${sDisp}" ${mn} ${mx} onchange="updateGlobalPeriod('start',this.value)" style="padding:7px 9px;font-size:12px;border:1px solid var(--hairline);border-radius:2px;min-width:128px;color:#0A0A0A">
+        </label>
+        <span class="period-filter-sep" style="padding-bottom:9px">〜</span>
+        <label style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:9.5px;font-weight:700;color:#6B6B6B;letter-spacing:.02em">終了日</span>
+          <input type="date" value="${eDisp}" ${mn} ${mx} onchange="updateGlobalPeriod('end',this.value)" style="padding:7px 9px;font-size:12px;border:1px solid var(--hairline);border-radius:2px;min-width:128px;color:#0A0A0A">
+        </label>
+        <button class="btn-sm" onclick="resetGlobalPeriod()">全期間に戻す</button>
+      </div>
+    </div>
+  </div>`;
+}
+function updateGlobalPeriod(field,value){ state.meta.period = state.meta.period||{start:'',end:''}; state.meta.period[field]=value; saveState(); renderAll(); }
+function resetGlobalPeriod(){ state.meta.period={start:'',end:''}; saveState(); renderAll(); }
+
+/* =====================================================================
+   SHARED UI HELPERS
+   ===================================================================== */
+function mc(label,value,sub,danger){
+  return `<div class="mc"><div class="ml">${escapeHtml(label)}</div><div class="mv" style="${danger?'color:#B40010':''}">${value}</div>${sub?`<div class="muted" style="margin-top:0;font-size:10px;line-height:1.2">${sub}</div>`:''}</div>`;
+}
+function emptyState(icon,title,desc,onclick,btn){
+  return `<div class="empty">
+     <div class="empty-ic" style="margin-bottom:10px">${svgIcon(icon,30,'#9A9A9A',1.5)}</div>
+     <div class="empty-t">${escapeHtml(title)}</div>
+     <div class="empty-d">${escapeHtml(desc)}</div>
+     ${onclick?`<button class="btn-g btn-sm" onclick="${onclick}">${escapeHtml(btn||'OK')}</button>`:''}
+   </div>`;
+}
+function emptyHere(){ return emptyState('database-off','データ未取込','「データ取込」からCSVを読み込むと表示されます。',"go('import')",'データを取り込む'); }
+function setBadge(id,text,gray,danger){ const e=document.getElementById(id); if(!e) return; e.className='bdg '+(danger?'bdg-rd':(gray?'bdg-gy':'bdg-g')); e.textContent=text; }
+function setPeriodSub(id,c){ const e=document.getElementById(id); if(!e) return; if(!c.hasData){e.textContent='データ未取込';return;} const r=(c.fullMin&&c.fullMax)?`${keyToMD(c.fullMin)}〜${keyToMD(c.fullMax)}`:''; e.textContent=(c.isFiltered?'（期間絞込中）':'')+r; }
+
+/* =====================================================================
+   RENDER: HOME
+   ===================================================================== */
+function renderHome(c){
+  const el=document.getElementById('home-content');
+  const ps=document.getElementById('home-period');
+  const stat=document.getElementById('home-status');
+  if(!c.hasData){
+    if(ps) ps.textContent='データ未取込';
+    if(stat){ stat.className='bdg bdg-gy'; stat.textContent='未取込'; }
+    el.innerHTML = emptyState('upload','データが取り込まれていません','「データ取込」から日次CSV（Shift-JIS）を読み込むと、ここに経営サマリーが表示されます。',"go('import')",'データを取り込む');
+    return;
+  }
+  const t=c.totals;
+  const range = (c.fullMin&&c.fullMax)?`${fmtDate(parseDate(c.fullMin.replace(/-/g,'')))} 〜 ${fmtDate(parseDate(c.fullMax.replace(/-/g,'')))}`:'';
+  if(ps) ps.textContent = (c.isFiltered?'（期間絞込中）':'') + range;
+  if(stat){ stat.className='bdg bdg-g'; stat.textContent=`${c.days.length}日 / ${t.count.toLocaleString()}件`; }
+  const a=c.alerts;
+  const kpis = `<div class="g4 mb-1">
+    ${mc('販売金額', fmtYen(t.sales), fmtYenShort(t.sales))}
+    ${mc('仕入金額', fmtYen(t.purchase), fmtYenShort(t.purchase))}
+    ${mc('粗利金額', fmtYen(t.gross), fmtYenShort(t.gross), t.gross<0)}
+    ${mc('粗利率', fmtPct(t.grossRate), null, (t.grossRate!==null&&t.grossRate<0))}
+  </div>
+  <div class="g4 mb-2">
+    ${mc('取扱重量', fmtKg(t.weight))}
+    ${mc('明細件数', t.count.toLocaleString()+'件')}
+    ${mc('荷受票数', t.juchuCount.toLocaleString()+'票')}
+    ${mc('平均単価', t.weight>0?fmtUnit(t.sales/t.weight)+'/kg':'—')}
+  </div>`;
+  const chart = `<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px">日別 販売金額・粗利金額</div>
+    <div class="muted" style="margin-bottom:8px">販売日ごとの推移</div>
+    <div class="chart-scroll"><div style="min-width:${Math.max(360, c.days.length*46)}px;height:230px"><canvas id="home-chart"></canvas></div></div>
+  </div>`;
+  const alertLine=(icon,label,val,danger,target)=>`<div class="home-alert-line" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--hairline);cursor:pointer" onclick="${target}">
+     <span style="display:flex;align-items:center;gap:8px;font-size:12px;color:#3A3A3A">${svgIcon(icon,14,danger?'#B40010':'#6B6B6B',1.8)} ${escapeHtml(label)}</span>
+     <span style="font-size:13px;font-weight:700;color:${danger?'#B40010':'#0A0A0A'}">${val}</span>
+   </div>`;
+  const alerts = `<div class="card">
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">要確認サマリー</div>
+    ${alertLine('alert-triangle','赤字明細（粗利マイナス・通常取引）', a.lossRows.length.toLocaleString()+'件', a.lossRows.length>0, "go('check')")}
+    ${alertLine('package-off','傷み（廃棄）原価', fmtYen(a.spoilTotal), a.spoilTotal>0, "go('check')")}
+    ${alertLine('trending-up','値引・値増の純額', fmtYen(a.adjustTotal), false, "go('check')")}
+    ${alertLine('chart-bar','低粗利の品目（粗利率3%未満）', a.lowMarginProducts.length+'品目', a.lowMarginProducts.length>0, "go('check')")}
+  </div>`;
+  el.innerHTML = periodFilterHTML(c)+kpis+chart+alerts;
+  const s=c.days;
+  makeChart('home-chart',{
+    type:'bar',
+    data:{ labels:s.map(d=>keyToMD(d.name)),
+      datasets:[
+        {type:'bar',label:'販売金額',data:s.map(d=>Math.round(d.sales)),backgroundColor:'rgba(10,10,10,0.16)',borderColor:'rgba(10,10,10,0.5)',borderWidth:1,order:2},
+        {type:'line',label:'粗利金額',data:s.map(d=>Math.round(d.gross)),borderColor:'#E60012',backgroundColor:'#E60012',borderWidth:2,pointRadius:2.5,tension:.25,order:1}
+      ]},
+    options: baseChartOpts({yYen:true})
+  });
+}
+
+/* =====================================================================
+   RENDER: IMPORT
+   ===================================================================== */
+function renderUploadZone(){
+  const wrap=document.getElementById('ui'); if(!wrap) return;
+  const files=state.meta.files||[];
+  if(uploadError){
+    const heads=(uploadError.headers||[]).slice(0,10).map(h=>`<code style="font-size:10px;background:#FFFFFF;padding:1px 5px;border-radius:3px;border:1px solid #D2D2D2;color:#B40010">${escapeHtml(h)}</code>`).join(' ');
+    wrap.innerHTML=`<div class="uz-st-action" style="color:#B40010;font-weight:700">${escapeHtml(uploadError.file)}：${escapeHtml(uploadError.msg)}</div>
+      <div class="muted" style="margin-top:6px">検出した列: ${heads||'なし'}</div>
+      <div class="muted" style="margin-top:6px">別のCSVをドロップ／クリックで選択</div>`;
+    return;
+  }
+  if(files.length){
+    const total=state.rows.length;
+    wrap.innerHTML=`<div class="uz-done-name">${files.length}ファイル取込済み（${total.toLocaleString()}件）</div>
+      <div class="uz-done-meta">クリック／ドロップで追加取込（合算されます）</div>`;
+  } else {
+    wrap.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:#6B6B6B">
+      ${svgIcon('upload',26,'#9A9A9A',1.6)}
+      <div style="font-size:12.5px;font-weight:600;color:#3A3A3A">CSVをドロップ または クリックで選択</div>
+      <div class="muted">Shift-JIS / 複数選択可</div></div>`;
+  }
+}
+function renderImport(){
+  renderUploadZone();
+  const detail=document.getElementById('import-detail'); if(!detail) return;
+  const files=state.meta.files||[];
+  if(!files.length){ detail.innerHTML=''; return; }
+  const cols=state.meta.cols||{};
+  const colChips = Object.keys(COL_HINTS).filter(k=>cols[k]).map(k=>`<code style="font-size:10px;background:#FAFAFA;padding:1px 6px;border-radius:3px;border:1px solid #D2D2D2;color:#3A3A3A">${escapeHtml(k)}→${escapeHtml(cols[k])}</code>`).join(' ');
+  const rowsHtml = files.map(f=>`<tr><td>${escapeHtml(f.name)}</td><td style="text-align:right">${(f.rows||0).toLocaleString()}</td><td style="text-align:right">${f.from?keyToMD(f.from):'—'}〜${f.to?keyToMD(f.to):'—'}</td></tr>`).join('');
+  detail.innerHTML=`<div class="card mb-1">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">取込済みファイル</div>
+      <div class="tbl-w"><div style="overflow-x:auto"><table class="dt">
+        <thead><tr><th>ファイル名</th><th style="text-align:right">明細数</th><th style="text-align:right">販売日範囲</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tbody><tr style="font-weight:700"><td>合計</td><td style="text-align:right">${state.rows.length.toLocaleString()}</td><td></td></tr></tbody>
+      </table></div></div>
+    </div>
+    <div class="card mb-1">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">列の自動マッピング</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${colChips||'<span class="muted">—</span>'}</div>
+    </div>`;
+}
+
+/* =====================================================================
+   RENDER: DAILY
+   ===================================================================== */
+function renderDaily(c){
+  const el=document.getElementById('daily-content');
+  setBadge('daily-badge', c.hasData? c.days.length+' 日':'— 日', !c.hasData);
+  setPeriodSub('daily-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  if(!c.days.length){ el.innerHTML=periodFilterHTML(c)+emptyState('alert-triangle','対象期間にデータがありません','期間を変更してください。'); return; }
+  const chart=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px">日別 販売・仕入・粗利</div>
+    <div class="chart-scroll"><div style="min-width:${Math.max(360,c.days.length*52)}px;height:240px"><canvas id="daily-chart"></canvas></div></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'販売日',get:r=>r.name,fmt:v=>keyToMD(v),sortVal:r=>r.name,align:'l'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'purchase',label:'仕入',get:r=>r.purchase,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'weight',label:'重量',get:r=>r.weight,fmt:v=>fmtKg(v),align:'r'},
+    {key:'count',label:'件数',get:r=>r.count,fmt:v=>v.toLocaleString(),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+chart+buildAnalysisTable('daily',c.days,cols,{title:'日別明細',searchable:false,defaultSort:'name',defaultDir:'asc'});
+  renderTableInto('daily',false);
+  const s=c.days;
+  makeChart('daily-chart',{
+    type:'bar',
+    data:{labels:s.map(d=>keyToMD(d.name)),datasets:[
+      {label:'販売',data:s.map(d=>Math.round(d.sales)),backgroundColor:'rgba(10,10,10,0.16)',borderColor:'rgba(10,10,10,0.5)',borderWidth:1},
+      {label:'仕入',data:s.map(d=>Math.round(d.purchase)),backgroundColor:'rgba(150,150,150,0.25)',borderColor:'rgba(120,120,120,0.6)',borderWidth:1},
+      {type:'line',label:'粗利',data:s.map(d=>Math.round(d.gross)),borderColor:'#E60012',backgroundColor:'#E60012',borderWidth:2,pointRadius:2.5,tension:.25}
+    ]},
+    options:baseChartOpts({yYen:true})
+  });
+}
+
+/* =====================================================================
+   RENDER: PRODUCT
+   ===================================================================== */
+function renderProduct(c){
+  const el=document.getElementById('product-content');
+  setBadge('product-badge', c.hasData? c.products.length+' 品目':'— 品目', !c.hasData);
+  setPeriodSub('product-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  const top=c.products.slice(0,15);
+  const pm=catMetric.product;
+  const chart=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">上位15品目（販売額順）</div>
+    ${catMetricToggle('product')}
+    <div class="muted" style="margin-bottom:8px">${pm==='gross'?'粗利金額を表示（<span style="color:#B40010;font-weight:700">赤＝赤字</span>）':'販売金額を表示'}</div>
+    <div style="height:${Math.max(190,top.length*22)}px"><canvas id="product-chart"></canvas></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'品名',get:r=>r.name,fmt:v=>`<span class="sku-main">${escapeHtml(v)}</span>`,align:'l'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'purchase',label:'仕入',get:r=>r.purchase,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'weight',label:'重量',get:r=>r.weight,fmt:v=>fmtKg(v),align:'r'},
+    {key:'sellUnit',label:'販売単価',get:r=>r.sellUnit,fmt:v=>v!=null?fmtUnit(v):'<span class="muted">—</span>',align:'r'},
+    {key:'count',label:'件数',get:r=>r.count,fmt:v=>v.toLocaleString(),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+chart+buildAnalysisTable('product',c.products,cols,{title:'品名別明細',searchPlaceholder:'品名で検索',defaultSort:'sales'});
+  renderTableInto('product',false);
+  makeMetricBarChart('product-chart', top, pm);
+}
+
+/* =====================================================================
+   RENDER: CUSTOMER
+   ===================================================================== */
+let custHideDisposition = true;
+function setCustHide(v){ custHideDisposition = v; renderAll(); }
+function renderCustomer(c){
+  const el=document.getElementById('customer-content');
+  setBadge('customer-badge', c.hasData? c.customers.length+' 社':'— 社', !c.hasData);
+  setPeriodSub('customer-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  let list = c.customers.slice();
+  if(custHideDisposition) list = list.filter(x=>!x.isDisposition);
+  const top=list.filter(x=>x.sales>0).slice(0,15);
+  const toggle=`<div class="seg-filter" style="margin-bottom:11px">
+     <button type="button" class="seg-btn${custHideDisposition?' on':''}" onclick="setCustHide(true)">実売先のみ</button>
+     <button type="button" class="seg-btn${!custHideDisposition?' on':''}" onclick="setCustHide(false)">傷み・値引も含む</button>
+   </div>`;
+  const cm=catMetric.customer;
+  const chart=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">上位15得意先（販売額順）</div>
+    ${catMetricToggle('customer')}
+    <div class="muted" style="margin-bottom:8px">${cm==='gross'?'粗利金額を表示（<span style="color:#B40010;font-weight:700">赤＝赤字の取引先</span>）':'販売金額を表示'}</div>
+    <div style="height:${Math.max(190,top.length*22)}px"><canvas id="customer-chart"></canvas></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'得意先',get:r=>r.name,fmt:(v,r)=>`<span class="sku-main">${escapeHtml(v)}</span>${r.isDisposition?' <span class="bdg bdg-rd" style="font-size:9px;padding:1px 6px">処理</span>':''}`,align:'l'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'products',label:'取扱品数',get:r=>r.products,fmt:v=>v.toLocaleString(),align:'r'},
+    {key:'count',label:'件数',get:r=>r.count,fmt:v=>v.toLocaleString(),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+toggle+chart+buildAnalysisTable('customer',list,cols,{title:'得意先別明細',searchPlaceholder:'得意先で検索',defaultSort:'sales'});
+  renderTableInto('customer',false);
+  makeMetricBarChart('customer-chart', top, cm);
+}
+
+/* =====================================================================
+   RENDER: SHIPPER
+   ===================================================================== */
+function renderShipper(c){
+  const el=document.getElementById('shipper-content');
+  setBadge('shipper-badge', c.hasData? c.shippers.length+' 社':'— 社', !c.hasData);
+  setPeriodSub('shipper-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  const top=c.shippers.slice(0,15);
+  const chart=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px">仕入金額 上位15出荷者</div>
+    <div class="chart-scroll"><div style="min-width:360px;height:${Math.max(240,top.length*26)}px"><canvas id="shipper-chart"></canvas></div></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'出荷者',get:r=>r.name,fmt:v=>`<span class="sku-main">${escapeHtml(v)}</span>`,align:'l'},
+    {key:'purchase',label:'仕入',get:r=>r.purchase,fmt:v=>fmtYen(v),align:'r'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'products',label:'品目数',get:r=>r.products,fmt:v=>v.toLocaleString(),align:'r'},
+    {key:'count',label:'件数',get:r=>r.count,fmt:v=>v.toLocaleString(),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+chart+buildAnalysisTable('shipper',c.shippers,cols,{title:'出荷者別明細',searchPlaceholder:'出荷者で検索',defaultSort:'purchase'});
+  renderTableInto('shipper',false);
+  makeChart('shipper-chart',{ type:'bar',
+    data:{labels:top.map(p=>p.name),datasets:[{label:'仕入金額',data:top.map(p=>Math.round(p.purchase)),backgroundColor:'rgba(10,10,10,0.7)'}]},
+    options:baseChartOpts({horizontal:true,xYen:true}) });
+}
+
+/* =====================================================================
+   RENDER: STAFF
+   ===================================================================== */
+/* 表彰リボン（花形ロゼット）: 1=金 2=銀 3=銅。中央に順位 */
+const RANK_MEDAL={1:{fill:'#E8C24A',dark:'#9A7A12'},2:{fill:'#CBD0D6',dark:'#7E848D'},3:{fill:'#D2904E',dark:'#8A5526'}};
+function rosetteSVG(rank,size){
+  size=size||17; const M=RANK_MEDAL[rank]||RANK_MEDAL[1];
+  const cx=12,cy=9.5,ring=3.9,pr=2.7,n=8; let petals='';
+  for(let i=0;i<n;i++){ const a=2*Math.PI*i/n; const x=(cx+ring*Math.cos(a)).toFixed(1), y=(cy+ring*Math.sin(a)).toFixed(1); petals+=`<circle cx="${x}" cy="${y}" r="${pr}" fill="${M.fill}" stroke="${M.dark}" stroke-width="0.5"/>`; }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" style="flex:0 0 auto;vertical-align:middle"><path d="M9 12.8 L7 22 L10 19.6 L12 22 L14 19.6 L17 22 L15 12.8 Z" fill="${M.dark}"/>${petals}<circle cx="${cx}" cy="${cy}" r="3.7" fill="${M.fill}" stroke="${M.dark}" stroke-width="0.6"/><text x="${cx}" y="${cy+0.2}" text-anchor="middle" dominant-baseline="central" font-size="5.2" font-weight="800" fill="${M.dark}" font-family="Arial,sans-serif">${rank}</text></svg>`;
+}
+function renderStaff(c){
+  const el=document.getElementById('staff-content');
+  setBadge('staff-badge', c.hasData? c.staff.length+' 名':'— 名', !c.hasData);
+  setPeriodSub('staff-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  const top=c.staff.slice(0,15);
+  const sm=catMetric.staff;
+  const rankByName={}; c.staff.slice(0,3).forEach((s,i)=>{ if(s.sales>0) rankByName[s.name]=i+1; });
+  const chart=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">担当者別（販売額順）</div>
+    ${catMetricToggle('staff')}
+    <div class="muted" style="margin-bottom:8px">${sm==='gross'?'粗利金額を表示（<span style="color:#B40010;font-weight:700">赤＝赤字</span>）':'販売金額を表示'}</div>
+    <div style="height:${Math.max(190,top.length*22)}px"><canvas id="staff-chart"></canvas></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'担当者',get:r=>r.name,fmt:(v,r)=>{const rk=rankByName[r.name];return `<span style="display:inline-flex;align-items:center;gap:5px">${rk?rosetteSVG(rk,18):''}<span class="sku-main">${escapeHtml(v)}</span></span>`;},align:'l'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'customers',label:'担当得意先',get:r=>r.customers,fmt:v=>v.toLocaleString(),align:'r'},
+    {key:'products',label:'取扱品数',get:r=>r.products,fmt:v=>v.toLocaleString(),align:'r'},
+    {key:'count',label:'件数',get:r=>r.count,fmt:v=>v.toLocaleString(),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+chart+buildAnalysisTable('staff',c.staff,cols,{title:'担当者別明細',searchPlaceholder:'担当者で検索',defaultSort:'sales'});
+  renderTableInto('staff',false);
+  makeMetricBarChart('staff-chart', top, sm);
+}
+
+/* =====================================================================
+   RENDER: UNIT PRICE (円/kg)
+   ===================================================================== */
+let unitScaleMode='main';   // 'main' = 線形(主要域) / 'log' = 対数(全体)
+let unitLossOnly=false;      // 逆ざや（販売単価<仕入単価）のみ表示
+function setUnitScale(m){ unitScaleMode=m; renderAll(); }
+function setUnitLossOnly(b){ unitLossOnly=b; renderAll(); }
+function renderUnit(c){
+  const el=document.getElementById('unit-content');
+  setBadge('unit-badge', c.hasData? c.unitMetrics.length+' 品目':'— 品目', !c.hasData);
+  setPeriodSub('unit-period', c);
+  if(!c.hasData){ el.innerHTML=emptyHere(); return; }
+  const m=c.unitMetrics;
+  if(!m.length){ el.innerHTML=periodFilterHTML(c)+emptyState('alert-triangle','単価を算出できる明細がありません','重量(kg)と販売金額がある通常取引が必要です。'); return; }
+
+  const lossCount=m.filter(p=>p.spread<0).length;
+  const tableRows = unitLossOnly ? m.filter(p=>p.spread<0) : m;
+  const pts0=m.filter(p=>p.buyUnit>0 && p.sellUnit>0);
+  const pts = unitLossOnly ? pts0.filter(p=>p.spread<0) : pts0;
+  const lossFilter=`<div class="seg-filter" style="margin:0">
+     <button type="button" class="seg-btn${!unitLossOnly?' on':''}" onclick="setUnitLossOnly(false)">すべて</button>
+     <button type="button" class="seg-btn${unitLossOnly?' on':''}" style="${unitLossOnly?'background:#E60012;border-color:#E60012;color:#fff':''}" onclick="setUnitLossOnly(true)">逆ざや(${lossCount})</button>
+   </div>`;
+
+  if(unitLossOnly && tableRows.length===0){
+    el.innerHTML=periodFilterHTML(c)+`<div class="card mb-2">${lossFilter}</div>`+emptyState('check','逆ざや（赤字単価）の品目はありません','販売単価が仕入単価を下回る品目はありませんでした。');
+    return;
+  }
+
+  const allVals=[]; pts.forEach(p=>{ allVals.push(p.buyUnit,p.sellUnit); });
+  const maxSales=Math.max(...pts.map(p=>p.sales),1);
+  let axMin, axMax, scaleType, offNote='';
+  if(unitScaleMode==='log'){
+    scaleType='logarithmic';
+    if(allVals.length){ const minV=Math.max(1,Math.min(...allVals)), maxV=Math.max(...allVals,10); axMin=Math.pow(10,Math.floor(Math.log10(minV))); axMax=Math.pow(10,Math.ceil(Math.log10(maxV))); }
+    else { axMin=10; axMax=10000; }
+  } else {
+    scaleType='linear'; axMin=0;
+    if(allVals.length){ const cap=Math.max(1000,niceCeil(percentile(allVals,0.975))); axMax=cap; const off=pts.filter(p=>p.buyUnit>cap||p.sellUnit>cap).length; if(off>0) offNote=`　高単価の${off}品目は範囲外（「全体（対数）」で表示）`; }
+    else { axMax=1000; }
+  }
+  const scaleToggle=`<div class="seg-filter" style="margin:0">
+     <button type="button" class="seg-btn${unitScaleMode==='main'?' on':''}" onclick="setUnitScale('main')">主要域</button>
+     <button type="button" class="seg-btn${unitScaleMode==='log'?' on':''}" onclick="setUnitScale('log')">対数</button>
+   </div>`;
+  const controls=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:11px">${lossFilter}<span style="width:1px;align-self:stretch;background:var(--hairline)"></span>${scaleToggle}</div>`;
+  const scatter=`<div class="card mb-2">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px">仕入単価 × 販売単価（円/kg）</div>
+    <div class="muted" style="margin-bottom:8px">${unitLossOnly?'<strong style="color:#B40010">逆ざや（赤字単価）の'+pts.length+'品目のみ表示中。</strong>':'破線（y=x）より上＝利益が乗っている品目。<span style="color:#0A0A0A;font-weight:700">黒=黒字</span>／<span style="color:#B40010;font-weight:700">赤=逆ざや</span>。'}点が大きいほど販売金額大。${offNote}</div>
+    ${controls}
+    <div style="height:320px"><canvas id="unit-chart"></canvas></div>
+  </div>`;
+  const cols=[
+    {key:'name',label:'品名',get:r=>r.name,fmt:v=>`<span class="sku-main">${escapeHtml(v)}</span>`,align:'l'},
+    {key:'buyUnit',label:'仕入単価',get:r=>r.buyUnit,fmt:v=>fmtUnit(v),align:'r'},
+    {key:'sellUnit',label:'販売単価',get:r=>r.sellUnit,fmt:v=>fmtUnit(v),align:'r'},
+    {key:'spread',label:'差額/kg',get:r=>r.spread,fmt:v=>`<span class="${v<0?'matrix-value-neg':''}">${fmtUnit(v)}</span>`,align:'r'},
+    {key:'spreadRate',label:'粗利率',get:r=>r.spreadRate,fmt:v=>rateCell(v),align:'r'},
+    {key:'weight',label:'重量',get:r=>r.weight,fmt:v=>fmtKg(v),align:'r'},
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+scatter+buildAnalysisTable('unit',tableRows,cols,{title:unitLossOnly?'品目別 単価明細（逆ざやのみ）':'品目別 単価明細',searchPlaceholder:'品名で検索',defaultSort:'sales'});
+  renderTableInto('unit',false);
+  makeChart('unit-chart',{ type:'scatter',
+    data:{datasets:[
+      { type:'line', label:'y=x', data:[{x:axMin,y:axMin},{x:axMax,y:axMax}], parsing:false,
+        borderColor:'rgba(0,0,0,0.28)', borderDash:[5,4], borderWidth:1.5, pointRadius:0, pointHitRadius:0, fill:false, order:99 },
+      { label:'品目',
+        data:pts.map(p=>({x:Math.round(p.buyUnit),y:Math.round(p.sellUnit),r:3+Math.sqrt(p.sales/maxSales)*16, name:p.name, sales:p.sales, spread:p.spread})),
+        backgroundColor:(ctx)=>ctx.raw.spread>=0?'rgba(10,10,10,0.5)':'rgba(230,0,18,0.7)',
+        borderColor:(ctx)=>ctx.raw.spread>=0?'rgba(10,10,10,0.75)':'rgba(230,0,18,0.9)', order:1 }
+    ]},
+    options:{ responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{filter:(ctx)=>ctx.datasetIndex===1,callbacks:{label:(ctx)=>{const d=ctx.raw;return `${d.name}: 仕入${fmtUnit(d.x)} → 販売${fmtUnit(d.y)}/kg（差${fmtUnit(d.spread)}・販売${fmtYenShort(d.sales)}）`;}}}},
+      scales:{
+        x:{type:scaleType,min:axMin,max:axMax,title:{display:true,text:'仕入単価 (円/kg)'},ticks:{callback:v=>'¥'+(v>=1000?(v/1000)+'k':v)}},
+        y:{type:scaleType,min:axMin,max:axMax,title:{display:true,text:'販売単価 (円/kg)'},ticks:{callback:v=>'¥'+(v>=1000?(v/1000)+'k':v)}} } } });
+}
+
+/* =====================================================================
+   RENDER: CHECK POINTS
+   ===================================================================== */
+function renderCheck(c){
+  const el=document.getElementById('check-content');
+  if(!c.hasData){ setBadge('check-badge','—',true); el.innerHTML=emptyHere(); return; }
+  const a=c.alerts;
+  setPeriodSub('check-period', c);
+  const issueCount = (a.lossRows.length>0?1:0)+(a.spoilTotal>0?1:0)+(a.lowMarginProducts.length>0?1:0)+(a.lossProducts.length>0?1:0);
+  setBadge('check-badge', issueCount+' 項目', false, issueCount>0);
+  const sec=(num,title,bodyHtml,danger)=>`<div class="card mb-1">
+     <div class="sec-h-title" style="display:flex;align-items:center;margin-bottom:10px"><span class="sec-num" style="${danger?'background:#B40010':''}">${num}</span><span style="font-size:13px;font-weight:700">${escapeHtml(title)}</span></div>
+     ${bodyHtml}
+   </div>`;
+  const kpi=`<div class="g4 mb-1">
+    ${mc('赤字明細', a.lossRows.length.toLocaleString()+'件', null, a.lossRows.length>0)}
+    ${mc('傷み原価', fmtYen(a.spoilTotal), null, a.spoilTotal>0)}
+    ${mc('値引・値増 純額', fmtYen(a.adjustTotal), null, false)}
+    ${mc('赤字品目', a.lossProducts.length+'品目', null, a.lossProducts.length>0)}
+  </div>`;
+  const lossTop=a.lossRows.slice(0,20);
+  const lossBody = lossTop.length? `<div class="muted" style="margin-bottom:8px">粗利がマイナスの通常取引（上位20件・損失額順）。原価割れ販売の確認に。</div>
+    <div class="tbl-w"><div style="overflow-x:auto"><table class="dt">
+      <thead><tr><th>販売日</th><th>品名</th><th>得意先</th><th>出荷者</th><th style="text-align:right">重量</th><th style="text-align:right">販売</th><th style="text-align:right">仕入</th><th style="text-align:right">粗利</th></tr></thead>
+      <tbody>${lossTop.map(r=>`<tr><td>${keyToMD(r.saleKey)}</td><td><span class="sku-main">${escapeHtml(r.product)}</span></td><td>${escapeHtml(r.customer)}</td><td>${escapeHtml(r.shipper)}</td><td style="text-align:right">${fmtKg(r.weight)}</td><td style="text-align:right">${fmtYen(r.sales)}</td><td style="text-align:right">${fmtYen(r.purchase)}</td><td style="text-align:right"><span class="matrix-value-neg">${fmtYen(r.gross)}</span></td></tr>`).join('')}</tbody>
+    </table></div></div>`
+    : `<div class="abox ok">${svgIcon('check-circle',15,'#0A0A0A',2)} 通常取引で粗利マイナスの明細はありません。</div>`;
+  const spoilTop=a.spoilByProduct.slice(0,12);
+  const spoilBody = a.spoilRows.length? `<div class="muted" style="margin-bottom:8px">得意先が「傷み」の明細＝廃棄ロス。合計原価 <strong>${fmtYen(a.spoilTotal)}</strong>（${a.spoilRows.length}件）。品目別上位。</div>
+    <div class="tbl-w"><div style="overflow-x:auto"><table class="dt">
+      <thead><tr><th>品名</th><th style="text-align:right">廃棄原価</th><th style="text-align:right">件数</th></tr></thead>
+      <tbody>${spoilTop.map(p=>`<tr><td><span class="sku-main">${escapeHtml(p.name)}</span></td><td style="text-align:right"><span class="matrix-value-neg">${fmtYen(p.value)}</span></td><td style="text-align:right">${p.count}</td></tr>`).join('')}</tbody>
+    </table></div></div>`
+    : `<div class="abox ok">${svgIcon('check-circle',15,'#0A0A0A',2)} 傷み（廃棄）の計上はありません。</div>`;
+  const lowTop=a.lowMarginProducts.slice(0,15);
+  const lowBody = lowTop.length? `<div class="muted" style="margin-bottom:8px">粗利率3%未満で販売規模のある品目（粗利率の低い順）。値決めの見直し候補。</div>
+    <div class="tbl-w"><div style="overflow-x:auto"><table class="dt">
+      <thead><tr><th>品名</th><th style="text-align:right">販売</th><th style="text-align:right">粗利</th><th style="text-align:right">粗利率</th></tr></thead>
+      <tbody>${lowTop.map(p=>`<tr><td><span class="sku-main">${escapeHtml(p.name)}</span></td><td style="text-align:right">${fmtYen(p.sales)}</td><td style="text-align:right">${fmtYen(p.gross)}</td><td style="text-align:right">${fmtPct(p.grossRate)}</td></tr>`).join('')}</tbody>
+    </table></div></div>`
+    : `<div class="abox ok">${svgIcon('check-circle',15,'#0A0A0A',2)} 粗利率3%未満の規模品目はありません。</div>`;
+  const kubunLabel=(k)=>({'0':'通常販売','1':'返品・取消','2':'訂正計上','7':'振替(出)','8':'振替(入)'})[k]||k;
+  const kbody=`<div class="muted" style="margin-bottom:8px">明細のデータ区分内訳。返品(1)・振替(7/8)は金額が相殺される調整行です。</div>
+    <div class="tbl-w"><div style="overflow-x:auto"><table class="dt">
+      <thead><tr><th>区分</th><th>種別</th><th style="text-align:right">件数</th><th style="text-align:right">販売</th><th style="text-align:right">粗利</th></tr></thead>
+      <tbody>${a.kubunRows.map(r=>`<tr><td>${escapeHtml(r.kubun)}</td><td>${escapeHtml(kubunLabel(r.kubun))}</td><td style="text-align:right">${r.count.toLocaleString()}</td><td style="text-align:right">${fmtYen(r.sales)}</td><td style="text-align:right">${yenCell(r.gross)}</td></tr>`).join('')}</tbody>
+    </table></div></div>`;
+  el.innerHTML = periodFilterHTML(c)+kpi
+    + sec(1,'原価割れ（赤字）明細', lossBody, a.lossRows.length>0)
+    + sec(2,'傷み（廃棄）ロス', spoilBody, a.spoilTotal>0)
+    + sec(3,'低粗利の品目', lowBody, a.lowMarginProducts.length>0)
+    + sec(4,'データ区分の内訳', kbody, false);
+}
+
+/* =====================================================================
+   RENDER: MANAGEMENT MATRIX (販売額 × 粗利率)
+   ===================================================================== */
+function median(arr){ const a=arr.filter(v=>isFinite(v)).sort((x,y)=>x-y); if(!a.length) return 0; const m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; }
+function percentile(arr,p){ const a=arr.filter(v=>isFinite(v)).sort((x,y)=>x-y); if(!a.length) return 0; const idx=Math.min(a.length-1, Math.max(0, Math.floor(p*(a.length-1)))); return a[idx]; }
+function niceCeil(v){ if(!isFinite(v)||v<=0) return 100; const mag=Math.pow(10,Math.floor(Math.log10(v))); const n=v/mag; const m=n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10; return m*mag; }
+let matrixQuadFilter = null;
+let matrixScaleMode = 'main';   // 'main' = 線形(主要域) / 'log' = 対数(全体)
+function setMatrixScale(m){ matrixScaleMode=m; renderAll(); }
+const MATRIX_Q = {
+  star:  {label:'主力',  sub:'高販売×高粗利', color:'#0A0A0A', dot:'rgba(10,10,10,0.72)'},
+  margin:{label:'高採算',sub:'低販売×高粗利', color:'#4A4A4A', dot:'rgba(74,74,74,0.72)'},
+  volume:{label:'量稼ぎ',sub:'高販売×低粗利', color:'#EF8089', dot:'rgba(239,128,137,0.9)'},
+  review:{label:'見直し',sub:'低販売×低粗利', color:'#E60012', dot:'rgba(230,0,18,0.9)'}
+};
+function setMatrixQuad(k){ matrixQuadFilter = (matrixQuadFilter===k)?null:k; renderAll(); }
+function matrixQuadCard(k,count){
+  const q=MATRIX_Q[k]; const active = matrixQuadFilter===k;
+  return `<button type="button" class="matrix-quad-card${active?' on':''}" onclick="setMatrixQuad('${k}')"
+    style="text-align:left;cursor:pointer;font-family:inherit;width:100%;background:${active?'#0A0A0A':'#FFFFFF'};border:1px solid var(--hairline);border-left:3px solid ${q.color};border-radius:2px;padding:8px 11px;-webkit-tap-highlight-color:transparent">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px">
+      <span style="font-size:11.5px;font-weight:700;color:${active?'#FFFFFF':'#0A0A0A'}">${q.label}${active?' <span style="font-size:9px;font-weight:700;color:#fff">✕</span>':''}</span>
+      <span style="font-size:16px;font-weight:700;color:${active?'#FFFFFF':'#0A0A0A'};letter-spacing:-.01em;white-space:nowrap">${count}<span style="font-size:10px;font-weight:500;color:${active?'#CCC':'#6B6B6B'}">品目</span></span>
+    </div>
+    <div style="font-size:10px;color:${active?'#CCCCCC':'#6B6B6B'};margin-top:1px">${q.sub}</div>
+  </button>`;
+}
+function renderMatrix(c){
+  const el=document.getElementById('matrix-content');
+  if(!c.hasData){ setBadge('matrix-badge','—',true); el.innerHTML=emptyHere(); return; }
+  setPeriodSub('matrix-period', c);
+  const rows=c.products.filter(p=>p.sales>0 && p.grossRate!==null);
+  setBadge('matrix-badge', rows.length+' 品目', false);
+  if(!rows.length){ matrixQuadFilter=null; el.innerHTML=periodFilterHTML(c)+emptyState('alert-triangle','分析できる品目がありません','期間を変更してください。'); return; }
+  const medSales=median(rows.map(r=>r.sales));
+  const medRate=median(rows.map(r=>r.grossRate));
+  const quadKey=(r)=>{ const hiS=r.sales>=medSales, hiR=r.grossRate>=medRate; return hiS&&hiR?'star':hiS&&!hiR?'volume':!hiS&&hiR?'margin':'review'; };
+  const counts={star:0,volume:0,margin:0,review:0};
+  rows.forEach(r=>{ counts[quadKey(r)]++; });
+  const kpi=`<div class="muted" style="font-size:10.5px;margin-bottom:6px">▼ カードをタップすると下の表をその区分だけに絞り込みます</div>
+   <div class="g4 mb-1">
+    ${matrixQuadCard('star',counts.star)}
+    ${matrixQuadCard('margin',counts.margin)}
+    ${matrixQuadCard('volume',counts.volume)}
+    ${matrixQuadCard('review',counts.review)}
+  </div>`;
+  // ---- scale params (主要域: 線形ズーム+Yクリップ / 全体: 対数X+全Y) ----
+  const salesArr=rows.map(r=>r.sales), rateArr=rows.map(r=>r.grossRate*100);
+  let xType,xMin,xMax,yMin,yMax,offCount=0;
+  if(matrixScaleMode==='log'){
+    xType='logarithmic';
+    const minS=Math.max(1,Math.min(...salesArr)), maxS2=Math.max(...salesArr,10);
+    xMin=Math.pow(10,Math.floor(Math.log10(minS))); xMax=Math.pow(10,Math.ceil(Math.log10(maxS2)));
+    yMin=Math.min(-5,Math.floor(Math.min(...rateArr)/10)*10); yMax=Math.max(10,Math.ceil(Math.max(...rateArr)/10)*10);
+  } else {
+    xType='linear'; xMin=0; xMax=Math.max(100000,niceCeil(percentile(salesArr,0.975)));
+    const yLo=percentile(rateArr,0.025), yHi=percentile(rateArr,0.975);
+    yMin=Math.max(-60,Math.floor(Math.min(yLo,-10)/10)*10); yMax=Math.min(80,Math.ceil(Math.max(yHi,10)/10)*10);
+    offCount=rows.filter(r=>r.sales>xMax||r.grossRate*100<yMin||r.grossRate*100>yMax).length;
+  }
+  const scaleToggle=`<div class="seg-filter" style="margin-bottom:10px">
+     <button type="button" class="seg-btn${matrixScaleMode==='main'?' on':''}" onclick="setMatrixScale('main')">主要域（見やすい）</button>
+     <button type="button" class="seg-btn${matrixScaleMode==='log'?' on':''}" onclick="setMatrixScale('log')">全体（対数）</button>
+   </div>`;
+  const offNote=(matrixScaleMode==='main'&&offCount>0)?`　範囲外の${offCount}品目は「全体（対数）」で確認`:'';
+  const chart=`<div class="card mb-2">
+     <div style="font-size:13px;font-weight:700;margin-bottom:8px">ポートフォリオ（販売金額 × 粗利率）</div>
+     ${scaleToggle}
+     <div class="muted" style="margin-bottom:8px">破線＝中央値（販売 ${fmtYenShort(medSales)} / 粗利率 ${fmtPct(medRate)}）の4象限。点が大きいほど販売金額大。${matrixQuadFilter?'　<strong>'+MATRIX_Q[matrixQuadFilter].label+'</strong>を強調中':''}${offNote}</div>
+     <div style="height:300px"><canvas id="matrix-chart"></canvas></div>
+   </div>`;
+  let tagged=rows.map(r=>{ const k=quadKey(r); const o=Object.assign({},r); o._qk=k; o._qlabel=MATRIX_Q[k].label+'（'+MATRIX_Q[k].sub+'）'; return o; });
+  if(matrixQuadFilter) tagged = tagged.filter(r=>r._qk===matrixQuadFilter);
+  const filterNote = matrixQuadFilter ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="bdg bdg-g">${MATRIX_Q[matrixQuadFilter].label} のみ表示中（${tagged.length}品目）</span><button class="btn-sm" onclick="setMatrixQuad('${matrixQuadFilter}')">絞り込み解除</button></div>` : '';
+  const cols=[
+    {key:'name',label:'品名',get:r=>r.name,fmt:v=>`<span class="sku-main">${escapeHtml(v)}</span>`,align:'l'},
+    ...(matrixQuadFilter ? [] : [{key:'_qk',label:'分類',get:r=>r._qk,fmt:(v,r)=>`<span style="font-size:10.5px;font-weight:700">${escapeHtml(r._qlabel)}</span>`,sortVal:r=>({star:0,margin:1,volume:2,review:3})[r._qk],align:'l'}]),
+    {key:'sales',label:'販売',get:r=>r.sales,fmt:v=>fmtYen(v),align:'r'},
+    {key:'gross',label:'粗利',get:r=>r.gross,fmt:v=>yenCell(v),align:'r'},
+    {key:'grossRate',label:'粗利率',get:r=>r.grossRate,fmt:v=>rateCell(v),align:'r'}
+  ];
+  el.innerHTML=periodFilterHTML(c)+kpi+chart+filterNote+buildAnalysisTable('matrix',tagged,cols,{title:'品目ポートフォリオ',searchPlaceholder:'品名で検索',defaultSort:'sales'});
+  renderTableInto('matrix',false);
+  const maxS=Math.max(...rows.map(r=>r.sales),1);
+  const medY=+(medRate*100).toFixed(1);
+  makeChart('matrix-chart',{ type:'scatter',
+    data:{datasets:[
+      { label:'品目', order:1,
+        data:rows.map(r=>{ const k=quadKey(r); const dim = matrixQuadFilter && k!==matrixQuadFilter;
+          return {x:Math.round(r.sales),y:+(r.grossRate*100).toFixed(1),r:dim?2.5:(4+Math.sqrt(r.sales/maxS)*18),name:r.name,_c:dim?'rgba(200,200,200,0.4)':MATRIX_Q[k].dot}; }),
+        backgroundColor:(ctx)=>ctx.raw._c, borderColor:'rgba(0,0,0,0.2)' },
+      { type:'line', label:'中央値(販売)', order:99, data:[{x:medSales,y:yMin},{x:medSales,y:yMax}], borderColor:'rgba(0,0,0,0.3)', borderDash:[5,4], borderWidth:1.3, pointRadius:0, pointHitRadius:0, fill:false },
+      { type:'line', label:'中央値(粗利率)', order:99, data:[{x:xMin,y:medY},{x:xMax,y:medY}], borderColor:'rgba(0,0,0,0.3)', borderDash:[5,4], borderWidth:1.3, pointRadius:0, pointHitRadius:0, fill:false }
+    ]},
+    options:{ responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{filter:(ctx)=>ctx.datasetIndex===0,callbacks:{label:(ctx)=>{const d=ctx.raw;return `${d.name}: 販売${fmtYenShort(d.x)} / 粗利率${d.y}%`;}}}},
+      scales:{ x:{type:xType,min:xMin,max:xMax,title:{display:true,text:'販売金額'},ticks:{callback:v=>fmtYenShort(v)}}, y:{type:'linear',min:yMin,max:yMax,title:{display:true,text:'粗利率 (%)'},ticks:{callback:v=>v+'%'}} } } });
+}
+
+/* =====================================================================
+   CHART HELPERS
+   ===================================================================== */
+const charts={};
+function makeChart(id,config){
+  const cv=document.getElementById(id); if(!cv) return;
+  if(charts[id]){ try{charts[id].destroy();}catch(e){} }
+  charts[id]=new Chart(cv.getContext('2d'),config);
+}
+function baseChartOpts(opt){
+  opt=opt||{};
+  const yTicks = opt.yYen ? {callback:v=>fmtYenShort(v)} : {};
+  const xTicks = opt.xYen ? {callback:v=>fmtYenShort(v)} : {};
+  return {
+    responsive:true,maintainAspectRatio:false,
+    indexAxis: opt.horizontal?'y':'x',
+    plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:10}}},
+      tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label}: ${fmtYen(ctx.parsed[opt.horizontal?'x':'y'])}`}}},
+    scales: opt.horizontal
+      ? {x:{ticks:xTicks,beginAtZero:true},y:{ticks:{font:{size:10}}}}
+      : {y:{ticks:yTicks,beginAtZero:false},x:{ticks:{font:{size:10}}}}
+  };
+}
+/* 横棒グラフ: 販売金額 + 粗利金額（粗利マイナスは赤）。儲かっているかを一目で。 */
+/* カテゴリ別グラフ: 販売金額/粗利金額をボタンで切替（1指標ずつ表示。粗利マイナスは赤） */
+let catMetric={product:'sales',customer:'sales',staff:'sales'};
+function setCatMetric(screen,m){ catMetric[screen]=m; renderAll(); }
+function catMetricToggle(screen){
+  const m=catMetric[screen]||'sales';
+  return `<div class="seg-filter" style="margin-bottom:10px">
+     <button type="button" class="seg-btn${m==='sales'?' on':''}" onclick="setCatMetric('${screen}','sales')">販売金額</button>
+     <button type="button" class="seg-btn${m==='gross'?' on':''}" onclick="setCatMetric('${screen}','gross')">粗利金額</button>
+   </div>`;
+}
+function makeMetricBarChart(id, items, metric){
+  const isGross = metric==='gross';
+  const data = items.map(p=>Math.round(isGross? p.gross : p.sales));
+  const bg = isGross ? items.map(p=>p.gross<0?'rgba(230,0,18,0.85)':'rgba(10,10,10,0.8)') : 'rgba(10,10,10,0.72)';
+  const bd = isGross ? items.map(p=>p.gross<0?'rgba(230,0,18,1)':'rgba(10,10,10,1)') : 'rgba(10,10,10,0.9)';
+  makeChart(id,{
+    type:'bar',
+    data:{ labels:items.map(p=>p.name),
+      datasets:[{ label:isGross?'粗利金額':'販売金額', data, backgroundColor:bg, borderColor:bd, borderWidth:1, barPercentage:0.92, categoryPercentage:0.9 }]},
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:(ctx)=>`${isGross?'粗利':'販売'}: ${fmtYen(ctx.parsed.x)}`}}},
+      scales:{ x:{beginAtZero:true, ticks:{callback:v=>fmtYenShort(v)}, grid:{color:'rgba(0,0,0,0.06)'}}, y:{ticks:{font:{size:10}}, grid:{display:false}} } }
+  });
+}
+
+/* =====================================================================
+   MODAL / TOAST / SHEET
+   ===================================================================== */
+function showModal(title,desc,onOk){
+  document.getElementById('modal-t').textContent=title;
+  document.getElementById('modal-d').textContent=desc;
+  const ok=document.getElementById('modal-ok');
+  ok.onclick=()=>{ closeModal(); if(onOk) onOk(); };
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+let toastTimer=null;
+function toast(msg,type){
+  const t=document.getElementById('toast'); const m=document.getElementById('toast-msg');
+  if(!t||!m) return; m.textContent=msg; t.className='toast show'+(type==='ok'?' ok':type==='err'?' err':'');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.className='toast';},2600);
+}
+function closeFilterSheet(){ const s=document.getElementById('filter-sheet'),sc=document.getElementById('filter-scrim'); if(s)s.classList.remove('show'); if(sc)sc.classList.remove('show'); }
+
+/* =====================================================================
+   IMAGE EXPORT
+   ===================================================================== */
+function exportScreenImage(selector,filename){
+  const node=document.querySelector(selector);
+  if(!node){ toast('対象が見つかりません','err'); return; }
+  if(typeof html2canvas==='undefined'){ toast('画像化ライブラリが読み込まれていません','err'); return; }
+  toast('画像を生成中…');
+  html2canvas(node,{backgroundColor:'#FFFFFF',scale:2,useCORS:true}).then(canvas=>{
+    const a=document.createElement('a'); a.download=filename||'export.png'; a.href=canvas.toDataURL('image/png'); a.click();
+    toast('画像を保存しました','ok');
+  }).catch(e=>{ console.error(e); toast('画像化に失敗しました','err'); });
+}
+function exportCurrentScreen(){
+  const id=getActiveScreenId();
+  const map={daily:'#daily-content',product:'#product-content',customer:'#customer-content',shipper:'#shipper-content',staff:'#staff-content',unit:'#unit-content',check:'#check-content',matrix:'#matrix-content',home:'#home-content'};
+  const names={home:'ホーム',daily:'日別推移',product:'品名分析',customer:'得意先分析',shipper:'出荷者分析',staff:'担当者分析',unit:'単価分析',check:'確認事項',matrix:'経営アドバイス'};
+  if(map[id]) exportScreenImage(map[id], (names[id]||'画面')+'.png');
+}
+
+/* =====================================================================
+   IMPORT ACTIONS
+   ===================================================================== */
+function loadSample(){
+  const products=['トマト','胡瓜','茄子','春ピーマン','キャベツ','ほうれん草','小松菜','玉葱','大根','人参','バラ ミニトマト','レタス','白加賀梅','クインシーメロン','オレンジ'];
+  const shippers=['ＪＡ全農埼玉','（株）東興青果','（Ｐ）ファーマインド','八代地域農協','渥美共計','（株）東京ローヤル'];
+  const customers=['（株）花徳 柏','（株）二重作商店','ヤオヒロ東店','（株）太陽青果','（株）ベジテック','マルエツ戸田','東一川崎中央青果','（有）ＭＫフルーツ'];
+  const staff=['綿引 義和','児玉英一郎','佐藤 裕之','豊永 渉吏','肥後 有司','尾原翔太'];
+  const dates=['20260601','20260602','20260603','20260604','20260605'];
+  let seed=987654321;
+  const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+  const pick=(a)=>a[Math.floor(rnd()*a.length)];
+  const rows=[];
+  let juchu=600000;
+  dates.forEach(d=>{
+    const n=120+Math.floor(rnd()*60);
+    for(let i=0;i<n;i++){
+      juchu++;
+      const prod=pick(products), ship=pick(shippers);
+      const weight=Math.round((5+rnd()*60)*10)/10;
+      const buyUnit=120+rnd()*500;
+      const purchase=Math.round(weight*buyUnit);
+      const r=rnd();
+      let customer, sales, gross;
+      if(r<0.08){ customer='傷み'; sales=0; gross=-purchase; }
+      else if(r<0.12){ customer='値引・値増（得意先）'; const adj=Math.round((rnd()-0.5)*purchase*0.2); sales=purchase+adj; gross=sales-purchase; }
+      else { customer=pick(customers); const margin=(rnd()-0.15)*0.18; sales=Math.round(purchase*(1+margin)); gross=sales-purchase; }
+      rows.push({ juchu:String(juchu), kubun:(customer==='傷み'?'0':'0'),
+        product:prod, customer, shipper:ship, staff:pick(staff),
+        saleKey:d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8), arrivalKey:'',
+        weight, purchase, sales, gross, type:'normal' });
+      rows[rows.length-1].type = classifyRow(rows[rows.length-1]);
+    }
+  });
+  state = getEmptyState();
+  state.rows = rows;
+  state.meta.cols = {product:'S:品名',customer:'H:得意先名',shipper:'S:出荷者名',staff:'H:販売担当者名',saleDate:'H:販売日',weight:'H:販売重量（Kg）',purchase:'H:仕入金額',sales:'H:販売金額',gross:'H:粗利金額',kubun:'H:データ区分',juchu:'H:荷受票№'};
+  state.meta.files=[{name:'サンプルデータ（生成）',rows:rows.length,at:new Date().toISOString(),from:'2026-06-01',to:'2026-06-05'}];
+  state.meta.importedAt=new Date().toISOString();
+  uploadError=null;
+  saveState(); toast(`サンプル ${rows.length.toLocaleString()}件を読込みました`,'ok'); renderAll(); go('home');
+}
+function confirmReset(){
+  showModal('全データ削除','取り込んだすべてのデータを削除します。元に戻せません。よろしいですか？', ()=>{
+    state=getEmptyState(); uploadError=null; saveState(); renderAll(); go('import'); toast('全データを削除しました','ok');
+  });
+}
+
+/* =====================================================================
+   NAVIGATION / ROUTING
+   ===================================================================== */
+const SCREEN_LABELS={home:'ホーム',import:'データ取込',daily:'日別推移',product:'品名分析',customer:'得意先分析',shipper:'出荷者分析',staff:'担当者分析',unit:'単価分析',matrix:'経営アドバイス',check:'確認事項'};
+function getActiveScreenId(){
+  const on=document.querySelector('.scr.on'); if(!on) return 'home';
+  return on.id.replace(/^s-/,'');
+}
+function go(id){
+  closeTopbarPeriod();
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const scr=document.getElementById('s-'+id); if(scr) scr.classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on', n.getAttribute('data-s')===id));
+  const c=getComputed();
+  renderScreen(id,c);
+  updateTopbar(id,c);
+  if(window.scrollTo) window.scrollTo(0,0);
+  const body=document.querySelector('.body'); if(body) body.scrollTop=0;
+}
+function renderScreen(id,c){
+  switch(id){
+    case 'home': renderHome(c); break;
+    case 'import': renderImport(); break;
+    case 'daily': renderDaily(c); break;
+    case 'product': renderProduct(c); break;
+    case 'customer': renderCustomer(c); break;
+    case 'shipper': renderShipper(c); break;
+    case 'staff': renderStaff(c); break;
+    case 'unit': renderUnit(c); break;
+    case 'check': renderCheck(c); break;
+    case 'matrix': renderMatrix(c); break;
+  }
+}
+function renderAll(){
+  const c=getComputed();
+  const id=getActiveScreenId();
+  renderScreen(id,c);
+  updateTopbar(id,c);
+  updateDataStatus();
+}
+function updateDataStatus(){
+  const e=document.getElementById('data-status'); if(!e) return;
+  const n=state.rows.length;
+  e.textContent = n? `${(state.meta.files||[]).length}ファイル / ${n.toLocaleString()}件` : '未取込';
+}
+function updateTopbar(id,c){
+  const title=document.getElementById('m-topbar-title');
+  const per=document.getElementById('m-topbar-period');
+  if(title) title.textContent=SCREEN_LABELS[id]||'Smart-EMS';
+  const showPeriod=(id!=='import') && c && c.hasData;
+  if(per){
+    let txt='';
+    if(c&&c.hasData){
+      if(c.isFiltered){ const a=c.period.start?keyToMD(c.period.start):(c.fullMin?keyToMD(c.fullMin):'最初'); const b=c.period.end?keyToMD(c.period.end):(c.fullMax?keyToMD(c.fullMax):'最後'); txt=`${a}〜${b}（絞込中）`; }
+      else if(c.fullMin&&c.fullMax){ txt=`${keyToMD(c.fullMin)}〜${keyToMD(c.fullMax)}`; }
+    }
+    per.textContent=txt;
+  }
+  const pb=document.getElementById('m-topbar-period-btn');
+  if(pb){ pb.style.display=showPeriod?'':'none'; pb.classList.toggle('on', !!(c&&c.isFiltered)); }
+  const cam=document.getElementById('m-topbar-cam');
+  const exportable=(['home','daily','product','customer','shipper','staff','unit','check','matrix'].indexOf(id)>=0)&&(c?c.hasData:false);
+  if(cam) cam.style.display=exportable?'':'none';
+  // sync topbar period inputs (default = full range so欄が空にならない)
+  const s=document.getElementById('tb-period-start'), e=document.getElementById('tb-period-end');
+  if(s&&c){ s.value=c.period.start||c.fullMin||''; if(c.fullMin){s.min=c.fullMin;} if(c.fullMax){s.max=c.fullMax;} }
+  if(e&&c){ e.value=c.period.end||c.fullMax||''; if(c.fullMin){e.min=c.fullMin;} if(c.fullMax){e.max=c.fullMax;} }
+}
+function toggleTopbarPeriod(e){
+  if(e) e.stopPropagation();
+  const p=document.getElementById('m-topbar-period-panel'); if(p) p.classList.toggle('open');
+}
+function closeTopbarPeriod(){ const p=document.getElementById('m-topbar-period-panel'); if(p) p.classList.remove('open'); }
+function toggleSidebar(){
+  const app=document.querySelector('.app'); if(app) app.classList.toggle('side-collapsed');
+}
+
+/* =====================================================================
+   INIT / EVENT BINDING
+   ===================================================================== */
+function setupUpload(){
+  const input=document.getElementById('uf');
+  const zone=document.getElementById('uz');
+  if(input){ input.addEventListener('change', e=>{ handleFiles(e.target.files); e.target.value=''; }); }
+  if(zone){
+    ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); zone.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag'); }));
+    zone.addEventListener('drop', e=>{ const dt=e.dataTransfer; if(dt&&dt.files&&dt.files.length) handleFiles(dt.files); });
+  }
+}
+function setupNav(){
+  document.querySelectorAll('.ni').forEach(n=>{
+    n.addEventListener('click', ()=>{ const s=n.getAttribute('data-s'); if(s) go(s); });
+  });
+  document.addEventListener('click', (ev)=>{
+    const panel=document.getElementById('m-topbar-period-panel');
+    const btn=document.getElementById('m-topbar-period-btn');
+    if(!panel || !panel.classList.contains('open')) return;
+    if(panel.contains(ev.target) || (btn && btn.contains(ev.target))) return;
+    closeTopbarPeriod();
+  });
+}
+async function init(){
+  setupUpload();
+  setupNav();
+  try{ await loadStateAsync(); }catch(e){}
+  renderAll();
+  go('home');
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+</script>
+</body>
+</html>
