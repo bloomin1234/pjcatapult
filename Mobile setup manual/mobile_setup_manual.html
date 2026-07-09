@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ホーム画面 追加マニュアル</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet"><style>
+:root{
+  --green:#0F5132; --green-deep:#0A3D26; --tint:#E9F1EC;
+  --red:#E60012; --ink:#0A0A0A; --text:#1A1A1A; --sub:#6B6B6B; --faint:#8A8A8A;
+  --line:#E6E6E6; --line2:#D9D9D9; --paper:#FFFFFF; --panel2:#F5F5F4;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{ font-family:"Noto Sans JP",sans-serif; color:var(--text); line-height:1.65; background:var(--panel2);
+  -webkit-font-smoothing:antialiased; }
+.en{font-family:"Archivo","Noto Sans JP",sans-serif}
+.sheet{ max-width:760px; margin:24px auto; background:var(--paper);
+  border:1px solid var(--line2); }
+img.ico{width:44px;height:44px;display:block;border-radius:2px}
+
+/* header band */
+.head{background:var(--green);color:#fff;padding:22px 26px;border-bottom:3px solid var(--ink)}
+.hmk{display:inline-block;vertical-align:middle;width:34px;height:34px}
+.hmk svg{width:34px;height:34px}
+.htx{display:inline-block;vertical-align:middle;margin-left:13px}
+.ht{font-weight:900;font-size:21px;letter-spacing:.03em;line-height:1.2}
+.he{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;opacity:.82;margin-top:2px}
+.hsub{font-size:10.5px;opacity:.85;margin-top:8px;letter-spacing:.04em}
+
+.body{padding:24px 26px 28px}
+.lead{font-size:13px;color:var(--text);margin:0 0 22px}
+
+/* section heads */
+.sh{font-weight:900;font-size:14px;letter-spacing:.03em;border-bottom:2px solid var(--ink);padding-bottom:7px;margin:0 0 16px}
+.sh .e{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--green);margin-left:8px;text-transform:uppercase}
+
+/* apps row (3-col, table for print safety) */
+.apps{display:table;width:100%;border-collapse:collapse;margin-bottom:24px;break-inside:avoid}
+.apps .ap{display:table-cell;width:33.33%;vertical-align:top;padding:0 12px;border-right:1px solid var(--line)}
+.apps .ap:first-child{padding-left:0}
+.apps .ap:last-child{padding-right:0;border-right:none}
+.ap .nm{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:15px;font-weight:800;letter-spacing:.03em;margin-top:10px}
+.ap .fn{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.5}
+.appnote{font-size:11px;color:var(--sub);margin:-14px 0 22px;line-height:1.55}
+
+/* url box */
+.urlbox{border:1px solid var(--line2);border-radius:2px;padding:12px 14px;margin-bottom:24px;break-inside:avoid}
+.urlbox .t{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;margin-bottom:8px}
+.urlrow{font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line2)}
+.urlrow:last-child{border-bottom:none}
+.urlrow b{font-family:"Archivo","Noto Sans JP",sans-serif;display:inline-block;width:96px;font-weight:800}
+.urlrow span{color:var(--faint)}
+.urlbox .ug{margin-top:12px}
+.urlbox .ug:first-of-type{margin-top:2px}
+.ugh{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:11px;font-weight:800;letter-spacing:.02em;padding:3px 0;border-bottom:1.5px solid;margin-bottom:2px}
+.ugh small{font-weight:600;font-size:9.5px;opacity:.75;letter-spacing:0}
+.ug.o .ugh{color:#0F5132;border-color:#0F5132}
+.ug.s .ugh{color:#1A3A63;border-color:#1A3A63}
+.ug.o .urlrow b{color:#0F5132} .ug.s .urlrow b{color:#1A3A63}
+.urlrow span.u{color:#1A1A1A}
+
+/* procedure */
+.proc{break-inside:avoid;margin-bottom:22px}
+.tag{display:inline-block;background:var(--green);color:#fff;font-weight:900;font-size:12.5px;letter-spacing:.02em;border-radius:2px;padding:5px 12px;margin-bottom:14px}
+.tag .e{font-family:"Archivo","Noto Sans JP",sans-serif;font-weight:700;font-size:10px;opacity:.85;margin-left:6px}
+.step{position:relative;padding-left:42px;margin-bottom:13px;min-height:30px}
+.step .n{position:absolute;left:0;top:0;width:28px;height:28px;background:var(--green);color:#fff;
+  font-family:"Archivo","Noto Sans JP",sans-serif;font-weight:800;font-size:14px;text-align:center;line-height:28px;border-radius:2px}
+.step .tx{font-size:13px;padding-top:3px}
+.step .tx b{font-weight:700}
+.gl{display:inline-block;vertical-align:middle;width:22px;height:22px;border:1px solid var(--line2);border-radius:2px;padding:2px;margin:0 2px}
+.gl svg{width:100%;height:100%;display:block}
+.result{background:var(--tint);border-left:3px solid var(--green);padding:9px 13px;font-size:12px;margin-top:8px}
+.result b{font-weight:700;color:var(--green-deep)}
+
+/* notes */
+.note{border:1px solid var(--line2);border-left:3px solid var(--red);border-radius:2px;padding:14px 16px;margin-top:8px;break-inside:avoid}
+.note .t{font-weight:900;font-size:12.5px;margin-bottom:8px}
+.note .t .e{font-family:"Archivo","Noto Sans JP",sans-serif;font-weight:700;font-size:9.5px;letter-spacing:.12em;color:var(--red);margin-left:6px}
+.note ul{margin:0;padding-left:0;list-style:none}
+.note li{position:relative;padding-left:16px;font-size:12px;margin-bottom:6px;line-height:1.55}
+.note li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;background:var(--red);border-radius:2px}
+.note li b{font-weight:700}
+
+/* footer strip (screen) */
+.foot{border-top:2px solid var(--ink);margin-top:24px;padding:12px 26px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.foot .l{font-family:"Archivo","Noto Sans JP",sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--faint)}
+
+@media print{
+  body{background:#fff}
+  .sheet{max-width:none;margin:0;border:none}
+  .foot{display:none}
+}
+@page{
+  size:A4; margin:15mm 15mm 18mm;
+  @bottom-center{
+    content:"ホーム画面 追加マニュアル ― " counter(page) " / " counter(pages);
+    font-family:"Noto Sans CJK JP"; font-size:8pt; color:#8A8A8A;
+  }
+}
+</style></head><body>
+<div class="sheet">
+  <div class="head">
+    <span class="hmk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3.5" width="10" height="17" rx="1.5"/><line x1="10.5" y1="6.5" x2="13.5" y2="6.5"/></svg></span>
+    <div class="htx">
+      <div class="ht">ホーム画面 追加マニュアル</div>
+      <div class="he">ADD TO HOME SCREEN</div>
+    </div>
+    <div class="hsub">受発注プラットフォーム ｜ SMART-AI・S-MOBILE・SMART-EMS</div>
+  </div>
+
+  <div class="body">
+    <p class="lead">下記3機能を、スマートフォンのホーム画面に「アプリのように」追加するための手順です。各機能のURLは下記に記載しています。追加すると専用ロゴで並び、タップすると全画面で開きます。</p>
+
+    <div class="sh">対象の3機能<span class="e">Apps</span></div>
+    <div class="apps">
+      <div class="ap"><img class="ico" src="data:image/png;base64,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" alt="SMART-AI"><div class="nm en">SMART-AI</div><div class="fn">AI読み取り・名寄せ<br>注文書・請求書を読み取り</div></div>
+      <div class="ap"><img class="ico" src="data:image/png;base64,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" alt="S-MOBILE"><div class="nm en">S-MOBILE</div><div class="fn">モバイル管理<br>発注・出荷・実績</div></div>
+      <div class="ap"><img class="ico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAABmJLR0QA/wD/AP+gvaeTAAACkklEQVR4nO3dMWpqQRiA0ZfHg4ArELKJFHZuwtrCIk1AV5PG/VgKFmmtbuU+3hbEb8gleE59+We4fDDVMC+LxeIPPOrv3BvgdxMQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERDJv7k38HQOh8N2ux0y6nq9fnx8DBn1MAH9tLe3t/f397l3MYwjjERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJM97tXm/369WqyGjLpfL8XgcMurXed6A1uv1ZrMZMur19fVpA3KEkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIZP6rzbvdbrlcDhl1Pp9Pp9OQUdxp/oA+Pz9HvaP+9fUloB/mCCMREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIZP73wq7X66hRt9vt/o+nafr+/h6y7jRN9398u91GrTvw1z3sZbFYzL0HfjFHGImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBI/gNbcjJrDoak+AAAAABJRU5ErkJggg==" alt="SMART-EMS"><div class="nm en">SMART-EMS</div><div class="fn">データ分析<br>売上・利益・単価</div></div>
+    </div>
+    <div class="appnote">※ SMART-AI・S-MOBILE はオーダー／ストックそれぞれに個別接続。SMART-EMS は両システム共通の集計機能です。</div>
+
+    <div class="urlbox">
+      <div class="t">URL（各機能のアクセス先）</div>
+      <div class="ug o">
+        <div class="ugh">Order <small>／ smart-order.online</small></div>
+        <div class="urlrow"><b>SMART-AI</b> <span class="u">https://www.smart-order.online/smart-ai/</span></div>
+        <div class="urlrow"><b>S-MOBILE</b> <span class="u">https://www.smart-order.online/smobile/</span></div>
+        <div class="urlrow"><b>SMART-EMS</b> <span class="u">https://www.smart-order.online/ems/</span></div>
+      </div>
+      <div class="ug s">
+        <div class="ugh">Stock <small>／ smart-stock.online</small></div>
+        <div class="urlrow"><b>SMART-AI</b> <span class="u">https://www.smart-stock.online/smart-ai/</span></div>
+        <div class="urlrow"><b>S-MOBILE</b> <span class="u">https://www.smart-stock.online/smobile/</span></div>
+        <div class="urlrow"><b>SMART-EMS</b> <span class="u">https://www.smart-stock.online/ems/</span></div>
+      </div>
+    </div>
+
+    <!-- iPhone -->
+    <div class="proc">
+      <div class="sh">iPhone の場合<span class="e">Safari</span></div>
+      <span class="tag">iPhone（Safari）<span class="e">必ず Safari で開く</span></span>
+      <div class="step"><span class="n">1</span><div class="tx">対象の <b>URL を Safari で開く</b>（Chrome など他ブラウザでは追加できません）。</div></div>
+      <div class="step"><span class="n">2</span><div class="tx">画面下中央の <b>共有</b> ボタン<span class="gl"><svg viewBox="0 0 24 24" fill="none" stroke="#0F5132" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14V4"/><path d="M9 7l3-3 3 3"/><path d="M7 11H5.5A1.5 1.5 0 0 0 4 12.5v6A1.5 1.5 0 0 0 5.5 20h13A1.5 1.5 0 0 0 20 18.5v-6A1.5 1.5 0 0 0 18.5 11H17"/></svg></span>をタップ。</div></div>
+      <div class="step"><span class="n">3</span><div class="tx">メニューを下にスクロールし <b>「ホーム画面に追加」</b><span class="gl"><svg viewBox="0 0 24 24" fill="none" stroke="#0F5132" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v10h12V10"/></svg></span>をタップ。</div></div>
+      <div class="step"><span class="n">4</span><div class="tx">名前（例：SMART-AI）を確認し、右上の <b>「追加」</b><span class="gl"><svg viewBox="0 0 24 24" fill="none" stroke="#0F5132" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 8.5v7M8.5 12h7"/></svg></span>をタップ。</div></div>
+      <div class="result"><b>完了：</b>ホーム画面に専用ロゴで追加されます。タップすると全画面で開きます。</div>
+    </div>
+
+    <!-- Android -->
+    <div class="proc">
+      <div class="sh">Android の場合<span class="e">Chrome</span></div>
+      <span class="tag">Android（Chrome）<span class="e">Chrome で開く</span></span>
+      <div class="step"><span class="n">1</span><div class="tx">対象の <b>URL を Chrome で開く</b>。</div></div>
+      <div class="step"><span class="n">2</span><div class="tx">右上の <b>「⋮」メニュー</b><span class="gl"><svg viewBox="0 0 24 24" fill="#0F5132"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></span>をタップ。</div></div>
+      <div class="step"><span class="n">3</span><div class="tx"><b>「アプリをインストール」</b> または <b>「ホーム画面に追加」</b><span class="gl"><svg viewBox="0 0 24 24" fill="none" stroke="#0F5132" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v10h12V10"/></svg></span>をタップ。</div></div>
+      <div class="step"><span class="n">4</span><div class="tx">確認画面で <b>「追加 / インストール」</b><span class="gl"><svg viewBox="0 0 24 24" fill="none" stroke="#0F5132" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 8.5v7M8.5 12h7"/></svg></span>をタップ。</div></div>
+      <div class="result"><b>完了：</b>ホーム画面に専用ロゴで追加されます。タップすると全画面で開きます。</div>
+    </div>
+
+    <!-- notes -->
+    <div class="sh">うまくいかない時・ご注意<span class="e">Notes</span></div>
+    <div class="note">
+      <div class="t">ご注意<span class="e">IMPORTANT</span></div>
+      <ul>
+        <li>iPhone は <b>必ず Safari</b> で開いてください（他ブラウザでは「ホーム画面に追加」が表示されないことがあります）。</li>
+        <li>アイコンの角は <b>iPhone 側で自動的に丸められます</b>（端末の仕様で、デザイン側では変更できません）。</li>
+        <li>追加できない時は、URL が <b>https:// で始まっているか</b> を管理者にご確認ください。</li>
+        <li>ロゴが正しく出ない時は、一度ホーム画面のアイコンを削除し、ページを再読み込みしてから追加し直してください。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="l">超整理</span>
+    <span class="l">緑 #0F5132 ・ 緋 #E60012 ・ 墨 #0A0A0A ・ 白 #FFFFFF</span>
+  </div>
+</div>
+</body></html>
