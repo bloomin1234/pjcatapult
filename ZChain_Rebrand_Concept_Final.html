@@ -13,6 +13,7 @@
     --ink:#0A0A0A; --text:#1A1A1A; --sub:#6B6B6B; --faint:#8A8A8A;
     --signal:#E60012;
     --navy:#1A3A63; --navy-d:#0E2746; --navy-t:#E9EEF5;
+    --ai:#B97F23; --ai-d:#8A5E14; --ai-t:#F6EEDA;
     --line:#E6E6E6; --line2:#D9D9D9; --paper:#FFFFFF; --panel:#F5F5F4;
     --maxw:1080px;
   }
@@ -659,10 +660,10 @@
         <p>赤は<b>ブランドマーク</b>であり、同時に<b>必須・警告の信号</b>でもある。器が同じだと、ロゴは鳴り続ける警告音になり、本当の警告は埋もれて効かなくなる。これが「謎の赤」の正体。</p>
       </div>
       <div class="dcard">
-        <div class="top"><span class="tag" style="background:var(--signal)">重なり 02</span><span class="idx">5 COLOURS</span></div>
+        <div class="top"><span class="tag" style="background:var(--signal)">重なり 02</span><span class="idx">MEANING</span></div>
         <div class="swatchrow"><i style="background:var(--green)"></i><i style="background:#1A3A63"></i><i style="background:#A65A1B"></i><i style="background:var(--ink)"></i><i style="background:var(--signal)"></i></div>
-        <h3>色が、増えてしまった。</h3>
-        <p>正典は「<b>3色＋無彩色</b>」。だが現場では緑・紺・茶・墨・赤の<b>5色</b>が走っている。意味を持たない色が増えるほど、視線は迷い、画面は遅くなる。</p>
+        <h3>色と意味が、ずれている。</h3>
+        <p>問題は色数そのものではなく、<b>色と意味の不一致</b>。茶は<b>意味を持たない</b>まま漂い、緑は<b>ブランド・操作・選択・受注・AI</b>まで抱えて過積載。無い意味も、多すぎる意味も、視線を迷わせる。</p>
       </div>
       <div class="dcard">
         <div class="top"><span class="tag" style="background:var(--signal)">重なり 03</span><span class="idx">NO SPINE</span></div>
@@ -671,7 +672,7 @@
         <p>Smart Order、Smart Stock、Smart-AI、S-Mobile、Smart-EMS、スマートコネクト。<b>名前は多い</b>のに、それらを束ねる一本の背骨——<b>構想の名</b>——が外に出ていない。</p>
       </div>
     </div>
-    <div class="concl"><b>結論。</b>　足すのではなく、減らす。一つの色には一つの意味だけを背負わせ、増えた色を退役させる。そして散らばった製品名に、一本の背骨を通す。リブランドとは、新しさを足すことではなく、本質を取り出すための整理である。</div>
+    <div class="concl"><b>結論。</b>　多い・少ないではなく、<b>一つの色に一つの意味</b>へ正す。意味なき色には意味を与え（茶→AIの琥珀）、意味を抱えすぎた色は分ける（緑からAIを独立）。そして散らばった製品名に、一本の背骨を通す。リブランドとは、新しさを足すことではなく、本質を取り出すための整理である。</div>
   </div>
 </section>
 
@@ -868,19 +869,21 @@
       </div>
     </div>
 
-    <p class="kicker" style="margin-bottom:14px">正典パレット ／ Canonical Palette ― 3色 ＋ 無彩色</p>
+    <p class="kicker" style="margin-bottom:14px">正典パレット ／ Canonical Palette ― 4色 ＋ 無彩色</p>
     <div class="palette">
-      <div class="pal"><div class="chip" style="background:var(--green)"><span class="role">主 ／ Brand</span></div><div class="meta2"><div class="nm">緑</div><div class="hex en">#0F5132</div><div class="use">ブランド・操作・選択・肯定。能動の色であり、Zチェーンの色。主役色は1画面に一つ。</div></div></div>
+      <div class="pal"><div class="chip" style="background:var(--green)"><span class="role">主 ／ Brand</span></div><div class="meta2"><div class="nm">緑</div><div class="hex en">#0F5132</div><div class="use">ブランド・操作・選択・肯定。売る面（受注）の能動の色。主役色は1画面に一つ。</div></div></div>
+      <div class="pal"><div class="chip" style="background:var(--ai)"><span class="role">AI ／ 接続</span></div><div class="meta2"><div class="nm">琥珀</div><div class="hex en">#B97F23</div><div class="use">SMART AI・AI・接続・要対応の起点。緑・紺のどちらにも属さない、知能と連携の色。予約色として限定使用。</div></div></div>
       <div class="pal"><div class="chip" style="background:var(--ink)"><span class="role">構造 ／ Structure</span></div><div class="meta2"><div class="nm">墨</div><div class="hex en">#0A0A0A</div><div class="use">構造・文字・統合（EMS）。太線で締め、ヘアラインで分ける。骨格をつくる色。</div></div></div>
       <div class="pal"><div class="chip ground" style="background:var(--paper)"><span class="role">地 ／ Ground</span></div><div class="meta2"><div class="nm">白・無彩色</div><div class="hex en">#FFFFFF</div><div class="use">面の基調。余白そのものを設計する。最も安価な高級。</div></div></div>
       <div class="pal signal"><div class="chip" style="background:var(--signal)"><span class="role">信号 ／ Signal</span></div><div class="meta2"><div class="nm">赤</div><div class="hex en">#E60012</div><div class="use"><b>必須・警告・赤伝のみ。</b>稀に、意味のある場所だけ。ブランド・装飾には一切使わない。</div></div></div>
     </div>
 
-    <p class="kicker" style="margin-top:38px;margin-bottom:14px">システム識別色 ／ System Colours ― 売る・買う・束ねる</p>
-    <div class="palette" style="grid-template-columns:repeat(3,1fr)">
+    <p class="kicker" style="margin-top:38px;margin-bottom:14px">システム識別色 ／ System Colours ― 売る・買う・束ねる・つなぐ</p>
+    <div class="palette" style="grid-template-columns:repeat(4,1fr)">
       <div class="pal"><div class="chip" style="background:var(--green)"><span class="role">SMART ORDER</span></div><div class="meta2"><div class="nm">緑 ／ 売る</div><div class="hex en">#0F5132</div><div class="use">受注・顧客の側。ブランド色と一致する、能動・前向きの方向。</div></div></div>
       <div class="pal"><div class="chip" style="background:var(--navy)"><span class="role">SMART STOCK</span></div><div class="meta2"><div class="nm">紺 ／ 買う</div><div class="hex en">#1A3A63</div><div class="use">仕入・仕入先の側。緑と対になる深い色。一目で核を見分ける。</div></div></div>
       <div class="pal"><div class="chip" style="background:var(--ink)"><span class="role">SMART EMS</span></div><div class="meta2"><div class="nm">墨 ／ 束ねる</div><div class="hex en">#0A0A0A</div><div class="use">統合・経営管理。二つの核を上から束ねる、構造の色。</div></div></div>
+      <div class="pal"><div class="chip" style="background:var(--ai)"><span class="role">SMART AI</span></div><div class="meta2"><div class="nm">琥珀 ／ つなぐ</div><div class="hex en">#B97F23</div><div class="use">データ読取・名寄せ・AI。二核をつなぐ知能。付随ではなく、独自の識別色を持つ。</div></div></div>
     </div>
 
     <p class="kicker" style="margin-top:30px;margin-bottom:14px">パッと見で、見分ける ／ At a Glance</p>
@@ -907,7 +910,7 @@
       </div>
     </div>
 
-    <div class="concl" style="margin-top:24px;border-left-color:var(--navy)"><b>色を増やすのではなく、意味のある二色に整える。</b>　緑＝売る／受注、紺＝買う／仕入、墨＝束ねる／統合、赤＝信号。各色の意味は、一つだけ。取引先連携（Connect）は文脈で緑・紺を継承し、独自色は持たない。意味を持たない色相だった茶 #A65A1B は退役する。</div>
+    <div class="concl" style="margin-top:24px;border-left-color:var(--ai)"><b>色を増やすのではなく、色と意味を一対一に正す。</b>　緑＝売る／受注、紺＝買う／仕入、墨＝束ねる／統合、<b style="color:var(--ai-d)">琥珀＝つなぐ／AI（SMART AI）</b>、赤＝信号。各色の意味は、一つだけ。取引先連携（Connect）は文脈で緑・紺を継承する。意味を持たなかった茶 #A65A1B は、退役ではなく<b>「AI・接続」という意味を与え、#B97F23 に整える</b>。</div>
 
     <div class="heat">
       <div class="hd"><span>データ表現 ／ ヒートマップ</span><span class="e">Single hue · 7 steps</span></div>
@@ -934,13 +937,13 @@
     <div class="prod" style="margin-top:26px">
       <div class="pcard"><div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="15"/><polyline points="7,11 12,16 17,11"/><line x1="5" y1="20" x2="19" y2="20"/></svg></div><div><div class="nm">SMART ORDER</div><div class="jp">スマートオーダー</div><div class="ro"><span class="core">受注 ／ 核</span></div></div></div>
       <div class="pcard"><div class="tile" style="background:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"><rect x="9" y="4" width="6.4" height="6.4"/><rect x="4.4" y="13" width="6.4" height="6.4"/><rect x="13.2" y="13" width="6.4" height="6.4"/></svg></div><div><div class="nm">SMART STOCK</div><div class="jp">スマートストック</div><div class="ro"><span class="core" style="color:var(--navy-d)">仕入 ／ 核</span></div></div></div>
-      <div class="pcard"><div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="7" x2="9.5" y2="7"/><line x1="5" y1="12" x2="9.5" y2="12"/><line x1="5" y1="17" x2="9.5" y2="17"/><path d="M9.5 7C13 7 13 12 15.5 12"/><path d="M9.5 12H15.5"/><path d="M9.5 17C13 17 13 12 15.5 12"/><line x1="15.5" y1="12" x2="19.5" y2="12"/></svg></div><div><div class="nm">SMART AI</div><div class="jp">データ読み取り</div><div class="ro">付随 ／ Attached</div></div></div>
+      <div class="pcard"><div class="tile" style="background:var(--ai)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="7" x2="9.5" y2="7"/><line x1="5" y1="12" x2="9.5" y2="12"/><line x1="5" y1="17" x2="9.5" y2="17"/><path d="M9.5 7C13 7 13 12 15.5 12"/><path d="M9.5 12H15.5"/><path d="M9.5 17C13 17 13 12 15.5 12"/><line x1="15.5" y1="12" x2="19.5" y2="12"/></svg></div><div><div class="nm">SMART AI</div><div class="jp">データ読み取り</div><div class="ro" style="color:var(--ai-d)">識別 ／ 琥珀＝AI</div></div></div>
       <div class="pcard"><div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3.5" width="10" height="17" rx="1.5"/><line x1="10.5" y1="6.5" x2="13.5" y2="6.5"/></svg></div><div><div class="nm">SMART MOBILE</div><div class="jp">モバイル</div><div class="ro">付随 ／ Attached</div></div></div>
       <div class="pcard"><div class="tile ink"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg></div><div><div class="nm">SMART EMS</div><div class="jp">経営管理（統合）</div><div class="ro">付随 ／ 統合＝墨</div></div></div>
       <div class="pcard"><div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5H15"/><polyline points="12,5.5 15,8.5 12,11.5"/><path d="M20 15.5H9"/><polyline points="12,12.5 9,15.5 12,18.5"/></svg></div><div><div class="nm">SMART CONNECT</div><div class="jp">取引先連携</div><div class="ro">付随 ／ 外部</div></div></div>
     </div>
 
-    <div class="prod-note"><b>器・色・線を、揃える。</b>　すべて<b>直角の正方形</b>を器とし、識別色は<b>受注＝緑・仕入＝紺・統合＝墨</b>（取引先連携は文脈で緑/紺を継承）。アイコンは<b>線幅1.7の直線</b>で統一し、塗り・絵文字は使わない。各システムが個別に再実装せず、この一枚を範とする。</div>
+    <div class="prod-note"><b>器・色・線を、揃える。</b>　すべて<b>直角の正方形</b>を器とし、識別色は<b>受注＝緑・仕入＝紺・統合＝墨・AI＝琥珀</b>（取引先連携は文脈で緑/紺を継承）。アイコンは<b>線幅1.7の直線</b>で統一し、塗り・絵文字は使わない。各システムが個別に再実装せず、この一枚を範とする。</div>
   </div>
 </section>
 
@@ -1001,7 +1004,7 @@
       <div class="gx">
         <h4>版の管理</h4><div class="e">Versioning</div>
         <p>本ポリシーは生きた文書。四半期ごとに見直し、事例の蓄積に応じて更新する。<b>最新版を常に唯一の基準とし、旧版は参照しない。</b>残すのは、最終バージョンだけ。</p>
-        <span class="ver">現行 Ver 3.2 ／ 2026</span>
+        <span class="ver">現行 Ver 3.3 ／ 2026</span>
       </div>
     </div>
 
@@ -1532,7 +1535,7 @@ async function shareResultImage(){
         <div class="k">Form ／ 形　・　Motion ／ 動き</div>
         <div class="v">佐藤可士和<small class="en">KASHIWA SATO</small></div>
         <div class="v" style="margin-top:4px">中村勇吾<small class="en">YUGO NAKAMURA</small></div>
-        <div class="org">UNIFIED REBRANDING CONCEPT ／ Z CHAIN ／ Ver 3.2 ／ Bloomin Digital and Strategy Design Group</div>
+        <div class="org">UNIFIED REBRANDING CONCEPT ／ Z CHAIN ／ Ver 3.3 ／ Bloomin Digital and Strategy Design Group</div>
       </div>
     </div>
   </div>
