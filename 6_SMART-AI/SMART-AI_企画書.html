@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMART-AI PDF・画像PDF AI読取／名寄せ機能 企画書</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --so-green:#0F5132;
+    --ink:#0A0A0A;
+    --amber:#B97F23;
+    --red:#E60012;
+    --bg:#D9D9D9;
+    --panel:#F5F5F4;
+    --line:#0A0A0A;
+    --gray:#6b6b6b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;border-radius:0!important;}
+  body{
+    font-family:'Noto Sans JP',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.9;
+    font-size:15px;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 24px 96px;}
+
+  /* ヘッダー */
+  header{
+    background:var(--panel);
+    border:2px solid var(--ink);
+    padding:40px 40px 32px;
+    margin-bottom:8px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  }
+  .brand-mark{
+    width:44px;height:44px;background:var(--so-green);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:900;font-size:20px;letter-spacing:0;
+  }
+  .brand-name{font-weight:900;letter-spacing:.28em;font-size:15px;}
+  .brand-sub{font-size:11px;color:var(--gray);letter-spacing:.12em;}
+  h1{
+    font-size:26px;font-weight:900;line-height:1.5;letter-spacing:.02em;
+    border-left:6px solid var(--so-green);padding-left:18px;
+  }
+  .doc-meta{
+    margin-top:22px;display:flex;flex-wrap:wrap;gap:0;
+    border-top:1px solid var(--ink);
+    font-size:12.5px;
+  }
+  .doc-meta div{padding:10px 22px 0 0;color:var(--gray);}
+  .doc-meta b{color:var(--ink);font-weight:700;margin-right:6px;}
+
+  
+  .rev{
+    background:var(--panel);
+    border:2px solid var(--amber);
+    border-left:10px solid var(--amber);
+    padding:26px 32px;
+    margin-bottom:40px;
+  }
+  .rev h2{
+    font-size:15px;font-weight:900;color:var(--amber);
+    letter-spacing:.1em;margin-bottom:12px;border:none;padding:0;
+  }
+  .rev ol{margin-left:22px;}
+  .rev li{margin-bottom:8px;font-size:14px;}
+  .rev li b{font-weight:700;}
+
+  /* セクション */
+  section{
+    background:var(--panel);
+    border:1px solid var(--ink);
+    padding:32px 40px;
+    margin-bottom:24px;
+  }
+  h2{
+    font-size:18px;font-weight:900;letter-spacing:.04em;
+    padding-bottom:12px;margin-bottom:20px;
+    border-bottom:2px solid var(--so-green);
+    display:flex;align-items:center;gap:10px;
+  }
+  .num{
+    color:var(--so-green);font-weight:900;font-size:15px;min-width:2.4em;
+  }
+  .kai{
+    display:inline-block;background:var(--amber);color:#fff;
+    font-size:11px;font-weight:700;padding:2px 10px;letter-spacing:.15em;
+    vertical-align:middle;
+  }
+  h3{
+    font-size:15px;font-weight:700;margin:22px 0 10px;
+    padding-left:12px;border-left:4px solid var(--ink);
+  }
+  p{margin-bottom:14px;}
+  ul,ol{margin:0 0 14px 24px;}
+  li{margin-bottom:5px;}
+  .note{
+    background:#fff;border:1px solid var(--ink);
+    padding:16px 20px;margin:14px 0;font-size:13.5px;
+  }
+  .note-amber{border-left:8px solid var(--amber);}
+  .note-red{border-left:8px solid var(--red);}
+  .note-green{border-left:8px solid var(--so-green);}
+  .del{
+    text-decoration:line-through;color:var(--gray);
+  }
+  .new{
+    font-weight:700;color:var(--amber);
+  }
+  table{
+    width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;
+    background:#fff;
+  }
+  th{
+    background:var(--so-green);color:#fff;font-weight:700;
+    padding:9px 14px;text-align:left;border:1px solid var(--ink);
+    letter-spacing:.04em;
+  }
+  td{padding:9px 14px;border:1px solid var(--ink);vertical-align:top;}
+  code{
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    background:#fff;border:1px solid #bbb;padding:1px 6px;font-size:12.5px;
+  }
+  .toc{
+    background:var(--panel);border:1px solid var(--ink);
+    padding:28px 40px;margin-bottom:24px;
+  }
+  .toc h2{border-bottom:2px solid var(--ink);}
+  .toc ol{columns:2;column-gap:48px;font-size:13.5px;margin-left:22px;}
+  .toc li{margin-bottom:4px;break-inside:avoid;}
+  .toc a{color:var(--ink);text-decoration:none;border-bottom:1px solid #bbb;}
+  .toc a:hover{color:var(--so-green);border-color:var(--so-green);}
+  .toc .k{color:var(--amber);font-weight:700;font-size:11px;margin-left:4px;}
+  footer{
+    margin-top:48px;padding-top:18px;border-top:2px solid var(--ink);
+    display:flex;justify-content:space-between;
+    font-size:11.5px;color:var(--gray);letter-spacing:.14em;
+  }
+  @media(max-width:640px){
+    section,header,.toc{padding:24px 20px;}
+    .toc ol{columns:1;}
+    h1{font-size:21px;}
+  }
+  @media print{
+    body{background:#fff;}
+    section,header{border-color:#000;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">Ǝ</div>
+    <div>
+      <div class="brand-name">SMART-AI</div>
+      <div class="brand-sub">読み取り ／ 名寄せ — Z CHAIN</div>
+    </div>
+  </div>
+  <h1>PDF・画像PDF AI読取／名寄せ機能 企画書</h1>
+  <div class="doc-meta">
+    <div><b>版</b>Ver 2.0</div>
+    <div><b>作成日</b>2026-07-13</div>
+    <div><b>対象</b>SMART ORDER / SMART STOCK 両システムの SMART-AI</div>
+    <div><b>区分</b>社外秘</div>
+  </div>
+</header>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">企画概要</a></li>
+    <li><a href="#s2">企画の目的</a></li>
+    <li><a href="#s3">サービス名と購入対象</a></li>
+    <li><a href="#s4">AIチケットの料金設計</a></li>
+    <li><a href="#s4-2">AIチケットのSO/SS共有</a></li>
+    <li><a href="#s5">決済方式(Stripe連携)</a></li>
+    <li><a href="#s6">顧客向け体験フロー</a></li>
+    <li><a href="#s7">対象帳票</a></li>
+    <li><a href="#s8">PDF読取機能の基本仕様</a></li>
+    <li><a href="#s9">画像解析モード</a></li>
+    <li><a href="#s10">SMART-AI標準データ形式</a></li>
+    <li><a href="#s11">名寄せ機能の重要性</a></li>
+    <li><a href="#s12">青果向け商品名正規化の考え方</a></li>
+    <li><a href="#s13">商品名と規格情報の分離</a></li>
+    <li><a href="#s14">名寄せ候補生成</a></li>
+    <li><a href="#s15">名寄せルール管理</a></li>
+    <li><a href="#s16">名寄せルールの保存単位</a></li>
+    <li><a href="#s17">名寄せ画面</a></li>
+    <li><a href="#s18">使うほど精度が上がる体験</a></li>
+    <li><a href="#s19">画面構成</a></li>
+    <li><a href="#s20">処理フロー</a></li>
+    <li><a href="#s21">DB設計案</a></li>
+    <li><a href="#s22">API設計案</a></li>
+    <li><a href="#s23">Excelエクスポート仕様</a></li>
+    <li><a href="#s24">SMART-AI直接取込仕様</a></li>
+    <li><a href="#s25">管理画面仕様</a></li>
+    <li><a href="#s26">原価管理・粗利管理</a></li>
+    <li><a href="#s27">セキュリティ・ファイル保存方針</a></li>
+    <li><a href="#s28">例外処理</a></li>
+    <li><a href="#s29">MVP範囲</a></li>
+    <li><a href="#s30">後回しにする機能</a></li>
+    <li><a href="#s31">実装ステップ</a></li>
+    <li><a href="#s32">テスト観点</a></li>
+    <li><a href="#s33">リスクと対策</a></li>
+    <li><a href="#s34">顧客向け文言</a></li>
+    <li><a href="#s35">経営上の意義</a></li>
+    <li><a href="#s36">企画の本質</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2><span class="num">1.</span>企画概要</h2>
+  <p>本企画は、SMART-AIのPDF・画像PDFのAI読取機能を拡充し、顧客が保有する請求書・納品書・発注書などの帳票データを、SMART-AIで活用可能な構造化データへ変換する機能を、有償の「AIチケット」モデルとともに提供するものである。</p>
+  <div class="note note-amber">
+    <b>既存機能マージ前提。</b>現行のSMART-AIには、DXONE Vision AI によるPDF・画像(JPG/PNG)・Excel・CSVの読取、名寄せ(完全一致/表記ゆれ吸収/別名辞書/外来語・略称/AI判定/新規/非商品)、要マスタ登録の一括登録が既に実装・稼働している。本企画はこれらを新規に作り直すものではなく、<b>既存機能を土台として、不足している要素(名寄せルールの永続化・AIチケット課金・Stripe決済・管理KPI等)を追加(マージ)する</b>ものである。既存のVision AI読取・既存名寄せと重複する実装は行わない。
+  </div>
+  <p>青果卸・食品流通の現場では、取引先から送られてくるデータが必ずしもExcel形式で整備されているわけではない。PDF、スキャンPDF、画像PDF、FAX由来の帳票、取引先独自フォーマットの納品書・発注書が多く存在する。Excelデータを持っている顧客だけでなく、PDFや紙帳票中心の顧客でもSMART-AIを利用できるようにすることが重要である。</p>
+  <p>本機能では、顧客がPDF・画像PDFをアップロードすると、AIが帳票内容を読み取り、SMART-AI標準データ形式に変換する。変換後は、Excelとしてダウンロードできるだけでなく、SMART-AIに直接取り込むことも可能にする。さらに、青果業界特有の商品名・取引先名・規格・容量・単位・荷姿の表記ゆれに対応するため、名寄せ・読み替え機能を中核機能として設計する。</p>
+  <p>単なるAI-OCR機能ではなく、読み取ったデータを顧客企業ごとの商品マスタ・取引先マスタに統合し、経営データとして使える状態にすることを目的とする。</p>
+</section>
+
+<section id="s2">
+  <h2><span class="num">2.</span>企画の目的</h2>
+  <p><b>第一に、SMART-AIの利用対象を拡大することである。</b>データ整備が進んでいない企業(紙・PDF・FAX・画像帳票中心)でもSMART-AIを利用できるようにする。</p>
+  <p><b>第二に、PDF・画像PDFを経営データに変換することである。</b>帳票を単に文字起こしするだけでは価値が弱い。商品別・取引先別・日別・粗利別に分析可能なデータへ変換し、SMART-AIの経営分析機能につなげる。</p>
+  <p><b>第三に、青果業界特有の表記ゆれを吸収することである。</b>同じ商品でも取引先ごとに呼称が異なる(キュウリ／きゅうり／胡瓜／ｷｭｳﾘ／キューリ／cucumber／胡瓜100g／胡瓜500g／胡瓜L／胡瓜 5kg 等)。これらをそのまま別商品として登録すると、粗利分析・在庫分析・販売分析が壊れる。AI読取後に自社商品マスタへ統合する名寄せ機能が不可欠である。</p>
+  <p><b>第四に、SMART ORDER / SMART STOCK / Z-CHAINへつながる正しい取引データを蓄積することである。</b>取引先から届く非構造データを、業界標準化された取引データへ変換する入口であり、将来的にZ-CHAINにおける商品マスタ・取引先データ・受発注データ・納品データ・請求データ・粗利データの蓄積基盤となる。</p>
+</section>
+
+<section id="s3">
+  <h2><span class="num">3.</span>サービス名と購入対象</h2>
+  <p>サービス名は引き続き「SMART-AI」とする。新しい別サービス名は作らない。</p>
+  <p>今回追加する有償購入対象は<b>「AIチケット」</b>とする。AIチケットとは、PDF・画像PDFをAIで読み取り、SMART-AIで使えるデータへ変換するための利用チケットである。</p>
+  <div class="note">顧客向け画面では以下の表現に統一する:<br><b>AIチケット</b> — PDF・画像PDFをAIでデータ化するためのチケットです。</div>
+  <p>顧客向けには、Claude、トークン、API原価、AIクレジットという表現は使用しない。内部的にはAI APIを利用するが、顧客にとって重要なのはAIの仕組みではなく、PDFをデータ化できることである。</p>
+</section>
+
+<section id="s4">
+  <h2><span class="num">4.</span>AIチケットの料金設計</h2>
+  <table>
+    <tr><th>項目</th><th>内容</th></tr>
+    <tr><td>1回あたりの価格換算</td><td><b>250円相当</b></td></tr>
+    <tr><td>1回あたりのページ上限</td><td><b>5ページまで</b></td></tr>
+    <tr><td>有料チケット</td><td>20回分 10,000円</td></tr>
+    <tr><td>20回で変換できる最大ページ数</td><td><b>100ページ</b></td></tr>
+    <tr><td>初回無料枠</td><td>3回分</td></tr>
+  </table>
+  <h3>チケット消費条件</h3>
+  <ul>
+    <li>1回のAI変換につき、AIチケットを1回分消費する。</li>
+    <li>変換に成功した場合のみ消費する。変換失敗時は消費しない。</li>
+    <li>同一ファイルの再変換が無制限になると原価リスクがあるため、再実行制限を設ける。</li>
+  </ul>
+  <div class="note note-amber">ページ上限チェックは「1回5ページまで」で実装する。Stripe側に作成済みの商品(¥10,000)をそのまま利用する。</div>
+</section>
+
+<section id="s4-2">
+  <h2><span class="num">4-2.</span>AIチケットのSO/SS共有</h2>
+  <h3>要件</h3>
+  <ul>
+    <li>AIチケットは、SO(スマートオーダー)側SMART-AIとSS(スマートストック)側SMART-AIで<b>共有</b>とする。</li>
+    <li>同一のユーザー/テナント(会社)であれば、チケット残高は<b>1つ</b>であり、SO側で使ってもSS側で使っても同じ残高から消費される。</li>
+    <li>購入(Stripe決済)も同様に、どちらの画面から購入しても付与先は同じ1つの残高である。</li>
+    <li>例:残20回の状態でSO側で1回使えば、SS側で見ても残19回。SS側で購入すればSO側でも残高が増える。</li>
+  </ul>
+  <h3>設計原則(財布を2つ作らない)</h3>
+  <ul>
+    <li>チケット残高・付与/消費履歴は、SOとSSで別々に持たず、単一の保存場所(single source of truth)とする。</li>
+    <li>実現方式は実装specで比較・確定する:①共通DB(共通スキーマ)に置き両システムから参照・更新/②一方をマスタとし他方はAPI経由で照会・消費/③現行のSO/SS構成(認証・テナント対応関係)に照らした最適案。</li>
+    <li>SO/SS双方から同時に消費が走っても、残高マイナス・二重消費が発生しないこと(排他/トランザクション整合)。</li>
+    <li>消費・付与の履歴に「どちらのシステムで使ったか(SO/SS)」を記録し、管理画面で確認できること。</li>
+    <li>残高表示は両システムで一致すること(片側で使った直後に他方でも正しい残数が見える)。</li>
+    <li>SOテナントとSSテナントの同一性の突き合わせ方法(同一ID/別採番/既存連携の利用)は、実装前調査で確定する。</li>
+  </ul>
+</section>
+
+<section id="s5">
+  <h2><span class="num">5.</span>決済方式(Stripe連携)</h2>
+  <p>AIチケットの購入はStripe連携で行う。SMART-AIのトップ画面、またはPDF変換画面に「AIチケットを購入する」ボタンを配置する。</p>
+  <h3>Stripe側の既存設定(作成済み・この実物と連携する)</h3>
+  <table>
+    <tr><th>項目</th><th>値</th></tr>
+    <tr><td>商品名</td><td>スマートAIチケット1万円分</td></tr>
+    <tr><td>商品ID</td><td><code>prod_UsA5lGu2pJV0o8</code></td></tr>
+    <tr><td>価格</td><td>¥10,000(JPY)・1回限り(one-time)・定額・外税</td></tr>
+    <tr><td>商品税コード</td><td>一般 - 電子的に提供されるサービス(<code>txcd_10000000</code>)</td></tr>
+    <tr><td>Payment Link</td><td><code>plink_1TsPmNC1AVLa3esni08y42Ls</code></td></tr>
+    <tr><td>決済手段</td><td>カード / Apple Pay / Link</td></tr>
+  </table>
+  <h3>決済後の処理フロー</h3>
+  <ol>
+    <li>ユーザーがAIチケット購入ボタンを押す</li>
+    <li>Stripeの決済画面へ遷移する</li>
+    <li>ユーザーがStripe画面で決済する</li>
+    <li>Stripe Webhookで決済完了を検知する</li>
+    <li>SMART-AI側で、購入したテナントの共有残高(§4-2)にAIチケット20回分を付与する</li>
+    <li>購入履歴に記録する(stripe_payment_id/イベントIDを保存)</li>
+    <li>顧客画面(SO/SS両方)に残チケット数を表示する</li>
+  </ol>
+  <div class="note note-red">
+    <b>【設計上の最重要論点】購入者⇔テナントの紐づけ。</b>作成済みのPayment Linkは全顧客共通のため、そのままでは「誰が買ったか」をテナントへ自動で紐づけられない。実装specで以下を比較し方式を確定する:<br>
+    <b>案1:</b>Payment Linkに client_reference_id(テナントID)等のパラメータを付与してアプリから遷移させ、Webhookで受け取り紐づける。<br>
+    <b>案2:</b>アプリ側でStripe Checkout Sessionを都度作成する(既存商品 <code>prod_UsA5lGu2pJV0o8</code> の価格を参照)。テナント紐づけが最も確実。<br>
+    いずれの場合も既存商品を活かし、Stripe側に重複商品を作らない。Webhook再送・二重通知でも二重付与しない(イベントIDで冪等化)。決済失敗時は付与しない。APIキー・Webhookシークレットはコードに直書きせず環境変数等で管理する。
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="num">6.</span>顧客向け体験フロー</h2>
+  <ol>
+    <li>SMART-AIトップ画面にアクセスする</li>
+    <li>残りAIチケット数を確認する</li>
+    <li>PDFをAIで変換するボタンを押す</li>
+    <li>PDFまたは画像PDFをアップロードする</li>
+    <li>書類種別を選択する</li>
+    <li>必要に応じて画像解析モードをONにする</li>
+    <li>AIが帳票を読み取る</li>
+    <li>SMART-AI標準データ形式に変換される</li>
+    <li>名寄せ候補が表示される</li>
+    <li>ユーザーが必要に応じて修正する</li>
+    <li>名寄せルールを保存する</li>
+    <li>Excelでダウンロードする/またはSMART-AIへ直接取り込む</li>
+    <li>変換成功時にAIチケットが1回分消費される</li>
+  </ol>
+  <p><b>顧客にとっての価値:</b>紙・PDFの帳票を手入力しなくてよい。取引先ごとに違う商品名を自社マスタへ統合できる。Excelデータがない会社でもSMART-AIを使える。使えば使うほど名寄せルールが蓄積され、次回以降の作業が楽になる。SMART ORDER / SMART STOCKへ正しい商品マスタIDでつながる。</p>
+</section>
+
+<section id="s7">
+  <h2><span class="num">7.</span>対象帳票</h2>
+  <p>MVPでは、対象帳票を<b>請求書中心</b>に絞る。対応候補:請求書/納品書/発注書/発注依頼書/仕入明細/販売明細。初期リリースでは請求書を優先し、後続フェーズで納品書・発注書・発注依頼書に拡張する。</p>
+  <p><b>初期対象外:</b>手書き帳票/極端に画質が悪いFAX/複数帳票が混在したPDF/上限ページ数を大きく超えるPDF/罫線が大きく崩れた帳票/明細行の構造が判別できない帳票。</p>
+</section>
+
+<section id="s8">
+  <h2><span class="num">8.</span>PDF読取機能の基本仕様</h2>
+  <div class="note note-amber">PDF・画像のAI読取は既存のDXONE Vision AIで既に稼働している。本章の要件のうち既存で充足するものは既存を流用し、不足分(ページ上限チェック・アップロード時チェックの拡充・画像解析モードの明示切替等)のみ追加する。</div>
+  <p>処理対象:テキストPDF/スキャンPDF/画像PDF/JPG/PNG。PDFがテキストを含む場合はテキスト抽出とAI解析を組み合わせ、画像の場合は画像解析モードでAIに読み取らせる。</p>
+  <p>アップロード時のチェック:ファイル形式/ファイルサイズ/ページ数/重複ファイル/破損ファイル/パスワード付きPDF/読取不能PDF。</p>
+  <p><b>1回あたりのページ上限は5ページとする。</b></p>
+</section>
+
+<section id="s9">
+  <h2><span class="num">9.</span>画像解析モード</h2>
+  <p>スキャンPDFや画像PDFでは通常のテキスト抽出だけでは読み取れないため、PDFを画像としてAIに読み取らせる「画像解析モード」を設ける。顧客向け表示:「画像PDF・スキャンPDFの場合は、画像解析モードをONにしてください。」</p>
+  <p>画像解析モードはAI API原価が高くなる可能性があるため、管理画面では通常PDFと画像解析モードの利用状況を分けて確認できるようにする。初期リリースでは画像解析モードもAIチケット1回分で処理する。原価が高すぎる場合は、将来的に高精度モードとして2チケット消費も検討する。</p>
+</section>
+
+<section id="s10">
+  <h2><span class="num">10.</span>SMART-AI標準データ形式</h2>
+  <p>PDFから読み取った内容は、まずSMART-AI標準JSONに変換し、その後、名寄せ処理・Excelエクスポート・SMART-AI直接取込に流す。</p>
+  <p><b>標準JSONの項目:</b>document_type / supplier_name / customer_name / document_date / document_number / subtotal / tax / total / line_items / warnings</p>
+  <p><b>line_itemsの項目:</b>raw_product_name / base_product_name / normalized_product_name / product_master_id / quantity / unit / normalized_unit / unit_price / amount / origin / normalized_origin / grade / normalized_grade / capacity / capacity_unit / package_type / confidence / matching_status</p>
+  <p><b>matching_statusの区分:</b>matched / candidate / unmatched / manually_mapped / new_master_required</p>
+</section>
+
+<section id="s11">
+  <h2><span class="num">11.</span>名寄せ機能の重要性</h2>
+  <p>本企画の中核は、PDFを読むことではない。本質は、PDFから読み取ったデータを、自社の経営データとして使える状態に変換することである。青果業界では同じ商品でも取引先ごとに呼び方が異なり(キュウリ/きゅうり/胡瓜/ｷｭｳﾘ/CUCU/胡瓜100g/胡瓜500g/きゅうり袋/きゅうりバラ 等)、これらをすべて別商品として扱うとSMART-AI上の分析が壊れる。読み取った商品名を自社商品マスタに統合する名寄せ機能が必須である。</p>
+  <div class="note note-amber">名寄せの照合エンジン(完全一致/表記ゆれ吸収/別名辞書/外来語・略称/AI判定/新規/非商品の経路分類・信頼度表示)は既に稼働している。本企画で追加する中核は、<b>名寄せルールの永続保存・取引先別優先・次回自動適用(§15〜18)</b>=「使うほど精度が上がる」蓄積の仕組みである。</div>
+</section>
+
+<section id="s12">
+  <h2><span class="num">12.</span>青果向け商品名正規化の考え方</h2>
+  <p>名寄せは単なる文字列一致では不十分であり、以下を組み合わせる:文字正規化/商品名分解/類似度判定/過去ルール参照/取引先別呼称参照/自社マスタ候補提示/ユーザー確認/ルール保存/次回自動適用。</p>
+  <p><b>文字正規化:</b>全角・半角の統一/カタカナ・ひらがなの統一/英大文字・小文字の統一/不要な空白・記号の除去/長音・表記ゆれ補正/旧字体・異体字補正/英語名・略称の日本語変換。</p>
+  <p><b>商品名分解:</b>基本商品名/規格/等級/サイズ/容量/単位/荷姿/産地/ブランド名/顧客独自略称 を分離する。</p>
+</section>
+
+<section id="s13">
+  <h2><span class="num">13.</span>商品名と規格情報の分離</h2>
+  <p>特に重要なのは、商品名と規格情報を混同しないことである。「キュウリ100g」「キュウリ500g」は商品名としてはどちらもキュウリであり、容量が異なるだけである。</p>
+  <table>
+    <tr><th>読み取り文字列</th><th>分解結果</th></tr>
+    <tr><td>キュウリ500g</td><td>raw_name: キュウリ500g / base_product_name: キュウリ / normalized_product_name: 胡瓜 / capacity: 500 / capacity_unit: g / package_type: null / grade: null / product_master_id: 自社商品マスタID</td></tr>
+    <tr><td>胡瓜L 5kg</td><td>raw_name: 胡瓜L 5kg / base_product_name: 胡瓜 / normalized_product_name: 胡瓜 / grade: L / capacity: 5 / capacity_unit: kg / product_master_id: 自社商品マスタID</td></tr>
+  </table>
+  <p>読み取り結果をそのまま商品名に入れるのではなく、商品名・規格・容量・荷姿・単位を可能な限り分解して扱う。</p>
+</section>
+
+<section id="s14">
+  <h2><span class="num">14.</span>名寄せ候補生成</h2>
+  <p>名寄せ候補は以下の情報を使って生成する:顧客の商品マスタ/顧客の取引先マスタ/過去に保存された名寄せルール/取引先ごとの過去の呼称/商品名の類似度/読み方の類似度/表記ゆれ辞書/青果品目辞書/単位・規格・容量の分解結果。</p>
+  <p>候補には信頼度スコアを付与する。例:AI読み取り名「ｷｭｳﾘ500g」→ 候補1:胡瓜/容量500g/信頼度95%、候補2:きゅうり/容量500g/信頼度88%、候補3:胡瓜L/信頼度62%。信頼度が高い候補は自動候補として表示し、低い候補は要確認とする。初期段階では完全自動確定は避け、プレビュー画面で確認可能にする。</p>
+</section>
+
+<section id="s15">
+  <h2><span class="num">15.</span>名寄せルール管理</h2>
+  <p>SMART-AI上に「名寄せルール管理」(読み替えルール管理)ボタンを配置し、保存済みルールの確認・編集・削除を可能にする。</p>
+  <p><b>管理項目:</b>ルール名/対象種別/変換前表記/正規化後表記/変換後マスタ項目/product_master_id/partner_master_id/適用範囲/適用条件/優先順位/有効・無効/使用回数/最終使用日/作成者/更新者。</p>
+  <p><b>対象種別:</b>商品名/取引先名/単位/規格/容量/荷姿/産地。<b>適用範囲:</b>顧客全体/取引先別/帳票種別別。<b>ルール種類:</b>完全一致/部分一致/正規表現/同義語/AI提案/取引先別優先/顧客全体。</p>
+</section>
+
+<section id="s16">
+  <h2><span class="num">16.</span>名寄せルールの保存単位</h2>
+  <p>名寄せルールは顧客単位で管理し、他社のルールが別会社に混ざってはならない。必ずcompany_idまたはtenant_id単位で分離する。取引先ごとに呼称が異なる場合に対応するため、partner_id単位のルールも持てるようにする(例:A社からの「CUCU」は胡瓜、B社からの「CUCU」はミニ胡瓜)。取引先別ルールの優先度を顧客全体ルールより高く設定できるようにする。</p>
+</section>
+
+<section id="s17">
+  <h2><span class="num">17.</span>名寄せ画面</h2>
+  <p>変換結果プレビュー画面に名寄せ確認エリアを設ける。<b>表示項目:</b>AI読み取り名/分解された基本商品名・容量・単位・規格・荷姿/自社マスタ候補/選択中の変換先/信頼度/要確認フラグ/「この対応関係を次回以降も使う」チェック/取引先別ルールとして保存するか/顧客全体ルールとして保存するか/新規マスタ登録ボタン。</p>
+</section>
+
+<section id="s18">
+  <h2><span class="num">18.</span>使うほど精度が上がる体験</h2>
+  <p>名寄せは初回から完全自動にしない。<b>初回:</b>AIが読み取り候補を提示し、ユーザーが正しい自社マスタを選択、ルールとして保存する。<b>2回目以降:</b>保存済みルールに基づき自動で自社マスタに変換し、不明なものだけユーザーに確認させる。この流れにより、使えば使うほど名寄せの手間が減り、SMART-AIが顧客企業ごとの業務に馴染んでいく。</p>
+</section>
+
+<section id="s19">
+  <h2><span class="num">19.</span>画面構成</h2>
+  <p><b>SMART-AIトップ画面:</b>Excel/CSVアップロード/PDFをAIで変換する/残りAIチケット数/無料AIチケット残数/AIチケットを購入するボタン/名寄せルール管理ボタン。</p>
+  <p><b>PDFアップロード画面:</b>PDFファイルアップロード/書類種別選択(請求書・納品書・発注書・その他)/画像解析モードON・OFF/変換後の処理選択(Excelでダウンロード/SMART-AIへ直接取込/両方)。</p>
+  <p><b>変換結果プレビュー画面:</b>取引先名/日付/商品名/数量/単価/金額/税額/合計金額/読取信頼度/要確認フラグ/明細合計と帳票記載合計の一致チェック/AI読み取り名/自社マスタ候補/名寄せ結果/名寄せルール保存チェック/新規マスタ登録導線。</p>
+  <p><b>名寄せルール管理画面:</b>保存済みルール一覧/検索/絞り込み/変換前表記/変換後マスタ項目/対象種別/適用範囲/有効・無効/編集/削除/新規作成。</p>
+  <p><b>管理画面:</b>顧客別AIチケット残数/無料AIチケット利用状況/購入履歴/消費履歴/PDF変換履歴/AI API利用量/API原価/売上/粗利/変換失敗率/画像解析モード利用状況/名寄せ成功率/未名寄せ件数/新規マスタ候補件数。</p>
+</section>
+
+<section id="s20">
+  <h2><span class="num">20.</span>処理フロー</h2>
+  <ol>
+    <li>ユーザーがPDFをアップロード</li>
+    <li>ファイル形式・ページ数・容量をチェック</li>
+    <li>AIチケット残数を確認(SO/SS共有残高 §4-2)</li>
+    <li>PDFがテキストPDFか画像PDFかを判定</li>
+    <li>必要に応じて画像解析モードで処理</li>
+    <li>AI APIで帳票内容を読み取る</li>
+    <li>SMART-AI標準JSONへ変換</li>
+    <li>商品名・取引先名・単位・規格を分解</li>
+    <li>自社商品マスタ・取引先マスタと照合</li>
+    <li>名寄せ候補を生成</li>
+    <li>変換結果プレビューを表示</li>
+    <li>ユーザーが必要に応じて名寄せを修正</li>
+    <li>名寄せルールを保存</li>
+    <li>明細合計と帳票合計をチェック</li>
+    <li>Excelエクスポート/SMART-AI直接取込</li>
+    <li>成功時にAIチケットを消費(共有残高から)</li>
+    <li>変換履歴・チケット履歴を保存</li>
+  </ol>
+</section>
+
+<section id="s21">
+  <h2><span class="num">21.</span>DB設計案</h2>
+  <p>以下のテーブルを検討する。実装時は既存テーブルとの重複・整合を確認し、既存を活かせる場合は拡張を優先する。チケット系テーブル(ai_ticket_accounts / ai_ticket_transactions)は<b>SO/SS共有残高(§4-2)の単一保存場所</b>として設計する。</p>
+  <table>
+    <tr><th>テーブル</th><th>目的</th><th>主なカラム</th></tr>
+    <tr><td>ai_ticket_accounts</td><td>顧客ごとのAIチケット残数(SO/SS共有)</td><td>id, company_id, free_ticket_remaining, paid_ticket_remaining, total_granted_count, total_purchased_count, total_used_count, created_at, updated_at</td></tr>
+    <tr><td>ai_ticket_transactions</td><td>付与・購入・消費・返却・調整履歴(SO/SSどちらで使ったかも記録)</td><td>id, company_id, transaction_type(free_grant/purchase/consume/refund/adjustment), quantity, balance_after, related_conversion_job_id, stripe_payment_id, source_system(SO/SS), note, created_by, created_at</td></tr>
+    <tr><td>document_conversion_jobs</td><td>PDF変換ジョブ管理</td><td>id, company_id, user_id, file_id, document_type, status(uploaded/processing/preview_ready/completed/failed/cancelled), page_count, use_image_mode, ai_ticket_consumed, total_amount_check_status, subtotal, tax, total, error_message, created_at, completed_at</td></tr>
+    <tr><td>document_files</td><td>アップロードファイル情報</td><td>id, company_id, original_file_name, file_path, file_type, file_size, page_count, hash, storage_status, created_at</td></tr>
+    <tr><td>document_extracted_items</td><td>AI読取明細行</td><td>id, conversion_job_id, line_no, raw_text, raw_product_name, base_product_name, normalized_product_name, product_master_id, quantity, unit, normalized_unit, capacity, capacity_unit, grade, package_type, origin, unit_price, amount, confidence, matching_status, created_at</td></tr>
+    <tr><td>normalization_rules</td><td>名寄せ・読み替えルール</td><td>id, company_id, partner_id, rule_name, rule_type, raw_pattern, normalized_value, target_master_id, target_master_type, match_type(exact/partial/regex/synonym/ai_suggested), scope(company/partner/document_type), priority, is_active, usage_count, last_used_at, created_by, updated_by, created_at, updated_at</td></tr>
+    <tr><td>normalization_candidates</td><td>AI提示の名寄せ候補</td><td>id, conversion_job_id, extracted_item_id, candidate_master_id, candidate_name, confidence_score, reason, selected_flag, created_at</td></tr>
+    <tr><td>payment_orders</td><td>Stripe決済注文</td><td>id, company_id, stripe_checkout_session_id, stripe_payment_intent_id, amount, currency, ticket_quantity, status, created_at, paid_at</td></tr>
+    <tr><td>api_usage_logs</td><td>AI API利用量・原価</td><td>id, company_id, conversion_job_id, api_provider, model_name, input_tokens, output_tokens, image_pages, estimated_cost, created_at</td></tr>
+  </table>
+</section>
+
+<section id="s22">
+  <h2><span class="num">22.</span>API設計案</h2>
+  <h3>AIチケット関連</h3>
+  <ul>
+    <li><code>GET /api/smart-ai/ai-tickets/balance</code> — 残りAIチケット数を取得(SO/SS共有残高)</li>
+    <li><code>POST /api/smart-ai/ai-tickets/checkout</code> — Stripe Checkout Sessionを作成</li>
+    <li><code>POST /api/webhooks/stripe</code> — Stripe Webhookを受信し、決済完了時にAIチケットを付与</li>
+    <li><code>GET /api/smart-ai/ai-tickets/transactions</code> — AIチケット履歴を取得</li>
+  </ul>
+  <h3>PDF変換関連</h3>
+  <ul>
+    <li><code>POST /api/smart-ai/document-conversions</code> — 変換ジョブ作成</li>
+    <li><code>POST /api/smart-ai/document-conversions/{id}/process</code> — AI解析</li>
+    <li><code>GET /api/smart-ai/document-conversions/{id}</code> — ジョブ詳細</li>
+    <li><code>GET /api/smart-ai/document-conversions/{id}/preview</code> — 変換結果プレビュー</li>
+    <li><code>POST /api/smart-ai/document-conversions/{id}/confirm</code> — 変換結果確定</li>
+    <li><code>GET /api/smart-ai/document-conversions/{id}/export-excel</code> — Excelダウンロード</li>
+    <li><code>POST /api/smart-ai/document-conversions/{id}/import-to-smart-ai</code> — SMART-AIへ直接取込</li>
+  </ul>
+  <h3>名寄せ関連</h3>
+  <ul>
+    <li><code>GET/POST /api/smart-ai/normalization-rules</code>、<code>PUT/DELETE /api/smart-ai/normalization-rules/{id}</code> — ルールCRUD</li>
+    <li><code>POST /api/smart-ai/normalization/candidates</code> — 候補生成</li>
+    <li><code>POST /api/smart-ai/normalization/apply</code> — 名寄せ結果適用</li>
+  </ul>
+  <h3>管理画面関連</h3>
+  <ul>
+    <li><code>GET /api/admin/smart-ai/ai-ticket-usage</code> — 顧客別チケット利用状況</li>
+    <li><code>GET /api/admin/smart-ai/conversion-logs</code> — PDF変換履歴</li>
+    <li><code>GET /api/admin/smart-ai/api-costs</code> — AI API原価</li>
+    <li><code>GET /api/admin/smart-ai/normalization-metrics</code> — 名寄せ成功率</li>
+  </ul>
+</section>
+
+<section id="s23">
+  <h2><span class="num">23.</span>Excelエクスポート仕様</h2>
+  <p>変換後のデータはExcelでダウンロードできるようにする。含めるシート:①読取結果(取引先名/日付/帳票番号/小計/消費税/合計/合計チェック結果)、②明細データ(行番号/商品名/名寄せ後商品名/商品マスタID/数量/単位/単価/金額/規格/容量/荷姿/産地/信頼度/確認ステータス)、③名寄せ結果(AI読み取り名/変換後名称/適用ルール/信頼度/保存有無)、④要確認一覧(要確認理由/対象行/対象項目/AI読取値/候補/ユーザー確認結果)、⑤変換メモ(変換日時/対象ファイル/ページ数/画像解析モード/AIチケット消費有無/注意事項)。</p>
+</section>
+
+<section id="s24">
+  <h2><span class="num">24.</span>SMART-AI直接取込仕様</h2>
+  <p>PDF変換結果はExcel出力だけでなく、SMART-AIへ直接取込できるようにする。ただし以下の場合は直接取込を制限する:明細合計と帳票合計が一致しない/必須項目が欠落/商品名が未名寄せで重要度が高い/取引先名が未名寄せ/数量・単価・金額の信頼度が低い。</p>
+  <p>直接取込前には確認画面を表示する(取込件数/未名寄せ件数/要確認件数/合計チェック結果/AIチケット消費予定/取込先)。取込先は既存のSMART-AIデータ取込フローと整合させる。既存のsmart_ai_draft関連処理・smart_ai_extract関連処理・SMART ORDER / SMART STOCKとの連携方式を確認したうえで、既存仕様を壊さない形で設計する。</p>
+</section>
+
+<section id="s25">
+  <h2><span class="num">25.</span>管理画面仕様</h2>
+  <p><b>管理項目:</b>顧客別AIチケット残数/無料AIチケット利用状況/購入履歴/消費履歴(SO/SS別の消費内訳を含む)/PDF変換履歴/変換成功率・失敗率/画像解析モード利用率/AI API利用量/AI API原価/AIチケット売上/粗利/名寄せ成功率/未名寄せ件数/要確認件数/新規マスタ候補件数。</p>
+  <p><b>重要KPI:</b>AI読取成功率/自動名寄せ成功率/未名寄せ・要確認件数/AIチケット消費数/AI API原価率/AIチケット粗利率。</p>
+</section>
+
+<section id="s26">
+  <h2><span class="num">26.</span>原価管理・粗利管理</h2>
+  <p>AIチケットは従量課金型の収益機能であるため、売上だけでなくAI API原価を必ず管理する。管理指標:1回あたり平均API原価/1ページあたり平均API原価/画像解析モード時・通常PDF時の平均API原価/変換失敗時・再変換時のAPI原価/AIチケット売上・粗利/顧客別利用回数・粗利。</p>
+  <p>1回250円相当で販売するため、API原価が高すぎる場合は価格設計を見直す。将来的には、通常PDF:1チケット/画像解析モード:1チケット/高精度画像解析モード:2チケット/5ページ超過:追加チケット/大量処理:別料金 も検討する。</p>
+</section>
+
+<section id="s27">
+  <h2><span class="num">27.</span>セキュリティ・ファイル保存方針</h2>
+  <p>PDF・画像PDFには取引先名・金額・商品名・請求情報などの機密情報が含まれるため、以下を方針とする:ファイルはcompany_id単位で分離し他社ファイルにアクセスできないようにする/アップロードファイルにアクセス権限を設定/不要ファイルは一定期間後に削除/変換結果JSONも会社単位で分離/AI APIに送信するデータ範囲を最小限に/ログに個人情報・機密情報を過剰に残さない/管理者操作ログを残す/Stripe決済情報は自社DBにカード情報として保存しない。</p>
+</section>
+
+<section id="s28">
+  <h2><span class="num">28.</span>例外処理</h2>
+  <ul>
+    <li><b>ページ数超過:</b>5ページを超える場合はアップロード不可、または分割を促す。</li>
+    <li><b>ファイル形式不正:</b>PDF/JPG/PNG以外はエラー。</li>
+    <li><b>パスワード付きPDF・破損PDF:</b>読取不可としてエラー。</li>
+    <li><b>AI読取失敗:</b>AIチケットは消費しない。</li>
+    <li><b>合計不一致:</b>プレビュー画面で警告し、直接取込を制限する。</li>
+    <li><b>未名寄せ多数:</b>確認を促す。</li>
+    <li><b>Stripe決済失敗:</b>AIチケットは付与しない。</li>
+    <li><b>Stripe Webhook重複:</b>二重付与を防止する(イベントIDで冪等化)。</li>
+    <li><b>同一ファイル再変換:</b>一定回数以上は制限する。</li>
+  </ul>
+</section>
+
+<section id="s29">
+  <h2><span class="num">29.</span>MVP範囲</h2>
+  <ul>
+    <li>AIチケット残数表示(SO/SS共有残高)</li>
+    <li>初回3回無料付与</li>
+    <li>AIチケット20回分10,000円購入(Stripe決済連携)</li>
+    <li>PDFアップロード(5ページ上限)</li>
+    <li>請求書のAI読取(既存Vision AIを流用し、不足分のみ補強)</li>
+    <li>画像解析モード</li>
+    <li>SMART-AI標準JSON変換</li>
+    <li>商品名・取引先名の名寄せ候補表示(既存名寄せを流用)</li>
+    <li>名寄せルール保存(新規追加の中核)</li>
+    <li>変換結果プレビュー</li>
+    <li>Excelエクスポート</li>
+    <li>SMART-AI直接取込</li>
+    <li>AIチケット消費履歴</li>
+    <li>管理者向け利用履歴</li>
+  </ul>
+  <p>MVPでは名寄せ対象は商品名と取引先名を最優先とする。単位・規格・容量・荷姿・産地は分解できる範囲で対応し、完全対応は後続フェーズでもよい。</p>
+</section>
+
+<section id="s30">
+  <h2><span class="num">30.</span>後回しにする機能</h2>
+  <p>手書き帳票対応/極端に画質が悪いFAX対応/複数帳票混在PDFの自動分割/上限を大きく超える大型PDF処理/完全自動取込/複雑な正規表現ルールUI/AIによる自動マスタ作成/高精度画像解析モードの別課金/複数ファイル一括アップロード/帳票テンプレート学習機能/取引先別帳票テンプレート管理。</p>
+</section>
+
+<section id="s31">
+  <h2><span class="num">31.</span>実装ステップ</h2>
+  <div class="note note-amber">Step 1(現状仕様確認)を必ず最初に行い、既存実装(Vision AI読取・既存名寄せ・一括登録・取込フロー)との突き合わせ(ギャップ分析)を経てから各Stepに着手する。既存で充足する部分は再実装しない。</div>
+  <ol>
+    <li><b>現状仕様確認:</b>Excel/CSVアップロード処理/smart_ai_draft・smart_ai_extract関連処理/商品マスタ・取引先マスタ構造/SO・SSとの連携方式/SOテナント⇔SSテナントの対応関係(チケット共有の前提)。</li>
+    <li><b>AIチケット基盤:</b>共有残高テーブル(§4-2)/無料3回付与/消費履歴/失敗時非消費/5ページ上限/再変換制限。</li>
+    <li><b>Stripe連携:</b>紐づけ方式の確定(§5 案1/案2)/Webhook/決済完了後の付与/二重付与防止。テストモードで通し検証後に本番へ。</li>
+    <li><b>PDFアップロード:</b>ファイルチェック/ページ数チェック(5ページ)/変換ジョブ管理。既存アップロードの拡張を優先。</li>
+    <li><b>AI読取:</b>既存Vision AIの流用を基本とし、標準JSON変換・信頼度・警告の不足分を補強。</li>
+    <li><b>名寄せ:</b>既存照合エンジンの上に、文字正規化・商品名分解の強化、候補スコアリング、<b>名寄せルール保存(中核)</b>を追加。</li>
+    <li><b>プレビュー:</b>要確認フラグ/合計チェック/名寄せ候補選択。</li>
+    <li><b>出力・取込:</b>Excelエクスポート/SMART-AI直接取込/取込前チェック。既存取込フローと整合。</li>
+    <li><b>管理画面:</b>チケット履歴/変換履歴/API原価/名寄せ成功率。</li>
+    <li><b>テスト:</b>PDF読取/画像PDF/名寄せ/Stripe決済/チケット消費(SO/SS共有含む)/SMART-AI取込。</li>
+  </ol>
+</section>
+
+<section id="s32">
+  <h2><span class="num">32.</span>テスト観点</h2>
+  <h3>AIチケット関連</h3>
+  <ul>
+    <li>新規顧客に無料3回分が付与されるか。</li>
+    <li>変換成功時のみチケットが消費され、失敗時は消費されないか。</li>
+    <li>無料チケットから先に消費されるか。有料チケット購入後に残数が増えるか。</li>
+    <li>二重決済・二重付与が発生しないか。</li>
+    <li>SO側で購入→SS側でも残高が増えるか(逆も同様)。SO側で消費→SS側の残数が一致して減るか。SO/SSほぼ同時消費でも二重消費・マイナスが起きないか。履歴にSO/SSどちらで使ったかが記録されるか。</li>
+  </ul>
+  <h3>Stripe関連</h3>
+  <ul>
+    <li>決済画面に遷移するか。決済完了Webhookを受け取れるか。</li>
+    <li>失敗時に付与されないか。Webhook再送時に二重付与されないか。</li>
+    <li>購入者が正しいテナントに紐づき、別テナントへ誤付与されないか。</li>
+  </ul>
+  <h3>PDF読取関連</h3>
+  <ul>
+    <li>テキストPDF・画像PDFを読み取れるか。</li>
+    <li>5ページ超過時に制限されるか。</li>
+    <li>破損PDF・パスワード付きPDFでエラーになるか。</li>
+  </ul>
+  <h3>名寄せ関連</h3>
+  <ul>
+    <li>キュウリ/きゅうり/胡瓜/ｷｭｳﾘが同一候補になるか。</li>
+    <li>キュウリ100g・キュウリ500gを商品名と容量に分解できるか。</li>
+    <li>取引先別ルールが優先されるか。顧客別ルールが他社に漏れないか。</li>
+    <li>保存したルールが次回適用されるか。</li>
+  </ul>
+  <h3>SMART-AI取込・管理画面関連</h3>
+  <ul>
+    <li>合計一致時に取込でき、不一致時に警告が出るか。未名寄せ商品を確認できるか。商品マスタID付きで取込できるか。</li>
+    <li>チケット残数・変換履歴・API原価・粗利・名寄せ成功率が管理画面で確認できるか。</li>
+  </ul>
+</section>
+
+<section id="s33">
+  <h2><span class="num">33.</span>リスクと対策</h2>
+  <table>
+    <tr><th>リスク</th><th>対策</th></tr>
+    <tr><td>AI読取精度が不十分</td><td>プレビュー画面を必須にする/読取信頼度を表示/合計チェック/失敗時はチケット非消費</td></tr>
+    <tr><td>商品名の名寄せ漏れが多い</td><td>文字正規化・品目辞書・過去ルール・取引先別ルールの組み合わせ/簡単にルール保存できるUI/名寄せ成功率の追跡</td></tr>
+    <tr><td>API原価が高く粗利が下がる</td><td>API利用量の記録/通常PDFと画像解析モードを分けた原価管理/必要に応じ高精度モードを別課金</td></tr>
+    <tr><td>Stripe決済後の付与漏れ</td><td>Webhookログ保存/決済ステータス管理/管理者向け手動付与機能</td></tr>
+    <tr><td>AI変換結果をそのまま取込して分析が壊れる</td><td>プレビュー必須/合計不一致時は直接取込を制限/未名寄せ商品は確認を促す</td></tr>
+    <tr><td>他社の名寄せルールが混ざる</td><td>company_id / tenant_idで完全分離/取引先別ルールもpartner_idで管理</td></tr>
+  </table>
+</section>
+
+<section id="s34">
+  <h2><span class="num">34.</span>顧客向け文言</h2>
+  <div class="note note-green">
+    <b>AIチケット</b><br>
+    PDF・画像PDFをAIでデータ化するためのチケットです。<br><br>
+    初回3回まで無料でお試しいただけます。<br>
+    1回の変換で5ページまで対応しています。<br>
+    この処理にはAIチケットを1回分使用します。<br><br>
+    20回分のAIチケットを10,000円で購入できます。<br>
+    最大100ページ分のPDFをAI変換できます。<br><br>
+    AIチケットは、スマートオーダーとスマートストックのSMART-AIで共通してご利用いただけます。<br><br>
+    画像が不鮮明な場合、読取精度が下がることがあります。<br>
+    変換結果は必ず確認のうえ、SMART-AIへ取り込んでください。<br>
+    変換に失敗した場合、AIチケットは消費されません。
+  </div>
+  <div class="note note-green">
+    <b>名寄せルール</b><br>
+    読み取った商品名や取引先名を、自社マスタ上の正式名称に変換するためのルールです。<br>
+    一度登録すると、次回以降は同じ表記を自動で変換できます。
+  </div>
+</section>
+
+<section id="s35">
+  <h2><span class="num">35.</span>経営上の意義</h2>
+  <p>本機能は、SMART-AIの有償機能として売上を作るだけでなく、SMART-AIの対象市場を広げる意味がある。Excel/CSVデータを持つ企業だけでなく、PDF・紙・FAX中心の企業もSMART-AIに取り込めるようになる。AIチケットにより従量課金モデルを組み込めるため、月額課金に加えて利用量に応じた売上を作ることができる。</p>
+  <p>また、PDF読取と名寄せによって、顧客ごとの商品名・取引先名・取引データが蓄積される。これは将来的に、SMART ORDER、SMART STOCK、Z-CHAINへ接続するための重要なデータ資産となる。</p>
+</section>
+
+<section id="s36">
+  <h2><span class="num">36.</span>企画の本質</h2>
+  <p>本企画の本質は、PDFを読むことではない。本質は、取引先ごとにバラバラな帳票・商品名・呼称・単位・規格を、顧客企業の自社マスタに統合し、経営データとして使える状態にすることである。</p>
+  <p>PDF読取だけなら他社AI-OCRでもできる。しかし、青果業界における表記ゆれ・荷姿違い・容量違い・規格違い・取引先別呼称を吸収し、SMART-AI、SMART ORDER、SMART STOCKに正しい商品マスタIDでつなげられることが、SMART-AIの競争優位である。</p>
+  <p><b>重要KPI:</b>AI読取成功率/自動名寄せ成功率/未名寄せ・要確認件数/AIチケット利用回数/AIチケット粗利率/SMART-AI直接取込率。</p>
+  <p>この機能により、SMART-AIは単なるExcel分析ツールではなく、青果卸・食品流通における非構造帳票を経営データへ変換する業務OSへ進化する。</p>
+</section>
+
+<footer>
+  <div>SMART-AI ／ Z CHAIN — PDF・画像PDF AI読取／名寄せ機能 企画書 Ver 2.0</div>
+  <div>CONFIDENTIAL</div>
+</footer>
+
+</div>
+</body>
+</html>
