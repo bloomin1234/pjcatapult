@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>請求額計算設定 - 計算フロー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ZChain rebrand design rules:
+   - border-radius: 0（全要素）
+   - 影・グラデーション・ティントなし
+   - 背景 #D9D9D9（外側）＋ #F5F5F4（パネル）
+   - SO緑 #0F5132 / 琥珀 #B97F23（アクション・設定バッジ）
+   - 赤 #E60012 は警告・必須のみ（本画面では未使用）
+   - Noto Sans JP
+   新規クラスのみ（zcf- プレフィックス）／既存CSS非上書き（§31）
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; }
+
+body {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  background: #D9D9D9;
+  color: #1a1a1a;
+  padding: 24px;
+  line-height: 1.6;
+}
+
+.zcf-num {
+  font-family: "Consolas", "Menlo", "Courier New", monospace;
+  font-feature-settings: "tnum";
+}
+
+/* ---------- ヘッダー ---------- */
+.zcf-header {
+  max-width: 1080px;
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+.zcf-back-btn {
+  display: inline-block;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 18px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+.zcf-back-btn:hover { background: #333; }
+.zcf-page-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.zcf-header-spacer { width: 110px; }
+
+/* ---------- パネル ---------- */
+.zcf-panel {
+  max-width: 1080px;
+  margin: 0 auto;
+  background: #F5F5F4;
+  border: 1px solid #C4C4C0;
+  padding: 28px 32px;
+}
+
+.zcf-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.zcf-panel-title-bar {
+  width: 6px;
+  height: 24px;
+  background: #0F5132;
+  flex-shrink: 0;
+}
+.zcf-panel-title-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.zcf-legend {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 24px 16px;
+}
+.zcf-legend-drop {
+  color: #999;
+  text-decoration: line-through;
+}
+.zcf-legend-fixed {
+  color: #0F5132;
+  font-weight: 700;
+}
+
+/* ---------- 縦タイムライン ---------- */
+.zcf-flow {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.zcf-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.zcf-badge {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.zcf-badge-base { background: #5F5E5A; }
+.zcf-badge-step { background: #0F5132; }
+.zcf-badge-final { background: #1a1a1a; }
+.zcf-rail-line {
+  width: 2px;
+  flex: 1;
+  background: #B4B2A9;
+}
+
+.zcf-card {
+  background: #fff;
+  border: 1px solid #C4C4C0;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.zcf-card-step { border-top: 3px solid #0F5132; }
+
+.zcf-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.zcf-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.zcf-card-title-green { color: #0F5132; }
+.zcf-card-sub {
+  font-size: 12px;
+  color: #777;
+}
+.zcf-setting-badge {
+  background: #B97F23;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  letter-spacing: 0.02em;
+}
+.zcf-formula {
+  font-size: 18px;
+  color: #1a1a1a;
+  word-break: break-all;
+}
+.zcf-formula-note {
+  font-size: 12px;
+  color: #777;
+  margin-top: 6px;
+}
+.zcf-drop {
+  color: #999;
+  text-decoration: line-through;
+}
+.zcf-arrow { color: #B97F23; font-weight: 700; }
+.zcf-fixed {
+  color: #0F5132;
+  font-weight: 700;
+}
+.zcf-ref {
+  font-size: 12px;
+  color: #555;
+  font-weight: 400;
+}
+
+/* ---------- 請求額（最終ブロック） ---------- */
+.zcf-final {
+  background: #0F5132;
+  padding: 18px 20px;
+  margin-bottom: 0;
+}
+.zcf-final .zcf-card-title { color: #fff; }
+.zcf-final .zcf-card-sub { color: #C8DCC8; }
+.zcf-final-formula {
+  font-size: 16px;
+  color: #C8DCC8;
+}
+.zcf-final-amount {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---------- 補足事項 ---------- */
+.zcf-notes {
+  margin-top: 24px;
+  border-top: 1px solid #C4C4C0;
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 10px 28px;
+}
+.zcf-note {
+  font-size: 12.5px;
+  color: #555;
+  display: flex;
+  gap: 8px;
+}
+.zcf-note-mark {
+  color: #0F5132;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 640px) {
+  body { padding: 12px; }
+  .zcf-panel { padding: 18px 14px; }
+  .zcf-header { grid-template-columns: auto 1fr; }
+  .zcf-header-spacer { display: none; }
+  .zcf-page-title { text-align: right; font-size: 18px; }
+  .zcf-flow { grid-template-columns: 36px minmax(0, 1fr); }
+  .zcf-formula { font-size: 15px; }
+  .zcf-final-amount { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<header class="zcf-header">
+  <button type="button" class="zcf-back-btn">← 設定に戻る</button>
+  <h1 class="zcf-page-title">請求額計算設定</h1>
+  <div class="zcf-header-spacer"></div>
+</header>
+
+<main class="zcf-panel">
+
+  <div class="zcf-panel-title">
+    <div class="zcf-panel-title-bar"></div>
+    <h2 class="zcf-panel-title-text">請求額はこの順番で計算されます</h2>
+  </div>
+  <p class="zcf-legend">
+    数字が上から下へ流れます。<span class="zcf-legend-drop">灰色の取り消し線</span>＝丸めで消える部分、<span class="zcf-legend-fixed">緑の太字</span>＝確定した金額です。
+  </p>
+
+  <div class="zcf-flow">
+
+    <!-- STEP 0: 単価×数量 -->
+    <div class="zcf-rail">
+      <div class="zcf-badge zcf-badge-base">＝</div>
+      <div class="zcf-rail-line"></div>
+    </div>
+    <section class="zcf-card">
+      <div class="zcf-card-head">
+        <span class="zcf-card-title">単価 × 数量</span>
+        <span class="zcf-card-sub">明細ごとに金額を出します（まだ丸めません）</span>
+      </div>
+      <div class="zcf-formula zcf-num">
+        111.1190円 × 14.3200kg ＝ 1,591.224080円
+      </div>
+    </section>
+
+    <!-- STEP 1: 明細金額の丸め -->
+    <div class="zcf-rail">
+      <div class="zcf-badge zcf-badge-step">①</div>
+      <div class="zcf-rail-line"></div>
+    </div>
+    <section class="zcf-card zcf-card-step">
+      <div class="zcf-card-head">
+        <span class="zcf-card-title zcf-card-title-green">明細金額の丸め</span>
+        <span class="zcf-setting-badge">設定: 切捨て・小数3桁</span>
+      </div>
+      <div class="zcf-formula zcf-num">
+        1,591.224<span class="zcf-drop">080</span>
+        <span class="zcf-arrow">→</span>
+        <span class="zcf-fixed">1,591.224円</span>
+      </div>
+      <div class="zcf-formula-note">小数第4位から下を切り捨てます</div>
+    </section>
+
+    <!-- STEP 2: 税率別合計の丸め -->
+    <div class="zcf-rail">
+      <div class="zcf-badge zcf-badge-step">②</div>
+      <div class="zcf-rail-line"></div>
+    </div>
+    <section class="zcf-card zcf-card-step">
+      <div class="zcf-card-head">
+        <span class="zcf-card-title zcf-card-title-green">税率別合計の丸め</span>
+        <span class="zcf-setting-badge">設定: 切捨て・0桁(整数)</span>
+      </div>
+      <div class="zcf-formula-note" style="margin: 0 0 6px;">①のあとの明細を税率（8%・10%）ごとに合計してから丸めます</div>
+      <div class="zcf-formula zcf-num">
+        8%対象の合計 45,082<span class="zcf-drop">.664</span>
+        <span class="zcf-arrow">→</span>
+        <span class="zcf-fixed">45,082円</span>
+        <span class="zcf-ref">…(A)</span>
+      </div>
+    </section>
+
+    <!-- STEP 3: 消費税額の丸め -->
+    <div class="zcf-rail">
+      <div class="zcf-badge zcf-badge-step">③</div>
+      <div class="zcf-rail-line"></div>
+    </div>
+    <section class="zcf-card zcf-card-step">
+      <div class="zcf-card-head">
+        <span class="zcf-card-title zcf-card-title-green">消費税額の丸め</span>
+        <span class="zcf-setting-badge">設定: 切捨て</span>
+      </div>
+      <div class="zcf-formula-note" style="margin: 0 0 6px;">(A)に税率を掛けて、1円未満を丸めます</div>
+      <div class="zcf-formula zcf-num">
+        45,082円 × 8% ＝ 3,606<span class="zcf-drop">.56</span>
+        <span class="zcf-arrow">→</span>
+        <span class="zcf-fixed">3,606円</span>
+        <span class="zcf-ref">…(B)</span>
+      </div>
+    </section>
+
+    <!-- FINAL: 請求額 -->
+    <div class="zcf-rail">
+      <div class="zcf-badge zcf-badge-final">￥</div>
+    </div>
+    <section class="zcf-card zcf-final">
+      <div class="zcf-card-head">
+        <span class="zcf-card-title">請求額</span>
+        <span class="zcf-card-sub">(A)＋(B)を足すだけ。あとから丸め直しません</span>
+      </div>
+      <div class="zcf-final-formula zcf-num">
+        45,082円 ＋ 3,606円 ＝ <span class="zcf-final-amount">48,688円</span>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="zcf-notes">
+    <div class="zcf-note"><span class="zcf-note-mark">↓</span>確定した金額を次の段階へ引き継ぎます。丸める前の金額に戻ることはありません</div>
+    <div class="zcf-note"><span class="zcf-note-mark">◇</span>「残す小数桁数」：0桁＝整数まで、3桁＝小数第3位まで残す</div>
+    <div class="zcf-note"><span class="zcf-note-mark">◇</span>丸めの設定が「未設定」の項目は、これまでどおりの計算のまま変わりません</div>
+    <div class="zcf-note"><span class="zcf-note-mark">◇</span>消費税は税率ごとにまとめて計算します（インボイス制度のルールに合わせ、明細ごとの個別計算は廃止）</div>
+  </div>
+
+</main>
+
+</body>
+</html>
