@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>取引先管理｜CSV一括登録</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0F5132; --green-dk:#0A3D26;
+    --navy:#1A3A63;
+    --amber:#B97F23; --amber-dk:#9A6A1C; --amber-bg:#FBF4E9;
+    --outer:#D9D9D9; --panel:#F5F5F4; --panel-2:#ECECEA;
+    --white:#FFFFFF;
+    --ink:#1E241F; --sub:#5E655F; --faint:#8A8F8B;
+    --line:#D2D5D2; --line-dk:#B7BBB7;
+    --err:#9E3B2E; --err-bg:#F4E6E3;
+    --skip:#7C827D;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--outer);
+    color:var(--ink);
+    font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    line-height:1.75; font-size:15px; letter-spacing:.01em;
+    -webkit-font-smoothing:antialiased;
+    padding:40px 16px 80px;
+  }
+  .container{max-width:940px; margin:0 auto; background:var(--white); border:1px solid var(--line-dk)}
+
+  /* ---------- header ---------- */
+  .hd{display:flex; align-items:center; gap:18px; background:var(--green); color:#fff; padding:0 22px; height:66px}
+  .hd .back{color:#fff; text-decoration:none; font-size:13.5px; font-weight:500; border:1px solid rgba(255,255,255,.5); padding:8px 14px; white-space:nowrap; transition:background .15s}
+  .hd .back:hover{background:rgba(255,255,255,.16)}
+  .hd h1{font-size:19px; font-weight:700; letter-spacing:.05em}
+  .hd .tag{margin-left:auto; font-size:11.5px; font-weight:500; letter-spacing:.1em; border:1px solid rgba(255,255,255,.5); padding:5px 11px}
+
+  /* ---------- intro ---------- */
+  .intro{padding:26px 28px 4px}
+  .intro .lead{font-size:17px; font-weight:500}
+  .intro .lead b{color:var(--green); font-weight:700}
+  .intro .lead-sub{color:var(--sub); font-size:13.5px; margin-top:2px}
+
+  /* ---------- stepper ---------- */
+  .steps-wrap{padding:22px 28px 6px; overflow-x:auto}
+  .steps{display:flex; align-items:flex-start; min-width:520px}
+  .step{display:flex; flex-direction:column; align-items:center; text-align:center; width:104px; flex:0 0 auto}
+  .sq{width:38px; height:38px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; border:2px solid var(--line-dk); background:#fff; color:var(--faint); transition:.2s}
+  .step.done .sq,.step.active .sq{background:var(--green); border-color:var(--green); color:#fff}
+  .lbl{margin-top:8px; font-size:12px; color:var(--sub); line-height:1.45}
+  .lbl b{display:block; font-size:10px; letter-spacing:.14em; color:var(--faint); font-weight:700; margin-bottom:1px}
+  .step.active .lbl,.step.active .lbl b,.step.done .lbl,.step.done .lbl b{color:var(--green)}
+  .bar{flex:1 1 auto; height:2px; background:var(--line-dk); margin-top:18px; transition:.2s}
+  .bar.done{background:var(--green)}
+
+  /* ---------- blocks ---------- */
+  .block{border-top:1px solid var(--line); padding:26px 28px}
+  .block-head{display:flex; align-items:center; gap:12px; margin-bottom:12px}
+  .block-no{width:30px; height:30px; background:var(--green); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:15px; flex:0 0 auto}
+  .block-title{font-size:17px; font-weight:700; letter-spacing:.02em}
+  .block-body{padding-left:42px}
+  .block-body>p{color:var(--ink); margin-bottom:14px; font-size:14.5px}
+  .muted{color:var(--sub)!important; font-size:13.5px!important}
+  @media(max-width:600px){.block-body{padding-left:0}}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex; align-items:center; gap:9px; font-family:inherit; font-size:15px; font-weight:700; padding:12px 20px; border:2px solid transparent; cursor:pointer; background:none; letter-spacing:.02em; transition:background .15s,border-color .15s,color .15s}
+  .btn:focus-visible{outline:3px solid var(--amber); outline-offset:2px}
+  .btn-line{border-color:var(--green); color:var(--green); background:#fff}
+  .btn-line:hover{background:var(--green); color:#fff}
+  .btn-primary{background:var(--amber); color:#fff; border-color:var(--amber)}
+  .btn-primary:hover{background:var(--amber-dk); border-color:var(--amber-dk)}
+  .btn-ghost{border-color:var(--line-dk); color:var(--sub); background:#fff; font-weight:500; font-size:13px; padding:9px 15px}
+  .btn-ghost:hover{border-color:var(--sub); color:var(--ink)}
+  .ic{font-size:16px; line-height:1}
+
+  /* ---------- example table ---------- */
+  .ex{border:1px solid var(--line-dk); margin:4px 0 18px}
+  .ex-cap{background:var(--panel); border-bottom:1px solid var(--line-dk); padding:8px 14px; font-size:11.5px; font-weight:700; color:var(--sub); letter-spacing:.08em}
+  .tbl{width:100%; border-collapse:collapse; font-size:14px}
+  .tbl th,.tbl td{border-bottom:1px solid var(--line); padding:11px 14px; text-align:left; vertical-align:middle}
+  .tbl thead th{background:#fff; font-weight:700; color:var(--ink); border-bottom:2px solid var(--line-dk); white-space:nowrap}
+  .tbl tbody tr:last-child td{border-bottom:none}
+  .tbl .empty{color:var(--faint)}
+  .req{display:inline-block; font-size:10px; font-weight:700; color:#fff; background:var(--green); padding:2px 6px; margin-left:6px; vertical-align:middle; letter-spacing:.04em}
+  .opt{display:inline-block; font-size:10px; font-weight:700; color:var(--sub); background:var(--panel-2); border:1px solid var(--line-dk); padding:1px 6px; margin-left:6px; vertical-align:middle}
+  .anno{font-size:12.5px; color:var(--sub); margin:-8px 0 18px; padding-left:2px}
+  .anno b{color:var(--green-dk)}
+
+  /* ---------- rules ---------- */
+  .rules{list-style:none; background:var(--panel); border:1px solid var(--line-dk); padding:14px 16px 14px}
+  .rules li{position:relative; padding-left:22px; font-size:13.5px; color:var(--ink); margin:8px 0; line-height:1.7}
+  .rules li:before{content:""; position:absolute; left:3px; top:10px; width:8px; height:8px; background:var(--green)}
+  .rules b{color:var(--green-dk); font-weight:700}
+
+  /* ---------- drop zone ---------- */
+  .drop{display:block; border:2px dashed var(--line-dk); background:var(--panel); padding:34px 20px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s}
+  .drop:hover{border-color:var(--amber); background:#fff}
+  .drop.drag{border-color:var(--amber); background:var(--amber-bg)}
+  .drop-icon{font-size:24px; color:var(--faint); margin-bottom:6px}
+  .drop-main{font-weight:700; font-size:15px}
+  .drop-sub{font-size:12px; color:var(--faint); margin-top:3px}
+  .demo{margin-top:12px}
+
+  /* ---------- preview ---------- */
+  .preview-note{font-size:13px; color:var(--sub); margin-bottom:14px}
+  .summary{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap}
+  .sm{display:flex; align-items:baseline; gap:8px; border:1px solid var(--line-dk); padding:8px 15px; font-size:13px; font-weight:700}
+  .sm .sm-n{font-size:21px; font-weight:700}
+  .sm.ok{color:var(--green); border-color:var(--green)}
+  .sm.skip{color:var(--skip)}
+  .sm.err{color:var(--err); border-color:var(--err)}
+
+  .result th:first-child,.result td:first-child{width:52px; text-align:center; color:var(--sub)}
+  .result td:last-child{white-space:nowrap}
+  .badge{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:3px 9px}
+  .badge.ok{background:var(--green); color:#fff}
+  .badge.skip{background:var(--panel-2); color:var(--skip); border:1px solid var(--line-dk)}
+  .badge.err{background:var(--err); color:#fff}
+  .err-cell{color:var(--err); font-weight:700}
+  tr.err-row td{background:var(--err-bg)}
+
+  .note-warn{margin-top:14px; font-size:13px; color:var(--ink); background:var(--err-bg); border-left:4px solid var(--err); padding:11px 14px}
+  .note-warn b{color:var(--err)}
+
+  /* ---------- confirm / done ---------- */
+  .actions{display:flex; gap:12px; flex-wrap:wrap}
+  .done-msg{display:flex; align-items:center; gap:13px; background:var(--green); color:#fff; padding:16px 20px; font-weight:700; font-size:15px}
+  .done-msg .ck{width:28px; height:28px; border:2px solid #fff; display:flex; align-items:center; justify-content:center; flex:0 0 auto; font-size:15px}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- header -->
+  <header class="hd">
+    <a class="back" href="#">← 設定に戻る</a>
+    <h1>取引先管理</h1>
+    <span class="tag">CSV一括登録</span>
+  </header>
+
+  <!-- intro -->
+  <section class="intro">
+    <p class="lead">取引先と配送先店舗を、<b>CSVファイル1つ</b>でまとめて登録できます。</p>
+    <p class="lead-sub">下の4ステップの通りに進めれば完了します。所要時間は数分です。</p>
+  </section>
+
+  <!-- stepper -->
+  <div class="steps-wrap">
+    <div class="steps" id="stepper">
+      <div class="step active"><span class="sq">1</span><span class="lbl"><b>STEP 1</b>テンプレを入手</span></div>
+      <div class="bar"></div>
+      <div class="step"><span class="sq">2</span><span class="lbl"><b>STEP 2</b>記入する</span></div>
+      <div class="bar"></div>
+      <div class="step"><span class="sq">3</span><span class="lbl"><b>STEP 3</b>アップして確認</span></div>
+      <div class="bar"></div>
+      <div class="step"><span class="sq">4</span><span class="lbl"><b>STEP 4</b>確定・登録</span></div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="block">
+    <div class="block-head"><span class="block-no">1</span><h2 class="block-title">テンプレートを入手する</h2></div>
+    <div class="block-body">
+      <p>記入用のCSVテンプレートをダウンロードします。列の順番はこのまま変えずに使ってください。</p>
+      <button class="btn btn-line"><span class="ic">⤓</span>テンプレートCSVをダウンロード</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="block">
+    <div class="block-head"><span class="block-no">2</span><h2 class="block-title">Excelなどで記入する</h2></div>
+    <div class="block-body">
+      <p>1行に「取引先」と「配送先店舗」を1組ずつ書きます。下の例のとおりに記入してください。</p>
+
+      <div class="ex">
+        <div class="ex-cap">記入例</div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>取引先名 <span class="req">必須</span></th>
+              <th>配送先店舗名 <span class="opt">任意</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>株式会社みどり青果</td><td>本店</td></tr>
+            <tr><td>株式会社みどり青果</td><td>駅前店</td></tr>
+            <tr><td>山田ファーム</td><td class="empty">（空欄でもOK）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="anno">1・2行目のように、<b>同じ取引先でも店舗ごとに行を分けて</b>書きます。3行目のように<b>店舗名が空欄なら、取引先だけ</b>が登録されます。</p>
+
+      <ul class="rules">
+        <li><b>「取引先名」だけは必ず入力</b>します。ここが空だとその行はエラーになります。</li>
+        <li>番号（No.）は<b>自動で振られる</b>ので、書く必要はありません。</li>
+        <li>すでに登録済みと<b>同じ名前</b>の行は、自動でスキップされます（二重登録になりません）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STEP 3 (upload) -->
+  <section class="block">
+    <div class="block-head"><span class="block-no">3</span><h2 class="block-title">アップロードして内容を確認する</h2></div>
+    <div class="block-body">
+      <p>記入したCSVを選ぶと、登録される内容が下に表示されます。<b>この時点ではまだ登録は確定しません。</b></p>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept=".csv" hidden>
+        <div class="drop-inner">
+          <div class="drop-icon">▤</div>
+          <div class="drop-main">CSVファイルをここにドラッグ、またはクリックして選択</div>
+          <div class="drop-sub">.csv 形式のファイル</div>
+        </div>
+      </label>
+      <button class="btn btn-ghost demo" id="demo" type="button">サンプルデータで動きを見る ▸</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 result (hidden) -->
+  <section class="block" id="preview" hidden>
+    <div class="block-head"><span class="block-no">3</span><h2 class="block-title">確認プレビュー</h2></div>
+    <div class="block-body">
+      <p class="preview-note muted">アップロードされた内容です。判定を確認して、問題なければSTEP 4で確定します。</p>
+      <div class="summary">
+        <div class="sm ok"><span class="sm-n" id="c-new">0</span>新規登録</div>
+        <div class="sm skip"><span class="sm-n" id="c-skip">0</span>スキップ</div>
+        <div class="sm err"><span class="sm-n" id="c-err">0</span>エラー</div>
+      </div>
+      <div class="ex">
+        <table class="tbl result">
+          <thead>
+            <tr><th>No.</th><th>取引先名</th><th>配送先店舗名</th><th>判定</th></tr>
+          </thead>
+          <tbody id="result-body"></tbody>
+        </table>
+      </div>
+      <p class="note-warn" id="warn" hidden>※ <b>エラーが1件</b>あります。その行は登録されません。取引先名を入力して直すか、このまま進めると<b>エラー以外の行だけ</b>を登録します。</p>
+    </div>
+  </section>
+
+  <!-- STEP 4 (hidden) -->
+  <section class="block" id="confirm" hidden>
+    <div class="block-head"><span class="block-no">4</span><h2 class="block-title">確定して登録する</h2></div>
+    <div class="block-body">
+      <p>内容に問題がなければ確定します。エラーの行は自動的に除いて登録します。</p>
+      <div class="actions" id="confirm-actions">
+        <button class="btn btn-primary" id="commit" type="button"><span class="ic">✓</span>この内容で確定して登録する</button>
+        <button class="btn btn-line" id="reset" type="button">最初からやり直す</button>
+      </div>
+      <div class="done-msg" id="done" hidden><span class="ck">✓</span><span id="done-text">登録が完了しました。</span></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ---- サンプルデータ（実際は取込CSVを解析して生成） ----
+  const sample = [
+    {no:1, name:'株式会社みどり青果', shop:'本店',   status:'ok'},
+    {no:2, name:'株式会社みどり青果', shop:'駅前店', status:'ok'},
+    {no:3, name:'山田ファーム',       shop:'',       status:'partner'},
+    {no:4, name:'株式会社さくら商店', shop:'中央店', status:'skip'},
+    {no:5, name:'',                   shop:'東店',   status:'err'},
+  ];
+
+  const $  = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+
+  function render(rows){
+    const tb = $('#result-body');
+    tb.innerHTML = '';
+    let nNew=0, nSkip=0, nErr=0;
+    rows.forEach(r=>{
+      const tr = document.createElement('tr');
+      let name = r.name ? r.name : '<span class="err-cell">（未入力）</span>';
+      let shop = r.shop ? r.shop : '<span class="empty">—</span>';
+      let badge = '';
+      if(r.status==='ok'){ badge='<span class="badge ok">✓ 新規登録</span>'; nNew++; }
+      else if(r.status==='partner'){ badge='<span class="badge ok">✓ 取引先のみ</span>'; shop='<span class="empty">（なし）</span>'; nNew++; }
+      else if(r.status==='skip'){ badge='<span class="badge skip">— スキップ（既存）</span>'; nSkip++; }
+      else { badge='<span class="badge err">✕ エラー</span>'; nErr++; tr.className='err-row'; }
+      tr.innerHTML = `<td>${r.no}</td><td>${name}</td><td>${shop}</td><td>${badge}</td>`;
+      tb.appendChild(tr);
+    });
+    $('#c-new').textContent  = nNew;
+    $('#c-skip').textContent = nSkip;
+    $('#c-err').textContent  = nErr;
+    $('#warn').hidden = (nErr===0);
+  }
+
+  function setStep(n){
+    $$('#stepper .step').forEach((el,i)=>{
+      const idx=i+1;
+      el.classList.toggle('done',  idx<n);
+      el.classList.toggle('active',idx===n);
+    });
+    $$('#stepper .bar').forEach((el,i)=>{
+      el.classList.toggle('done',(i+1)<n);
+    });
+  }
+
+  function showPreview(){
+    render(sample);
+    $('#preview').hidden = false;
+    $('#confirm').hidden = false;
+    $('#confirm-actions').hidden = false;
+    $('#done').hidden = true;
+    setStep(3);
+    $('#preview').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function resetAll(){
+    $('#preview').hidden = true;
+    $('#confirm').hidden = true;
+    $('#file').value = '';
+    setStep(1);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // ---- events ----
+  $('#file').addEventListener('change', e=>{ if(e.target.files.length) showPreview(); });
+  $('#demo').addEventListener('click', showPreview);
+
+  const drop = $('#drop');
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', showPreview);
+
+  $('#commit').addEventListener('click', ()=>{
+    const n = $('#c-new').textContent;
+    $('#confirm-actions').hidden = true;
+    $('#done-text').textContent = `登録が完了しました。新規${n}件を登録しました（エラー・既存の行は除外）。`;
+    $('#done').hidden = false;
+    setStep(4);
+    $('#done').scrollIntoView({behavior:'smooth', block:'center'});
+  });
+
+  $('#reset').addEventListener('click', resetAll);
+</script>
+</body>
+</html>
