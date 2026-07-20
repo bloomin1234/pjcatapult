@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMS 在庫日別推移 — 改善提案モック</title>
+<style>
+  :root{
+    --so-deep:#0F5132;      /* SO緑 濃 */
+    --so-mid:#4C9A6A;       /* SO緑 中 */
+    --so-pale:#8FBFA3;      /* SO緑 淡 */
+    --so-mist:#DCEAE2;      /* SO緑 薄面 */
+    --amber:#B97F23;        /* 実在庫マーカー（ZChain第4色） */
+    --amber-band:#F6EDDD;   /* 棚卸日ハイライト帯 */
+    --ink:#1A1A1A;
+    --sub:#6B6B6B;
+    --line:#D9D9D9;
+    --panel:#F5F5F4;
+    --bad:#B3261E;
+    font-size:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;border-radius:0 !important;}
+  body{
+    font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+    color:var(--ink);
+    background:#fff;
+    padding:32px 40px 64px;
+  }
+  h1{font-size:1.3rem;font-weight:700;letter-spacing:.02em;}
+  .lede{color:var(--sub);font-size:.9rem;margin-top:4px;}
+  .frame{border:1px solid var(--line);margin-top:20px;}
+
+  /* ── 操作バー ─────────────────────── */
+  .opsbar{
+    display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;
+    padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);
+  }
+  .opsbar label{font-size:.82rem;color:var(--sub);}
+  .opsbar input[type="text"]{border:1px solid var(--line);padding:6px 10px;width:220px;font-size:.9rem;background:#fff;}
+  .opsbar input[type="date"],.opsbar select{border:1px solid var(--line);padding:5px 8px;font-size:.9rem;background:#fff;}
+  .seg{display:inline-flex;border:1px solid var(--ink);}
+  .seg button{
+    border:0;background:#fff;color:var(--ink);
+    padding:6px 14px;font-size:.85rem;cursor:pointer;
+  }
+  .seg button.on{background:var(--ink);color:#fff;}
+  .seg + .seg{margin-left:6px;}
+
+  /* ── サマリ帯（グラフの読みどころを言葉で） ── */
+  .readout{
+    display:flex;gap:0;border-bottom:1px solid var(--line);
+  }
+  .readout div{
+    flex:1;padding:12px 18px;border-right:1px solid var(--line);
+  }
+  .readout div:last-child{border-right:0;}
+  .readout .k{font-size:.75rem;color:var(--sub);}
+  .readout .v{font-size:1.25rem;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;}
+  .readout .v small{font-size:.75rem;font-weight:400;color:var(--sub);margin-left:6px;}
+  .diff-ok{color:var(--so-deep);}
+  .diff-bad{color:var(--bad);}
+
+  /* ── グラフ ───────────────────────── */
+  .chartwrap{padding:20px 18px 8px;}
+  .scopeline{font-size:.8rem;color:var(--sub);margin-bottom:8px;}
+  svg{display:block;width:100%;height:auto;}
+  .legend{
+    display:flex;gap:22px;align-items:center;
+    padding:10px 18px 16px;font-size:.8rem;color:var(--sub);
+  }
+  .sw{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:baseline;}
+  .sw.area{background:var(--so-mist);border-top:2px solid var(--so-deep);}
+  .sw.band{background:var(--amber-band);border-left:2px solid var(--amber);height:12px;}
+  .sw.dot{width:8px;height:8px;background:var(--amber);}
+
+  .note{
+    margin-top:28px;border:1px solid var(--line);
+  }
+  .note h2{
+    font-size:.85rem;background:var(--ink);color:#fff;
+    padding:8px 14px;font-weight:600;letter-spacing:.04em;
+  }
+  .note ol{padding:14px 18px 16px 36px;font-size:.88rem;line-height:1.85;}
+  .note li b{color:var(--so-deep);}
+</style>
+</head>
+<body>
+
+<h1>在庫日別推移 — 改善提案</h1>
+<p class="lede">棚卸日を起点に「毎日つながる」理論在庫。棚卸日は帯＋点で誤差が一目で分かる形。</p>
+
+<div class="frame">
+
+  <!-- 操作バー（現行の要素は全部残しつつ1列に整理） -->
+  <div class="opsbar">
+    <input type="text" placeholder="商品名・JANで絞り込み（空欄＝全体）">
+    <span class="seg"><button class="on">全体</button></span>
+    <label>期首基準日 <input type="date" value="2026-07-17"></label>
+    <label>棚卸日
+      <select><option>全棚卸日</option><option selected>2026-07-17</option><option>2026-07-20</option></select>
+    </label>
+    <label>採用原価</label>
+    <span class="seg"><button class="on">Excel原価</button><button>SS仕入単価</button></span>
+    <span class="seg"><button class="on">金額</button><button>数量</button><button>両方</button></span>
+  </div>
+
+  <!-- 読みどころのサマリ：グラフを見る前に結論が分かる -->
+  <div class="readout">
+    <div>
+      <span class="k">理論在庫（今日 07-21 時点）</span>
+      <div class="v">9,213千円</div>
+    </div>
+    <div>
+      <span class="k">直近棚卸（07-20）の実在庫</span>
+      <div class="v">9,540千円</div>
+    </div>
+    <div>
+      <span class="k">棚卸時点の誤差（実 − 理論）</span>
+      <div class="v diff-ok">+118千円 <small>実在庫が多い</small></div>
+    </div>
+    <div>
+      <span class="k">期間中の在庫減少ペース</span>
+      <div class="v">−82千円<small>/日</small></div>
+    </div>
+  </div>
+
+  <!-- グラフ本体：毎日連続の面＋棚卸日の帯 -->
+  <div class="chartwrap">
+    <div class="scopeline">対象: 全体（全SKU合計）／ 期間: 2026-07-17 〜 07-21（毎日表示・売上仕入が無い日は前日値を維持）</div>
+
+    <svg viewBox="0 0 1160 300" xmlns="http://www.w3.org/2000/svg" aria-label="在庫日別推移">
+      <!-- 目盛り（千円・キリ良く） -->
+      <g font-size="11" fill="#6B6B6B" font-family="sans-serif">
+        <text x="8" y="46">10,000千円</text>
+        <text x="24" y="136">7,500</text>
+        <text x="24" y="226">5,000</text>
+      </g>
+      <line x1="90" y1="42" x2="1140" y2="42" stroke="#EDEDEC"/>
+      <line x1="90" y1="132" x2="1140" y2="132" stroke="#EDEDEC"/>
+      <line x1="90" y1="222" x2="1140" y2="222" stroke="#EDEDEC"/>
+
+      <!-- 棚卸日ハイライト帯（棒の背後・薄い琥珀） -->
+      <rect x="90"  y="30" width="120" height="240" fill="#F6EDDD"/>
+      <rect x="930" y="30" width="120" height="240" fill="#F6EDDD"/>
+
+      <!-- 理論在庫：毎日連続の面グラフ（値が無い日は前日値を維持して段差で表現） -->
+      <path d="M90,58 L210,58 L210,66 L420,66 L420,88 L630,88 L630,96 L840,96 L840,112 L1050,112 L1050,118 L1140,118 L1140,270 L90,270 Z"
+            fill="#DCEAE2"/>
+      <path d="M90,58 L210,58 L210,66 L420,66 L420,88 L630,88 L630,96 L840,96 L840,112 L1050,112 L1050,118 L1140,118"
+            fill="none" stroke="#0F5132" stroke-width="2.5"/>
+
+      <!-- 実在庫：棚卸日の点（琥珀・面の上に明確に浮く） -->
+      <circle cx="150" cy="55" r="6" fill="#B97F23"/>
+      <circle cx="990" cy="100" r="6" fill="#B97F23"/>
+      <!-- 誤差の可視化：実在庫点と理論線の差を短い縦線で結ぶ -->
+      <line x1="990" y1="100" x2="990" y2="112" stroke="#B97F23" stroke-width="2" stroke-dasharray="3 2"/>
+
+      <!-- 日付ラベル（グラフ外・等間隔・毎日） -->
+      <g font-size="11.5" fill="#6B6B6B" font-family="sans-serif" text-anchor="middle">
+        <text x="150" y="292">07-17</text>
+        <text x="360" y="292">07-18</text>
+        <text x="570" y="292">07-19</text>
+        <text x="780" y="292">07-20</text>
+        <text x="990" y="292">07-20棚卸</text>
+        <text x="1100" y="292">07-21</text>
+      </g>
+      <!-- 棚卸日ラベル（帯の上端・グラフ内に埋もれない） -->
+      <g font-size="11" fill="#B97F23" font-family="sans-serif" text-anchor="middle" font-weight="bold">
+        <text x="150" y="24">▼棚卸 9,540千円</text>
+        <text x="990" y="24">▼棚卸 9,540千円</text>
+      </g>
+    </svg>
+
+    <div class="legend">
+      <span><span class="sw area"></span>理論在庫（毎日連続・金額）</span>
+      <span><span class="sw band"></span>棚卸日（ハイライト帯）</span>
+      <span><span class="sw dot"></span>実在庫（棚卸値）— 理論線との縦の差＝誤差</span>
+    </div>
+  </div>
+</div>
+
+<!-- 改善ポイントの説明 -->
+<div class="note">
+  <h2>現行グラフからの変更ポイント</h2>
+  <ol>
+    <li><b>毎日つなげる</b>：売上・仕入が無い日は前日値を維持して描画。飛び飛びの棒 → 連続した面グラフになり「推移」が読める。</li>
+    <li><b>横軸は等間隔の毎日</b>：期間は「最古棚卸日〜今日」を既定。日付ラベルはグラフの外に出し、棒と重ならない。</li>
+    <li><b>実在庫は琥珀の点＋薄帯</b>：棚卸日は背景に薄い帯を敷き、実在庫は面の上に点で置く。理論線との縦の差がそのまま「誤差」として見える。</li>
+    <li><b>読みどころを言葉で先出し</b>：グラフ上部に「今日の理論在庫／直近棚卸の実在庫／誤差／減少ペース」のサマリ帯。グラフを読む前に結論が分かる。</li>
+    <li><b>面グラフ化</b>：日数が増えても棒が細くならず、期間が伸びるほど推移の形が読みやすくなる。</li>
+  </ol>
+</div>
+
+</body>
+</html>
