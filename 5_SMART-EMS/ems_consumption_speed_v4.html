@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart-EMS｜在庫管理（品目在庫消化スピード プロトタイプ v4）</title>
+<style>
+  :root{
+    --ink:#1C1C1A;
+    --green:#0F5132;
+    --red:#C0392B;
+    --amber:#B97F23;
+    --gray:#6B6B66;
+    --panel:#FFFFFF;
+    --bg:#D9D9D9;
+    --field:#F5F5F4;
+    --line:#D9D9D9;
+    --sub:#6B6B66;
+    --side:#141412;
+  }
+  *{box-sizing:border-box; border-radius:0 !important;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    font-size:14px; line-height:1.6;
+  }
+  .app{display:grid; grid-template-columns:212px 1fr; min-height:100vh;}
+  @media (max-width:900px){ .app{grid-template-columns:1fr;} .sidebar{display:none;} }
+
+  /* サイドバー（現行踏襲） */
+  .sidebar{background:var(--side); color:#fff; padding:18px 0;}
+  .sidebar .brand{display:flex; gap:10px; align-items:center; padding:0 18px 16px 18px; border-bottom:1px solid #2E2E2A;}
+  .sidebar .brand .mark{width:34px; height:34px; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:18px;}
+  .sidebar .brand .nm{font-size:16px; font-weight:700; line-height:1.2;}
+  .sidebar .brand .sb{font-size:10px; color:#9A9A94;}
+  .sidebar .sec{font-size:11px; color:#8A8A84; padding:14px 18px 4px 18px;}
+  .sidebar a{display:block; color:#D7D7D2; text-decoration:none; padding:8px 18px; font-size:13px;}
+  .sidebar a.on{background:#fff; color:var(--ink); font-weight:700;}
+
+  .main{padding:18px 22px 40px 22px;}
+  .topline{display:flex; justify-content:space-between; align-items:flex-start; gap:12px;}
+  .topline .lead{font-size:12px; color:#3A3A36;}
+  .topline h1{font-size:23px; margin:2px 0 0 0;}
+  .btn-out{border:1px solid var(--ink); background:#fff; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;}
+
+  .panel{background:var(--panel); border:1px solid var(--line); padding:16px 18px; margin-top:14px;}
+
+  /* 上部タブ */
+  .ptabs{display:flex; border-bottom:1px solid var(--line); margin-bottom:14px;}
+  .ptabs span{padding:9px 18px; font-size:14px; color:var(--sub); border-bottom:3px solid transparent; margin-bottom:-1px;}
+  .ptabs span.on{color:var(--ink); font-weight:700; border-bottom-color:var(--ink);}
+
+  /* フィルタ行 */
+  .filterbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--field); border:1px solid var(--line); padding:11px; margin-bottom:12px;}
+  .filterbar .btn-dark{background:var(--ink); color:#fff; padding:8px 22px; font-weight:600; font-size:13px;}
+  .filterbar .tag{background:var(--ink); color:#fff; padding:6px 12px; font-size:12px; font-weight:600;}
+  .filterbar input[type=text]{flex:1; min-width:180px; border:1px solid var(--line); padding:8px 12px; background:#fff; font-size:13px; font-family:inherit;}
+  .filterbar select, .filterbar input[type=date]{border:1px solid var(--line); padding:7px 9px; background:#fff; font-size:13px; font-family:inherit;}
+  .filterbar .sep{color:var(--sub);}
+
+  .toggle{display:flex; border:1px solid var(--ink);}
+  .toggle button{appearance:none; border:none; background:#fff; color:var(--ink); padding:7px 15px; font-size:13px; font-weight:600; cursor:pointer; border-left:1px solid var(--ink); font-family:inherit;}
+  .toggle button:first-child{border-left:none;}
+  .toggle button.on{background:var(--ink); color:#fff;}
+  .toggle.dim{opacity:.28; pointer-events:none;}
+
+  /* KPI 4カード */
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .kpi{background:#fff; padding:11px 16px;}
+  .kpi .t{font-size:12px; color:var(--sub);}
+  .kpi .v{font-size:21px; font-weight:700; line-height:1.35;}
+  .kpi .v small{font-size:12px; font-weight:400; color:var(--sub); margin-left:6px;}
+  .kpi .v.plus{color:var(--green);} .kpi .v.minus{color:var(--red);}
+  @media (max-width:900px){ .kpis{grid-template-columns:1fr 1fr;} }
+
+  .scope{font-size:12px; color:var(--sub); padding:10px 2px 6px 2px;}
+
+  /* グラフ切替タブ */
+  .gtabs{display:flex; border-bottom:1px solid var(--ink); margin:4px 0 12px 0;}
+  .gtabs button{appearance:none; border:none; background:transparent; font-family:inherit; padding:9px 20px; font-size:14px; font-weight:600; color:var(--sub); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-1px;}
+  .gtabs button.on{color:var(--ink); border-bottom-color:var(--green);}
+
+  .gbar{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:8px;}
+  .gbar .hint{font-size:12px; color:var(--sub); max-width:720px;}
+  .gbar .ctrl{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .gbar .ctrl label{font-size:12px; color:var(--sub);}
+  .gbar .ctrl select{border:1px solid var(--line); padding:6px 8px; font-size:12px; background:#fff; font-family:inherit;}
+
+  .view{display:none;} .view.on{display:block;}
+
+  .chips{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
+  .chip{display:flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--line); background:#fff; padding:5px 13px; font-size:13px;}
+  .chip b{color:#fff; font-size:12px; padding:0 8px; font-weight:700;}
+  .chip.a b{background:var(--red);} .chip.b b{background:var(--green);}
+  .chip.c b{background:var(--amber);} .chip.n b{background:var(--gray);}
+  .chip small{color:var(--sub);}
+  .chip.off{opacity:.32;}
+
+  .layout{display:grid; grid-template-columns:1fr 280px; gap:14px; align-items:start;}
+  @media (max-width:1100px){ .layout{grid-template-columns:1fr;} }
+  #chart svg, #chart2 svg{width:100%; height:auto; display:block;}
+
+  .side{background:#fff; border:1px solid var(--line); margin-bottom:12px;}
+  .side h3{font-size:12px; margin:0; padding:7px 12px; color:#fff; font-weight:700;}
+  .side h3.up{background:var(--amber);} .side h3.down{background:var(--red);}
+  .side ul{list-style:none; margin:0; padding:2px 0; max-height:228px; overflow:auto;}
+  .side li{display:flex; justify-content:space-between; gap:8px; align-items:baseline; padding:4px 12px; font-size:12px; cursor:pointer; border-bottom:1px solid #F0F0EE;}
+  .side li:hover,.side li.hl{background:#EFEFED;}
+  .side li .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .side li .nm b{margin-right:5px;}
+  .side li.a .nm b{color:var(--red);} .side li.b .nm b{color:var(--green);}
+  .side li.c .nm b{color:var(--amber);} .side li.n .nm b{color:var(--gray);}
+  .side li .v{font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--sub);}
+
+  .legend{display:flex; gap:15px; font-size:12px; color:var(--sub); margin-top:9px; flex-wrap:wrap;}
+  .legend i{display:inline-block; width:14px; height:3px; margin-right:5px; vertical-align:3px;}
+  .legend i.band{height:12px; width:10px; vertical-align:-1px;}
+  .note{background:var(--field); border-left:3px solid var(--amber); padding:9px 13px; font-size:12px; color:#3A3A36; margin-top:10px;}
+  .note b{color:var(--ink);}
+  .tooltip{position:fixed; z-index:30; background:var(--ink); color:#fff; font-size:12px; padding:8px 12px; pointer-events:none; display:none; white-space:nowrap; line-height:1.7;}
+
+  /* 在庫点検・絞り込み */
+  .barrow{background:#fff; border:1px solid var(--line); padding:12px 16px; margin-top:12px; display:flex; align-items:center; gap:12px; font-size:14px;}
+  .barrow .ttl{font-weight:700;}
+  .barrow .alert{background:#E60012; color:#fff; font-size:12px; font-weight:700; padding:3px 12px;}
+  .barrow .cnt{color:var(--sub); font-size:13px;}
+  .barrow .chev{margin-left:auto; color:var(--sub);}
+  .barrow .btn-filter{border:1px solid var(--ink); background:#fff; padding:8px 18px; font-size:13px; font-weight:600;}
+
+  table{width:100%; border-collapse:collapse; background:#fff; font-size:12px; margin-top:-1px;}
+  th,td{border:1px solid var(--line); padding:7px 9px; white-space:nowrap;}
+  th{background:var(--field); font-size:11px; line-height:1.35;}
+  th small{display:block; color:var(--sub); font-weight:400;}
+  td.num{text-align:right; font-variant-numeric:tabular-nums;}
+  td.ok{color:var(--green); font-weight:700;} td.ng{color:var(--red); font-weight:700; background:#FBEDEB;}
+  .tblwrap{overflow:auto; border:1px solid var(--line); border-top:none;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- サイドバー -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="mark">▦</div>
+      <div><div class="nm">Smart-EMS</div><div class="sb">実践データ分析ツール</div></div>
+    </div>
+    <a href="#">ホーム</a>
+    <a href="#">データ取込</a>
+    <div class="sec">分析</div>
+    <a href="#">売上・仕入分析</a>
+    <a href="#">粗利分析</a>
+    <a href="#" class="on">在庫管理</a>
+    <a href="#">単価分析</a>
+    <a href="#">確認事項</a>
+    <a href="#">経営アドバイス</a>
+    <a href="#">AI経営相談</a>
+  </div>
+
+  <!-- メイン -->
+  <div class="main">
+    <div class="topline">
+      <div>
+        <div class="lead">売上・仕入データから当日理論在庫を自動計算。期首在庫・実在庫は手入力。</div>
+        <h1>在庫管理</h1>
+      </div>
+      <button class="btn-out">画像で保存</button>
+    </div>
+
+    <div class="panel">
+      <div class="ptabs"><span>① 在庫データ取込</span><span class="on">② 在庫管理</span></div>
+
+      <!-- フィルタ行（最新画面準拠） -->
+      <div class="filterbar">
+        <span class="btn-dark">全体</span>
+        <input type="text" placeholder="商品名・JANで絞り込み（空欄＝全体・表と連動）">
+        <span class="tag">期首基準日</span>
+        <select id="startsel">
+          <option value="85" selected>2026-07-17</option>
+          <option value="60">2026-06-22</option>
+          <option value="30">2026-05-23</option>
+          <option value="0">2026-04-23</option>
+        </select>
+        <span class="sep">〜</span>
+        <span class="tag">終了日</span>
+        <input type="date" id="enddate">
+        <button class="btn-out" id="allperiod">全期間</button>
+        <div class="toggle" id="tg-cost">
+          <button data-v="excel" class="on">Excel原価</button>
+          <button data-v="ss">SS仕入単価</button>
+        </div>
+        <div class="toggle" id="tg-unit">
+          <button data-v="amt" class="on">金額</button>
+          <button data-v="qty">数量</button>
+          <button data-v="both">両方</button>
+        </div>
+      </div>
+
+      <!-- KPI 4カード -->
+      <div class="kpis" id="kpis"></div>
+
+      <div class="scope" id="scope"></div>
+
+      <!-- グラフ切替タブ -->
+      <div class="gtabs" id="gtabs">
+        <button data-v="speed" class="on">品目在庫消化スピード</button>
+        <button data-v="trend">在庫推移</button>
+      </div>
+
+      <!-- ① 品目在庫消化スピード -->
+      <div class="view on" id="view-speed">
+        <div class="gbar">
+          <div class="hint">全品目を期首基準日＝0の同じ位置から描画。<b>下へ行くほど消化が速く（要補充）、上へ行くほど在庫が積み上がっています（滞留）。</b>期中に入荷して在庫が発生した品目も、入荷日に線が立ち上がる形で表示されます。</div>
+          <div class="ctrl">
+            <label>強調</label>
+            <select id="topn">
+              <option value="5">各分類 上位5</option>
+              <option value="10" selected>各分類 上位10</option>
+              <option value="20">各分類 上位20</option>
+              <option value="999">全品目</option>
+            </select>
+            <div class="toggle" id="tg-mode">
+              <button data-v="amt" class="on">金額</button>
+              <button data-v="pct">在庫比</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips" id="chips"></div>
+
+        <div class="layout">
+          <div>
+            <div id="chart"></div>
+            <div class="legend">
+              <span><i style="background:var(--red)"></i>A 要補充（消化が速い）</span>
+              <span><i style="background:var(--green)"></i>B 安定消化</span>
+              <span><i style="background:var(--amber)"></i>C 滞留（入庫超過）</span>
+              <span><i style="background:var(--gray)"></i>判定保留（期中発生・履歴不足）</span>
+            </div>
+            <div class="note">
+              <b>在庫比モードの分母：</b>期首在庫を分母にすると期首在庫ゼロの品目で計算できないため、<b>期間中の最大在庫</b>を100%としています。<b>期間が短いと扇が広がりません。</b>消化スピードを見るときは「期首基準日」を1〜3か月前に広げてください。
+            </div>
+          </div>
+          <div>
+            <div class="side"><h3 class="up">▲ 積み上がっている品目</h3><ul id="list-up"></ul></div>
+            <div class="side"><h3 class="down">▼ 消化が速い品目</h3><ul id="list-down"></ul></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 在庫推移（現行グラフ） -->
+      <div class="view" id="view-trend">
+        <div id="chart2"></div>
+        <div class="legend">
+          <span><i style="background:var(--green)"></i>当日理論在庫（毎日連続・金額）</span>
+          <span><i class="band" style="background:#F0E2C4"></i>棚卸日（ハイライト帯）</span>
+          <span><i class="band" style="background:var(--amber)"></i>実在庫（棚卸値）— 理論線との縦差＝誤差</span>
+          <span id="trend-cost">採用原価: Excel原価</span>
+        </div>
+        <div class="note">上部の「Excel原価／SS仕入単価」「金額／数量／両方」トグルは、この<b>在庫推移</b>タブにのみ適用されます。</div>
+      </div>
+    </div>
+
+    <!-- 在庫点検 -->
+    <div class="barrow">
+      <span class="ttl">在庫点検</span>
+      <span class="alert">要確認 2項目</span>
+      <span class="cnt" id="checkcnt">305 SKU を点検</span>
+      <span class="chev">⌄</span>
+    </div>
+
+    <!-- 絞り込み・CSV -->
+    <div class="barrow">
+      <span class="btn-filter">▽ 絞り込み・CSV</span>
+      <span class="cnt" id="rowcnt">305/305件</span>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th style="text-align:left">商品名 / JAN販売条件</th>
+          <th>期首在庫<small>棚卸</small></th>
+          <th>Stock数量<small>指定期間内</small></th>
+          <th>Order数量<small>指定期間内</small></th>
+          <th>注文可能在庫<small>自動</small></th>
+          <th>当日理論在庫<small>自動</small></th>
+          <th>実在庫<small>棚卸</small></th>
+          <th>誤差</th>
+          <th>平均Stock単価</th>
+          <th>当日理論在庫<small>金額</small></th>
+          <th>実在庫<small>金額</small></th>
+          <th>判定</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="tooltip" id="tip"></div>
+
+<script>
+/* ============================================================
+   ダミーデータ 305 SKU ／ 2026-04-23 〜 2026-07-22（90日）
+   実装時は EMS の品目別 日次「入庫額 / 出庫額」から
+   累積増減 cum[d] = Σ(入庫 − 出庫) を作り、
+   期首基準日でリベース（その日を0にする）すれば同じ形になります
+============================================================ */
+let seed = 20260722;
+function rnd(){ seed = (seed*9301+49297)%233280; return seed/233280; }
+
+const DAYS = 90;                       // index 0=2026-04-23 … 90=2026-07-22
+const DATE0 = new Date(2026,3,23);
+const dateOf = i => new Date(DATE0.getTime() + i*86400000);
+const md = i => { const d=dateOf(i); return String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const ymd = i => { const d=dateOf(i); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+
+const base=["キャベツ","レタス","トマト","きゅうり","ほうれん草","長ねぎ","なす","ピーマン","玉ねぎ","じゃがいも",
+"にんじん","ごぼう","さつまいも","かぼちゃ","大根","白菜","れんこん","里芋","小松菜","水菜","ブロッコリー",
+"アスパラ","オクラ","ズッキーニ","春菊","みょうが","生姜","にんにく","乾しいたけ","切干大根","高野豆腐",
+"春雨","ごま油","うずら水煮","メンマ","紅生姜","わかめ","昆布","神州一味噌","かつお節"];
+const spec=["1玉","L","2L","4kg箱","10kg","20kg","業務用","秀品","A品","1/2","1/4","束","M","洗い","500g","1kg","2kg","缶"];
+
+const skus=[];
+function pushSku(name,type){
+  const inflow=[],outflow=[];
+  const startStock = (type==="Z") ? 0 : 500+rnd()*3500;
+  const firstIn = (type==="Z") ? Math.floor(10+rnd()*78) : 0;
+  for(let d=0; d<DAYS; d++){
+    let inn=0,out=0;
+    if(type==="A"){ if(rnd()<0.20) inn=2200+rnd()*4200; out=380+rnd()*760; }
+    else if(type==="B"){ if(rnd()<0.10) inn=800+rnd()*1100; out=60+rnd()*100; }
+    else if(type==="C"){ if(d<4&&rnd()<0.7) inn=1800+rnd()*2800; if(rnd()<0.12) inn+=180+rnd()*380; out=rnd()<0.06?28:0; }
+    else { if(d===firstIn) inn=1400+rnd()*3200; if(d>firstIn&&rnd()<0.10) inn+=280+rnd()*560; if(d>firstIn) out=rnd()<0.5?(45+rnd()*380):0; }
+    inflow.push(inn); outflow.push(out);
+  }
+  const stock=[startStock];
+  for(let d=0; d<DAYS; d++) stock.push(Math.max(0, stock[d]+inflow[d]-outflow[d]));
+  skus.push({name,type,inflow,outflow,stock});
+}
+const plan=[["A",55],["B",140],["C",80],["Z",30]];   // 合計 305 SKU
+let idx=0;
+plan.forEach(([t,n])=>{ for(let i=0;i<n;i++){
+  pushSku(base[Math.floor(rnd()*base.length)]+" "+spec[Math.floor(rnd()*spec.length)]+" #"+(++idx), t);
+}});
+
+/* ---------- 期間に応じた指標計算 ---------- */
+const CLS={a:{label:"A",title:"要補充",color:"#C0392B"},b:{label:"B",title:"安定消化",color:"#0F5132"},
+           c:{label:"C",title:"滞留",color:"#B97F23"},n:{label:"—",title:"判定保留",color:"#6B6B66"}};
+const fmt=n=>Math.round(n).toLocaleString("ja-JP");
+const fmtDays=d=>!isFinite(d)?"出庫なし":Math.round(d)+"日";
+let S=85, E=DAYS;                       // 期間 index（既定＝2026-07-17 〜 今日）
+const active={a:true,b:true,c:true,n:true};
+let mode="amt", topN=10, pinned=null;
+
+function recompute(){
+  const span = Math.max(1, E-S);
+  skus.forEach(s=>{
+    s.cum=[]; for(let d=S; d<=E; d++) s.cum.push(s.stock[d]-s.stock[S]);   // 期首基準日を0にリベース
+    s.maxStock = Math.max(1, ...s.stock.slice(S,E+1));                     // ★在庫比の分母
+    s.cumPct = s.cum.map(v=> v/s.maxStock*100);
+    let out=0; for(let d=S; d<E; d++) out+=s.outflow[d];
+    s.daily = out/span;
+    s.cur = s.stock[E];
+    s.days = s.daily<10 ? Infinity : s.cur/s.daily;
+    s.end = s.cum[s.cum.length-1];
+    s.isNew = s.stock[S]===0;
+    // 在庫が発生してからの日数
+    let sd=S; while(sd<=E && s.stock[sd]===0) sd++;
+    const hist = E-sd;
+    if(sd>E)                        s.cls="n";                 // 期間中ずっと在庫なし
+    else if(s.isNew && hist<14)     s.cls="n";                 // 期中発生・履歴不足＝判定保留
+    else if(s.days<=14)             s.cls="a";
+    else if(!isFinite(s.days)||s.days>60) s.cls="c";
+    else                            s.cls="b";
+  });
+}
+
+/* ---------- KPI・スコープ表記 ---------- */
+function renderKpis(){
+  const cur = skus.reduce((t,s)=>t+s.cur,0)/1000;
+  const stock = skus.reduce((t,s)=>t+s.stock[S],0)/1000*1.236;     // 棚卸実在庫（ダミー）
+  const pace = (skus.reduce((t,s)=>t+s.end,0)/Math.max(1,E-S))/1000;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi"><div class="t">当日理論在庫（${ymd(DAYS)} 時点）</div><div class="v">${fmt(cur)}千円</div></div>
+    <div class="kpi"><div class="t">直近棚卸（${md(S)}）の実在庫</div><div class="v">${fmt(stock)}千円</div></div>
+    <div class="kpi"><div class="t">棚卸時点の誤差（実 − 理論）</div><div class="v plus">±0千円<small>差なし</small></div></div>
+    <div class="kpi"><div class="t">期間中の在庫増減ペース</div><div class="v ${pace>=0?"plus":"minus"}">${(pace>=0?"+":"−")+fmt(Math.abs(pace))}千円<small>/日</small></div></div>`;
+  document.getElementById("scope").textContent =
+    `対象: 全体（全SKU合計）／ 期間: ${ymd(S)} 〜 ${E===DAYS?"全期間（終了日未指定・グラフのX軸のみ今日まで）":ymd(E)}`;
+}
+
+/* ---------- チップ ---------- */
+function renderChips(){
+  const el=document.getElementById("chips");
+  el.innerHTML=["a","b","c","n"].map(k=>{
+    const n=skus.filter(s=>s.cls===k).length;
+    return `<div class="chip ${k} ${active[k]?"":"off"}" data-k="${k}"><b>${CLS[k].label}</b>${CLS[k].title}<small>${n}品目</small></div>`;
+  }).join("");
+  el.querySelectorAll(".chip").forEach(c=>{
+    c.onclick=()=>{ active[c.dataset.k]=!active[c.dataset.k]; pinned=null; buildChart(); renderLists(); };
+  });
+}
+
+/* ---------- ファンチャート ---------- */
+const GEO={W:1000,H:520,L:88,R:26,T:22,B:42};
+let paths=[], scaleY=null;
+function highlightSet(){
+  const set=new Set();
+  ["a","b","c","n"].forEach(k=>{
+    if(!active[k]) return;
+    skus.map((s,i)=>({s,i})).filter(o=>o.s.cls===k)
+      .sort((p,q)=>Math.abs(q.s.end)-Math.abs(p.s.end)).slice(0,topN).forEach(o=>set.add(o.i));
+  });
+  return set;
+}
+function ticks(){
+  const span=E-S, out=[];
+  const step = span<=7?1 : Math.ceil(span/6);
+  for(let d=0; d<=span; d+=step) out.push(d);
+  if(out[out.length-1]!==span) out.push(span);
+  return out;
+}
+function buildChart(){
+  const {W,H,L,R,T,B}=GEO, plotW=W-L-R, plotH=H-T-B, span=E-S;
+  const list=skus.map((s,i)=>({s,i})).filter(o=>active[o.s.cls]);
+  const val=s=> mode==="amt"?s.cum:s.cumPct;
+  let maxAbs = mode==="amt"?500:10;
+  list.forEach(o=>val(o.s).forEach(v=>{ if(Math.abs(v)>maxAbs) maxAbs=Math.abs(v); }));
+  maxAbs*=1.06;
+  const x=d=>L+d/Math.max(1,span)*plotW, y=v=>T+plotH/2-(v/maxAbs)*(plotH/2);
+  scaleY=y;
+  const unit = mode==="amt"?"円":"％";
+  const hi=highlightSet();
+
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="inherit">`;
+  g+=`<rect x="${L}" y="${T}" width="${plotW}" height="${plotH/2}" fill="#B97F23" opacity="0.05"/>`;
+  g+=`<rect x="${L}" y="${T+plotH/2}" width="${plotW}" height="${plotH/2}" fill="#0F5132" opacity="0.04"/>`;
+  g+=`<text x="${W-R-6}" y="${T+16}" text-anchor="end" font-size="11" font-weight="700" fill="#B97F23">▲ 在庫が積み上がる（滞留）</text>`;
+  g+=`<text x="${W-R-6}" y="${T+plotH-6}" text-anchor="end" font-size="11" font-weight="700" fill="#C0392B">▼ 在庫がどんどん出る（消化が速い）</text>`;
+  ticks().forEach(d=>{
+    if(d>0) g+=`<line x1="${x(d)}" y1="${T}" x2="${x(d)}" y2="${T+plotH}" stroke="#EDEDEB"/>`;
+    g+=`<text x="${x(d)}" y="${H-14}" text-anchor="middle" font-size="11" fill="#6B6B66">${md(S+d)}</text>`;
+  });
+  for(let i=-2;i<=2;i++){
+    const v=maxAbs/2*i;
+    if(i!==0) g+=`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#F4F4F2"/>`;
+    g+=`<text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#6B6B66">${(v>0?"+":"")+fmt(v)}</text>`;
+  }
+  g+=`<line x1="${L}" y1="${y(0)}" x2="${W-R}" y2="${y(0)}" stroke="#1C1C1A" stroke-width="1.5"/>`;
+  g+=`<text x="${L-8}" y="${T-6}" text-anchor="end" font-size="11" fill="#6B6B66">期首基準日からの累積増減(${unit})</text>`;
+
+  const draw=(o,strong)=>{
+    const v=val(o.s); let d="";
+    for(let i=0;i<v.length;i++) d+=(i?"L":"M")+x(i).toFixed(1)+","+y(v[i]).toFixed(1);
+    return `<path class="ln" data-i="${o.i}" d="${d}" fill="none" stroke="${CLS[o.s.cls].color}" stroke-width="${strong?1.9:1}" opacity="${strong?0.9:0.18}" style="cursor:pointer" pointer-events="stroke"/>`;
+  };
+  list.filter(o=>!hi.has(o.i)).forEach(o=> g+=draw(o,false));
+  list.filter(o=> hi.has(o.i)).forEach(o=> g+=draw(o,true));
+  g+=`<g id="focus-layer"></g></svg>`;
+  document.getElementById("chart").innerHTML=g;
+  paths=Array.from(document.querySelectorAll("#chart .ln"));
+
+  const tip=document.getElementById("tip");
+  paths.forEach(p=>{
+    p.addEventListener("mousemove",e=>{
+      const i=+p.dataset.i, s=skus[i];
+      if(pinned===null) setFocus(i);
+      tip.style.display="block"; tip.style.left=(e.clientX+14)+"px"; tip.style.top=(e.clientY+14)+"px";
+      tip.innerHTML=`<b>${s.name}</b>${s.isNew?'<span style="color:#B97F23"> ［期中発生］</span>':''}`
+        +`<br>分類：${CLS[s.cls].label}（${CLS[s.cls].title}）`
+        +`<br>累積増減：${(s.end>0?"+":"")+fmt(s.end)}円`
+        +`<br>1日あたり出庫：${fmt(s.daily)}円/日`
+        +`<br>在庫日数：${fmtDays(s.days)}`
+        +`<br>当日理論在庫：${fmt(s.cur)}円（期間中最大 ${fmt(s.maxStock)}円）`;
+    });
+    p.addEventListener("mouseleave",()=>{ tip.style.display="none"; if(pinned===null) setFocus(null); });
+    p.addEventListener("click",()=>{ const i=+p.dataset.i; pinned=(pinned===i)?null:i; setFocus(pinned); renderLists(); });
+  });
+  setFocus(pinned);
+}
+function setFocus(i){
+  const hi=highlightSet();
+  paths.forEach(p=>{
+    const k=+p.dataset.i, strong=hi.has(k);
+    if(i===null){ p.setAttribute("opacity",strong?0.9:0.18); p.setAttribute("stroke-width",strong?1.9:1); }
+    else if(k===i){ p.setAttribute("opacity",1); p.setAttribute("stroke-width",3.4); p.parentNode.appendChild(p); }
+    else{ p.setAttribute("opacity",0.07); p.setAttribute("stroke-width",1); }
+  });
+  const layer=document.getElementById("focus-layer"); if(!layer) return;
+  layer.innerHTML="";
+  if(i!==null&&scaleY){
+    const s=skus[i], v=mode==="amt"?s.end:s.cumPct[s.cumPct.length-1];
+    const ex=GEO.W-GEO.R, ey=scaleY(v);
+    layer.innerHTML=`<circle cx="${ex}" cy="${ey}" r="4" fill="${CLS[s.cls].color}"/>`
+      +`<text x="${ex-6}" y="${ey-9}" text-anchor="end" font-size="12" font-weight="700" fill="${CLS[s.cls].color}">${s.name}</text>`;
+  }
+}
+function renderLists(){
+  const list=skus.map((s,i)=>({s,i})).filter(o=>active[o.s.cls]);
+  const up=[...list].filter(o=>o.s.end>=0).sort((p,q)=>q.s.end-p.s.end).slice(0,15);
+  const dn=[...list].filter(o=>o.s.end<0).sort((p,q)=>p.s.end-q.s.end).slice(0,15);
+  const row=o=>`<li class="${o.s.cls} ${o.i===pinned?"hl":""}" data-i="${o.i}">
+    <span class="nm"><b>${CLS[o.s.cls].label}</b>${o.s.name}${o.s.isNew?" ◆":""}</span>
+    <span class="v">${(o.s.end>0?"+":"")+fmt(o.s.end)}円</span></li>`;
+  document.getElementById("list-up").innerHTML  = up.map(row).join("")||`<li><span class="nm" style="color:var(--sub)">該当なし</span></li>`;
+  document.getElementById("list-down").innerHTML= dn.map(row).join("")||`<li><span class="nm" style="color:var(--sub)">該当なし</span></li>`;
+  document.querySelectorAll(".side li[data-i]").forEach(li=>{
+    const i=+li.dataset.i;
+    li.onclick=()=>{ pinned=(pinned===i)?null:i; setFocus(pinned); renderLists(); };
+    li.onmouseenter=()=>{ if(pinned===null) setFocus(i); };
+    li.onmouseleave=()=>{ if(pinned===null) setFocus(null); };
+  });
+}
+
+/* ---------- ② 在庫推移（現行グラフ） ---------- */
+let costMode="excel", unitMode="amt";
+function buildTrend(){
+  const W=1000,H=400,L=88,R=26,T=20,B=44, plotW=W-L-R, plotH=H-T-B, span=Math.max(1,E-S);
+  const k=costMode==="excel"?1:0.92, q=unitMode==="qty"?0.011:1;
+  const unit=unitMode==="qty"?"千点":"千円";
+  const total=[]; for(let d=S; d<=E; d++){ let t=0; skus.forEach(s=>t+=s.stock[d]); total.push(t*k*q/1000); }
+  const maxV=Math.max(...total)*1.18, minV=0;
+  const x=d=>L+d/span*plotW, y=v=>T+plotH-(v-minV)/(maxV-minV)*plotH;
+
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="inherit">`;
+  g+=`<rect x="${x(0)}" y="${T}" width="${Math.max(6,x(Math.min(span,1))-x(0))}" height="${plotH}" fill="#B97F23" opacity="0.16"/>`;
+  for(let i=0;i<=2;i++){ const v=maxV/2*i;
+    g+=`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#F0F0EE"/>`;
+    g+=`<text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#6B6B66">${fmt(v)}${unit}</text>`; }
+  let d=""; total.forEach((v,i)=>{ const px=x(i).toFixed(1), py=y(v).toFixed(1); d+= i?`H${px}V${py}`:`M${px},${py}`; });
+  g+=`<path d="${d}V${y(0).toFixed(1)}H${x(0).toFixed(1)}Z" fill="#0F5132" opacity="0.10"/>`;
+  g+=`<path d="${d}" fill="none" stroke="#0F5132" stroke-width="2"/>`;
+  const spot=total[0]*1.236;
+  g+=`<circle cx="${x(0)}" cy="${y(spot)}" r="7" fill="#B97F23"/>`;
+  g+=`<text x="${x(0)+12}" y="${y(spot)-14}" font-size="13" font-weight="700" fill="#B97F23">▼棚卸 ${fmt(spot)}${unit}</text>`;
+  ticks().forEach(dd=> g+=`<text x="${x(dd)}" y="${H-14}" text-anchor="middle" font-size="11" fill="#6B6B66">${md(S+dd)}</text>`);
+  g+=`<text x="${L-8}" y="${T-4}" text-anchor="end" font-size="11" fill="#6B6B66">${unitMode==="qty"?"数量":"金額"}(${unit})</text></svg>`;
+  document.getElementById("chart2").innerHTML=g;
+  document.getElementById("trend-cost").textContent="採用原価: "+(costMode==="excel"?"Excel原価":"SS仕入単価");
+}
+
+/* ---------- 明細テーブル（モック） ---------- */
+function renderTable(){
+  const rows=skus.slice(0,6).map(s=>{
+    const th=Math.round(s.cur/120), ac=Math.round(th*(0.9+rnd()*0.25)), gap=ac-th;
+    return `<tr><td>${s.name}</td>
+      <td class="num">${fmt(s.stock[S]/120)}</td><td class="num">${fmt(s.inflow.slice(S,E).reduce((a,b)=>a+b,0)/120)}</td>
+      <td class="num">${fmt(s.outflow.slice(S,E).reduce((a,b)=>a+b,0)/120)}</td><td class="num">${fmt(th)}</td>
+      <td class="num">${fmt(th)}</td><td class="num">${fmt(ac)}</td>
+      <td class="num ${gap===0?"":"ng"}">${gap>0?"+":""}${fmt(gap)}</td>
+      <td class="num">120</td><td class="num">${fmt(s.cur)}</td><td class="num">${fmt(ac*120)}</td>
+      <td class="${gap===0?"ok":"ng"}">${gap===0?"一致":"要確認"}</td></tr>`;
+  }).join("");
+  document.getElementById("tbody").innerHTML=rows;
+  document.getElementById("checkcnt").textContent=`${skus.length} SKU を点検`;
+  document.getElementById("rowcnt").textContent=`${skus.length}/${skus.length}件`;
+}
+
+/* ---------- 操作 ---------- */
+function refreshAll(){ recompute(); renderKpis(); renderChips(); buildChart(); renderLists(); buildTrend(); renderTable(); }
+
+document.getElementById("startsel").onchange=e=>{ S=+e.target.value; pinned=null; refreshAll(); };
+document.getElementById("enddate").onchange=e=>{
+  if(!e.target.value){ E=DAYS; }
+  else{ const t=new Date(e.target.value); const i=Math.round((t-DATE0)/86400000);
+        E=Math.max(S+1, Math.min(DAYS, i)); }
+  pinned=null; refreshAll();
+};
+document.getElementById("allperiod").onclick=()=>{
+  document.getElementById("enddate").value=""; document.getElementById("startsel").value="0";
+  S=0; E=DAYS; pinned=null; refreshAll();
+};
+document.querySelectorAll("#gtabs button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#gtabs button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
+    document.getElementById("view-"+b.dataset.v).classList.add("on");
+    const trend=b.dataset.v==="trend";
+    document.getElementById("tg-cost").classList.toggle("dim",!trend);
+    document.getElementById("tg-unit").classList.toggle("dim",!trend);
+    if(trend) buildTrend();
+  };
+});
+document.querySelectorAll("#tg-mode button").forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll("#tg-mode button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); mode=b.dataset.v; buildChart(); };
+});
+document.querySelectorAll("#tg-cost button").forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll("#tg-cost button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); costMode=b.dataset.v; buildTrend(); };
+});
+document.querySelectorAll("#tg-unit button").forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll("#tg-unit button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); unitMode=b.dataset.v; buildTrend(); };
+});
+document.getElementById("topn").onchange=e=>{ topN=+e.target.value; buildChart(); };
+
+refreshAll();
+document.getElementById("tg-cost").classList.add("dim");
+document.getElementById("tg-unit").classList.add("dim");
+</script>
+</body>
+</html>
